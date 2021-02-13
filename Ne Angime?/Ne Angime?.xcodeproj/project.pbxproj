@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 51;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -12,12 +12,20 @@
 		46374A231AF0F9A343EFE6F0 /* Pods_Ne_Angime_Tests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B396BD6E97E88CBF868504E8 /* Pods_Ne_Angime_Tests.framework */; };
 		873CE19825D7A85E0007E066 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 873CE19725D7A85E0007E066 /* AppDelegate.swift */; };
 		873CE19A25D7A85E0007E066 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 873CE19925D7A85E0007E066 /* SceneDelegate.swift */; };
-		873CE19C25D7A85E0007E066 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 873CE19B25D7A85E0007E066 /* ViewController.swift */; };
+		873CE19C25D7A85E0007E066 /* TabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 873CE19B25D7A85E0007E066 /* TabBarController.swift */; };
 		873CE19F25D7A85E0007E066 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 873CE19D25D7A85E0007E066 /* Main.storyboard */; };
 		873CE1A125D7A85F0007E066 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 873CE1A025D7A85F0007E066 /* Assets.xcassets */; };
 		873CE1A425D7A85F0007E066 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 873CE1A225D7A85F0007E066 /* LaunchScreen.storyboard */; };
 		873CE1AF25D7A85F0007E066 /* Ne_Angime_Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 873CE1AE25D7A85F0007E066 /* Ne_Angime_Tests.swift */; };
 		873CE1BA25D7A85F0007E066 /* Ne_Angime_UITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 873CE1B925D7A85F0007E066 /* Ne_Angime_UITests.swift */; };
+		879A7F1825D7BFBD00C70171 /* ConversationsCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 879A7F1725D7BFBD00C70171 /* ConversationsCollectionViewCell.swift */; };
+		879A7F1E25D7CB0E00C70171 /* UIColor+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 879A7F1D25D7CB0E00C70171 /* UIColor+Extensions.swift */; };
+		879A7F2625D7DD5500C70171 /* FriendsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 879A7F2525D7DD5500C70171 /* FriendsViewController.swift */; };
+		879A7F2E25D7EC3400C70171 /* FriendsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 879A7F2D25D7EC3400C70171 /* FriendsViewModel.swift */; };
+		879A7F3425D7ECCB00C70171 /* FriendsCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 879A7F3325D7ECCB00C70171 /* FriendsCollectionViewCell.swift */; };
+		879A7F4525D7EF7E00C70171 /* FindViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 879A7F4425D7EF7E00C70171 /* FindViewController.swift */; };
+		87DC193025D7B0FD00C67EB4 /* ConversationsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87DC192F25D7B0FD00C67EB4 /* ConversationsViewController.swift */; };
+		87DC194425D7B4CC00C67EB4 /* ConversationsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87DC194325D7B4CC00C67EB4 /* ConversationsViewModel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -44,7 +52,7 @@
 		873CE19425D7A85E0007E066 /* Ne Angime?.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Ne Angime?.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		873CE19725D7A85E0007E066 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		873CE19925D7A85E0007E066 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
-		873CE19B25D7A85E0007E066 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		873CE19B25D7A85E0007E066 /* TabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarController.swift; sourceTree = "<group>"; };
 		873CE19E25D7A85E0007E066 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		873CE1A025D7A85F0007E066 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		873CE1A325D7A85F0007E066 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -55,6 +63,14 @@
 		873CE1B525D7A85F0007E066 /* Ne Angime?UITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Ne Angime?UITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		873CE1B925D7A85F0007E066 /* Ne_Angime_UITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Ne_Angime_UITests.swift; sourceTree = "<group>"; };
 		873CE1BB25D7A85F0007E066 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		879A7F1725D7BFBD00C70171 /* ConversationsCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationsCollectionViewCell.swift; sourceTree = "<group>"; };
+		879A7F1D25D7CB0E00C70171 /* UIColor+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor+Extensions.swift"; sourceTree = "<group>"; };
+		879A7F2525D7DD5500C70171 /* FriendsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FriendsViewController.swift; sourceTree = "<group>"; };
+		879A7F2D25D7EC3400C70171 /* FriendsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FriendsViewModel.swift; sourceTree = "<group>"; };
+		879A7F3325D7ECCB00C70171 /* FriendsCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FriendsCollectionViewCell.swift; sourceTree = "<group>"; };
+		879A7F4425D7EF7E00C70171 /* FindViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FindViewController.swift; sourceTree = "<group>"; };
+		87DC192F25D7B0FD00C67EB4 /* ConversationsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationsViewController.swift; sourceTree = "<group>"; };
+		87DC194325D7B4CC00C67EB4 /* ConversationsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationsViewModel.swift; sourceTree = "<group>"; };
 		A8D45F3542CC0CA1A385586F /* Pods-Ne Angime?-Ne Angime?UITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Ne Angime?-Ne Angime?UITests.release.xcconfig"; path = "Target Support Files/Pods-Ne Angime?-Ne Angime?UITests/Pods-Ne Angime?-Ne Angime?UITests.release.xcconfig"; sourceTree = "<group>"; };
 		B396BD6E97E88CBF868504E8 /* Pods_Ne_Angime_Tests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Ne_Angime_Tests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B67827AEF373D204B17B7813 /* Pods-Ne Angime?Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Ne Angime?Tests.debug.xcconfig"; path = "Target Support Files/Pods-Ne Angime?Tests/Pods-Ne Angime?Tests.debug.xcconfig"; sourceTree = "<group>"; };
@@ -101,7 +117,6 @@
 				B67827AEF373D204B17B7813 /* Pods-Ne Angime?Tests.debug.xcconfig */,
 				BC954D28220E3E17F873F45B /* Pods-Ne Angime?Tests.release.xcconfig */,
 			);
-			name = Pods;
 			path = Pods;
 			sourceTree = "<group>";
 		};
@@ -132,11 +147,12 @@
 			children = (
 				873CE19725D7A85E0007E066 /* AppDelegate.swift */,
 				873CE19925D7A85E0007E066 /* SceneDelegate.swift */,
-				873CE19B25D7A85E0007E066 /* ViewController.swift */,
+				87DC192A25D7AFDA00C67EB4 /* Tab Bar */,
 				873CE19D25D7A85E0007E066 /* Main.storyboard */,
 				873CE1A025D7A85F0007E066 /* Assets.xcassets */,
 				873CE1A225D7A85F0007E066 /* LaunchScreen.storyboard */,
 				873CE1A525D7A85F0007E066 /* Info.plist */,
+				879A7F1C25D7CAFC00C70171 /* Extensions */,
 			);
 			path = "Ne Angime?";
 			sourceTree = "<group>";
@@ -157,6 +173,101 @@
 				873CE1BB25D7A85F0007E066 /* Info.plist */,
 			);
 			path = "Ne Angime?UITests";
+			sourceTree = "<group>";
+		};
+		879A7F1C25D7CAFC00C70171 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				879A7F1D25D7CB0E00C70171 /* UIColor+Extensions.swift */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
+		879A7F2225D7DD3200C70171 /* Friends */ = {
+			isa = PBXGroup;
+			children = (
+				879A7F2325D7DD4000C70171 /* View Model */,
+				879A7F2425D7DD4700C70171 /* View */,
+			);
+			path = Friends;
+			sourceTree = "<group>";
+		};
+		879A7F2325D7DD4000C70171 /* View Model */ = {
+			isa = PBXGroup;
+			children = (
+				879A7F2D25D7EC3400C70171 /* FriendsViewModel.swift */,
+			);
+			path = "View Model";
+			sourceTree = "<group>";
+		};
+		879A7F2425D7DD4700C70171 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				879A7F2525D7DD5500C70171 /* FriendsViewController.swift */,
+				879A7F3325D7ECCB00C70171 /* FriendsCollectionViewCell.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		879A7F4125D7EF5C00C70171 /* Find */ = {
+			isa = PBXGroup;
+			children = (
+				879A7F4325D7EF7200C70171 /* View Model */,
+				879A7F4225D7EF6300C70171 /* View */,
+			);
+			path = Find;
+			sourceTree = "<group>";
+		};
+		879A7F4225D7EF6300C70171 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				879A7F4425D7EF7E00C70171 /* FindViewController.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		879A7F4325D7EF7200C70171 /* View Model */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = "View Model";
+			sourceTree = "<group>";
+		};
+		87DC192A25D7AFDA00C67EB4 /* Tab Bar */ = {
+			isa = PBXGroup;
+			children = (
+				873CE19B25D7A85E0007E066 /* TabBarController.swift */,
+				879A7F4125D7EF5C00C70171 /* Find */,
+				879A7F2225D7DD3200C70171 /* Friends */,
+				87DC192E25D7B09200C67EB4 /* Conversations */,
+			);
+			path = "Tab Bar";
+			sourceTree = "<group>";
+		};
+		87DC192E25D7B09200C67EB4 /* Conversations */ = {
+			isa = PBXGroup;
+			children = (
+				87DC194225D7B4B800C67EB4 /* View Model */,
+				87DC194025D7B49F00C67EB4 /* View */,
+			);
+			path = Conversations;
+			sourceTree = "<group>";
+		};
+		87DC194025D7B49F00C67EB4 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				87DC192F25D7B0FD00C67EB4 /* ConversationsViewController.swift */,
+				879A7F1725D7BFBD00C70171 /* ConversationsCollectionViewCell.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		87DC194225D7B4B800C67EB4 /* View Model */ = {
+			isa = PBXGroup;
+			children = (
+				87DC194325D7B4CC00C67EB4 /* ConversationsViewModel.swift */,
+			);
+			path = "View Model";
 			sourceTree = "<group>";
 		};
 		B23486C606523DAA95CDC6C4 /* Frameworks */ = {
@@ -407,9 +518,17 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				873CE19C25D7A85E0007E066 /* ViewController.swift in Sources */,
+				879A7F2625D7DD5500C70171 /* FriendsViewController.swift in Sources */,
+				873CE19C25D7A85E0007E066 /* TabBarController.swift in Sources */,
+				879A7F3425D7ECCB00C70171 /* FriendsCollectionViewCell.swift in Sources */,
+				879A7F1825D7BFBD00C70171 /* ConversationsCollectionViewCell.swift in Sources */,
+				87DC194425D7B4CC00C67EB4 /* ConversationsViewModel.swift in Sources */,
 				873CE19825D7A85E0007E066 /* AppDelegate.swift in Sources */,
+				879A7F1E25D7CB0E00C70171 /* UIColor+Extensions.swift in Sources */,
+				879A7F4525D7EF7E00C70171 /* FindViewController.swift in Sources */,
+				87DC193025D7B0FD00C67EB4 /* ConversationsViewController.swift in Sources */,
 				873CE19A25D7A85E0007E066 /* SceneDelegate.swift in Sources */,
+				879A7F2E25D7EC3400C70171 /* FriendsViewModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
