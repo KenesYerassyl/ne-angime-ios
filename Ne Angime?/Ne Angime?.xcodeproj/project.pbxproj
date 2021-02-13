@@ -10,6 +10,7 @@
 		184E359CD16985D403668897 /* Pods_Ne_Angime__Ne_Angime_UITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 22ACDC3173C71910B96C2F01 /* Pods_Ne_Angime__Ne_Angime_UITests.framework */; };
 		2A079019245B50100D16AD61 /* Pods_Ne_Angime_.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FFCDB66AF8DB440C2C33093A /* Pods_Ne_Angime_.framework */; };
 		46374A231AF0F9A343EFE6F0 /* Pods_Ne_Angime_Tests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B396BD6E97E88CBF868504E8 /* Pods_Ne_Angime_Tests.framework */; };
+		87131FD825D849B700FE342A /* UITextField+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87131FD725D849B700FE342A /* UITextField+Extension.swift */; };
 		873CE19825D7A85E0007E066 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 873CE19725D7A85E0007E066 /* AppDelegate.swift */; };
 		873CE19A25D7A85E0007E066 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 873CE19925D7A85E0007E066 /* SceneDelegate.swift */; };
 		873CE19C25D7A85E0007E066 /* TabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 873CE19B25D7A85E0007E066 /* TabBarController.swift */; };
@@ -24,6 +25,8 @@
 		879A7F2E25D7EC3400C70171 /* FriendsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 879A7F2D25D7EC3400C70171 /* FriendsViewModel.swift */; };
 		879A7F3425D7ECCB00C70171 /* FriendsCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 879A7F3325D7ECCB00C70171 /* FriendsCollectionViewCell.swift */; };
 		879A7F4525D7EF7E00C70171 /* FindViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 879A7F4425D7EF7E00C70171 /* FindViewController.swift */; };
+		879A7F5125D82B2E00C70171 /* SignInViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 879A7F5025D82B2E00C70171 /* SignInViewController.swift */; };
+		879A7F5625D82CDE00C70171 /* SignInViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 879A7F5525D82CDE00C70171 /* SignInViewModel.swift */; };
 		87DC193025D7B0FD00C67EB4 /* ConversationsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87DC192F25D7B0FD00C67EB4 /* ConversationsViewController.swift */; };
 		87DC194425D7B4CC00C67EB4 /* ConversationsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87DC194325D7B4CC00C67EB4 /* ConversationsViewModel.swift */; };
 /* End PBXBuildFile section */
@@ -49,6 +52,7 @@
 		155414FA4BF097D262C7CD5F /* Pods-Ne Angime?.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Ne Angime?.release.xcconfig"; path = "Target Support Files/Pods-Ne Angime?/Pods-Ne Angime?.release.xcconfig"; sourceTree = "<group>"; };
 		22ACDC3173C71910B96C2F01 /* Pods_Ne_Angime__Ne_Angime_UITests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Ne_Angime__Ne_Angime_UITests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		3625DC80AF09459E7F84F67E /* Pods-Ne Angime?.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Ne Angime?.debug.xcconfig"; path = "Target Support Files/Pods-Ne Angime?/Pods-Ne Angime?.debug.xcconfig"; sourceTree = "<group>"; };
+		87131FD725D849B700FE342A /* UITextField+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UITextField+Extension.swift"; sourceTree = "<group>"; };
 		873CE19425D7A85E0007E066 /* Ne Angime?.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Ne Angime?.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		873CE19725D7A85E0007E066 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		873CE19925D7A85E0007E066 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -69,6 +73,8 @@
 		879A7F2D25D7EC3400C70171 /* FriendsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FriendsViewModel.swift; sourceTree = "<group>"; };
 		879A7F3325D7ECCB00C70171 /* FriendsCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FriendsCollectionViewCell.swift; sourceTree = "<group>"; };
 		879A7F4425D7EF7E00C70171 /* FindViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FindViewController.swift; sourceTree = "<group>"; };
+		879A7F5025D82B2E00C70171 /* SignInViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignInViewController.swift; sourceTree = "<group>"; };
+		879A7F5525D82CDE00C70171 /* SignInViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignInViewModel.swift; sourceTree = "<group>"; };
 		87DC192F25D7B0FD00C67EB4 /* ConversationsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationsViewController.swift; sourceTree = "<group>"; };
 		87DC194325D7B4CC00C67EB4 /* ConversationsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationsViewModel.swift; sourceTree = "<group>"; };
 		A8D45F3542CC0CA1A385586F /* Pods-Ne Angime?-Ne Angime?UITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Ne Angime?-Ne Angime?UITests.release.xcconfig"; path = "Target Support Files/Pods-Ne Angime?-Ne Angime?UITests/Pods-Ne Angime?-Ne Angime?UITests.release.xcconfig"; sourceTree = "<group>"; };
@@ -147,6 +153,7 @@
 			children = (
 				873CE19725D7A85E0007E066 /* AppDelegate.swift */,
 				873CE19925D7A85E0007E066 /* SceneDelegate.swift */,
+				879A7F4925D8281800C70171 /* Sign Up & Sign In */,
 				87DC192A25D7AFDA00C67EB4 /* Tab Bar */,
 				873CE19D25D7A85E0007E066 /* Main.storyboard */,
 				873CE1A025D7A85F0007E066 /* Assets.xcassets */,
@@ -179,6 +186,7 @@
 			isa = PBXGroup;
 			children = (
 				879A7F1D25D7CB0E00C70171 /* UIColor+Extensions.swift */,
+				87131FD725D849B700FE342A /* UITextField+Extension.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -227,6 +235,63 @@
 			sourceTree = "<group>";
 		};
 		879A7F4325D7EF7200C70171 /* View Model */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = "View Model";
+			sourceTree = "<group>";
+		};
+		879A7F4925D8281800C70171 /* Sign Up & Sign In */ = {
+			isa = PBXGroup;
+			children = (
+				879A7F4D25D82A3000C70171 /* Sign Up */,
+				879A7F4A25D8286500C70171 /* Sign In */,
+			);
+			path = "Sign Up & Sign In";
+			sourceTree = "<group>";
+		};
+		879A7F4A25D8286500C70171 /* Sign In */ = {
+			isa = PBXGroup;
+			children = (
+				879A7F4C25D8287900C70171 /* View Model */,
+				879A7F4B25D8287200C70171 /* View */,
+			);
+			path = "Sign In";
+			sourceTree = "<group>";
+		};
+		879A7F4B25D8287200C70171 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				879A7F5025D82B2E00C70171 /* SignInViewController.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		879A7F4C25D8287900C70171 /* View Model */ = {
+			isa = PBXGroup;
+			children = (
+				879A7F5525D82CDE00C70171 /* SignInViewModel.swift */,
+			);
+			path = "View Model";
+			sourceTree = "<group>";
+		};
+		879A7F4D25D82A3000C70171 /* Sign Up */ = {
+			isa = PBXGroup;
+			children = (
+				879A7F4F25D82AA400C70171 /* View Model */,
+				879A7F4E25D82A9E00C70171 /* View */,
+			);
+			path = "Sign Up";
+			sourceTree = "<group>";
+		};
+		879A7F4E25D82A9E00C70171 /* View */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		879A7F4F25D82AA400C70171 /* View Model */ = {
 			isa = PBXGroup;
 			children = (
 			);
@@ -519,12 +584,15 @@
 			buildActionMask = 2147483647;
 			files = (
 				879A7F2625D7DD5500C70171 /* FriendsViewController.swift in Sources */,
+				879A7F5625D82CDE00C70171 /* SignInViewModel.swift in Sources */,
 				873CE19C25D7A85E0007E066 /* TabBarController.swift in Sources */,
 				879A7F3425D7ECCB00C70171 /* FriendsCollectionViewCell.swift in Sources */,
 				879A7F1825D7BFBD00C70171 /* ConversationsCollectionViewCell.swift in Sources */,
 				87DC194425D7B4CC00C67EB4 /* ConversationsViewModel.swift in Sources */,
 				873CE19825D7A85E0007E066 /* AppDelegate.swift in Sources */,
+				879A7F5125D82B2E00C70171 /* SignInViewController.swift in Sources */,
 				879A7F1E25D7CB0E00C70171 /* UIColor+Extensions.swift in Sources */,
+				87131FD825D849B700FE342A /* UITextField+Extension.swift in Sources */,
 				879A7F4525D7EF7E00C70171 /* FindViewController.swift in Sources */,
 				87DC193025D7B0FD00C67EB4 /* ConversationsViewController.swift in Sources */,
 				873CE19A25D7A85E0007E066 /* SceneDelegate.swift in Sources */,

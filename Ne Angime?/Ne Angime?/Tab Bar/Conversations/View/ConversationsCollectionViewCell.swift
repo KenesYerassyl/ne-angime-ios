@@ -10,16 +10,8 @@ import UIKit
 class ConversationsCollectionViewCell: UICollectionViewCell {
     static let id = "ConversationsCollectionViewCell"
     var userImageView = UIImageView()
-    var userNameLabel: UILabel = {
-        var temp = UILabel()
-        temp.font = UIFont(name: "Avenir", size: 20)
-        return temp
-    }()
-    var userMessageLabel: UILabel = {
-        var temp = UILabel()
-        temp.font = UIFont(name: "Avenir", size: 15)
-        return temp
-    }()
+    var userNameLabel = UILabel()
+    var userMessageLabel = UILabel()
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -48,6 +40,7 @@ class ConversationsCollectionViewCell: UICollectionViewCell {
     
     func updateUserNameLabel() {
         contentView.addSubview(userNameLabel)
+        userNameLabel.font = UIFont(name: "Avenir", size: 20)
         userNameLabel.snp.makeConstraints { make in
             make.height.equalTo(contentView.bounds.height * 0.3);
             make.leading.equalTo(userImageView.snp.trailing).offset(contentView.bounds.height * 0.3 * 0.5)
@@ -58,6 +51,7 @@ class ConversationsCollectionViewCell: UICollectionViewCell {
     
     func updateUserMessageLabel() {
         contentView.addSubview(userMessageLabel)
+        userMessageLabel.font = UIFont(name: "Avenir", size: 15)
         userMessageLabel.textColor = .systemGray
         userMessageLabel.snp.makeConstraints { make in
             make.height.equalTo(contentView.bounds.height * 0.3);

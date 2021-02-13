@@ -9,11 +9,7 @@ import SnapKit
 
 class ConversationsViewController: UIViewController {
     private let conversationsViewModel = ConversationsViewModel()
-    private let titleLabel: UILabel = {
-        var temp = UILabel()
-        temp.font = UIFont(name: "Avenir Black", size: 35)
-        return temp
-    }()
+    private let titleLabel = UILabel()
     private lazy var collectionViewFlowLayout: UICollectionViewFlowLayout = {
         var temp = UICollectionViewFlowLayout()
         temp.minimumLineSpacing = 12
@@ -54,6 +50,7 @@ class ConversationsViewController: UIViewController {
     
     func configureTitleLabel() {
         view.addSubview(titleLabel)
+        titleLabel.font = UIFont(name: "Avenir Black", size: 35)
         titleLabel.snp.makeConstraints { make in
             make.centerX.equalTo(view)
             make.width.equalTo(UIScreen.main.bounds.width*0.9)
