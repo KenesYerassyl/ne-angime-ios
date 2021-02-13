@@ -1,0 +1,21 @@
+platform :ios, '13.0'
+
+target 'Ne Angime?' do
+
+  use_frameworks!
+
+pod 'SnapKit', '~> 5.0.0'
+pod 'MessageKit'
+
+  # Pods for Ne Angime?
+
+  target 'Ne Angime?Tests' do
+    inherit! :search_paths
+    # Pods for testing
+  end
+
+  target 'Ne Angime?UITests' do
+    # Pods for testing
+  end
+
+end

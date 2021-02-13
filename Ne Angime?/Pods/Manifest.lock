@@ -1,0 +1,26 @@
+PODS:
+  - InputBarAccessoryView (5.2.0):
+    - InputBarAccessoryView/Core (= 5.2.0)
+  - InputBarAccessoryView/Core (5.2.0)
+  - MessageKit (3.4.1):
+    - InputBarAccessoryView (~> 5.2.0)
+  - SnapKit (5.0.1)
+
+DEPENDENCIES:
+  - MessageKit
+  - SnapKit (~> 5.0.0)
+
+SPEC REPOS:
+  trunk:
+    - InputBarAccessoryView
+    - MessageKit
+    - SnapKit
+
+SPEC CHECKSUMS:
+  InputBarAccessoryView: ac1bc2a11508fc2490c2322beb1d4c9f05c8e634
+  MessageKit: aa047ad093f022189ed5a0d1cea04fc59f064c93
+  SnapKit: 97b92857e3df3a0c71833cce143274bf6ef8e5eb
+
+PODFILE CHECKSUM: b36d6e682233c9486c1cf6af889f3b35aa090323
+
+COCOAPODS: 1.9.3
