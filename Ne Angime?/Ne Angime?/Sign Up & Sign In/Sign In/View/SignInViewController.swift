@@ -9,23 +9,31 @@ import UIKit
 
 class SignInViewController: UIViewController {
     
+    private let signInViewModel = SignInViewModel()
     private let spacing = 24.0
-    private var fieldsView = UIView()
-    private var welcomeLabel = UILabel()
-    private var emailTextField = UITextField()
-    private var passwordTextField = UITextField()
-    private var signInButton = UIButton()
-    private var signUpLabel = UILabel()
+    private let fieldsView = UIView()
+    private let welcomeLabel = UILabel()
+    private let userNameTextField = UITextField()
+    private let passwordTextField = UITextField()
+    private let signInButton = UIButton()
+    private let signUpLabel = UILabel()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = UIColor(hex: "#30289f")
+        signInViewModel.delegate = self
+        
         updateFieldsView()
         updateWelcomeLabel()
-        updateEmailTextField()
+        updateUserNameTextField()
         updatePasswordTextField()
         updateSignInButton()
         updateSignUpLabel()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.setNavigationBarHidden(true, animated: false)
     }
     
     func updateFieldsView() {
@@ -50,21 +58,21 @@ class SignInViewController: UIViewController {
         }
     }
     
-    func updateEmailTextField() {
-        view.addSubview(emailTextField)
-        emailTextField.snp.makeConstraints { make in
+    func updateUserNameTextField() {
+        view.addSubview(userNameTextField)
+        userNameTextField.snp.makeConstraints { make in
             make.height.equalTo(view.bounds.height * 0.09)
             make.centerX.equalTo(view)
             make.width.equalTo(view.bounds.width * 0.85)
             make.top.equalTo(welcomeLabel.snp.bottom).offset(spacing*2)
         }
-        emailTextField.layer.cornerRadius = 20
-        emailTextField.layer.borderWidth = 3
-        emailTextField.layer.borderColor = UIColor.systemGray5.cgColor
-        emailTextField.setRightPaddingPoints(view.bounds.width * 0.08)
-        emailTextField.setLeftPaddingPoints(view.bounds.width * 0.08)
-        emailTextField.font = UIFont(name: "Avenir", size: 20)
-        emailTextField.placeholder = "Insert your email"
+        userNameTextField.layer.cornerRadius = 20
+        userNameTextField.layer.borderWidth = 3
+        userNameTextField.layer.borderColor = UIColor.systemGray5.cgColor
+        userNameTextField.setRightPaddingPoints(view.bounds.width * 0.08)
+        userNameTextField.setLeftPaddingPoints(view.bounds.width * 0.08)
+        userNameTextField.font = UIFont(name: "Avenir", size: 20)
+        userNameTextField.placeholder = "Insert your username"
     }
     
     func updatePasswordTextField() {
@@ -73,7 +81,7 @@ class SignInViewController: UIViewController {
             make.height.equalTo(view.bounds.height * 0.09)
             make.centerX.equalTo(view)
             make.width.equalTo(view.bounds.width * 0.85)
-            make.top.equalTo(emailTextField.snp.bottom).offset(spacing)
+            make.top.equalTo(userNameTextField.snp.bottom).offset(spacing)
         }
         passwordTextField.layer.cornerRadius = 20
         passwordTextField.layer.borderWidth = 3
@@ -82,6 +90,7 @@ class SignInViewController: UIViewController {
         passwordTextField.setLeftPaddingPoints(view.bounds.width * 0.08)
         passwordTextField.font = UIFont(name: "Avenir", size: 20)
         passwordTextField.placeholder = "Insert your password"
+        passwordTextField.isSecureTextEntry = true
     }
     
     func updateSignInButton() {
@@ -96,6 +105,7 @@ class SignInViewController: UIViewController {
         signInButton.layer.cornerRadius = 20
         signInButton.setTitle("SIGN IN", for: .normal)
         signInButton.titleLabel?.font = UIFont(name: "Avenir Heavy", size: 20)
+        signInButton.addTarget(self, action: #selector(didTapSignInButton), for: .touchUpInside)
     }
     
     func updateSignUpLabel() {
@@ -115,5 +125,28 @@ class SignInViewController: UIViewController {
             make.leading.equalTo(customTextLabel.snp.trailing).offset(5)
         }
         signUpLabel.textColor = UIColor(hex: "#30289f")
+        signUpLabel.isUserInteractionEnabled = true
+        let tap = UITapGestureRecognizer(target: self, action: #selector(didTapSignUpLabel))
+        signUpLabel.addGestureRecognizer(tap)
     }
+}
+
+extension SignInViewController {
+    @objc func didTapSignInButton() {
+        guard let username = userNameTextField.text?.trimmingCharacters(in: .whitespacesAndNewlines),
+              let password = passwordTextField.text?.trimmingCharacters(in: .whitespacesAndNewlines)
+        else {
+            //TODO: show error –> i.e not all fields are filled
+            return
+        }
+        signInViewModel.signIn(username: username, password: password)
+    }
+    
+    @objc func didTapSignUpLabel() {
+        navigationController?.pushViewController(SignUpViewController1(), animated: true)
+    }
+}
+
+extension SignInViewController: SignInViewModelDelegate {
+    
 }
