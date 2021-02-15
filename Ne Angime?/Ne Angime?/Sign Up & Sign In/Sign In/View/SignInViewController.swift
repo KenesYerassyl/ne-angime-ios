@@ -133,11 +133,13 @@ class SignInViewController: UIViewController {
 
 extension SignInViewController {
     @objc func didTapSignInButton() {
+        print("CLICK")
         guard let username = userNameTextField.text?.trimmingCharacters(in: .whitespacesAndNewlines),
               let password = passwordTextField.text?.trimmingCharacters(in: .whitespacesAndNewlines)
         else {
             return
         }
+        view.isUserInteractionEnabled = false
         signInViewModel.signIn(username: username, password: password)
     }
     
@@ -155,5 +157,10 @@ extension SignInViewController: SignInViewModelDelegate {
         )
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
         present(alert, animated: true, completion: nil)
+    }
+    
+    func goToMainPage() {
+        navigationController?.dismiss(animated: true)
+        view.isUserInteractionEnabled = true
     }
 }

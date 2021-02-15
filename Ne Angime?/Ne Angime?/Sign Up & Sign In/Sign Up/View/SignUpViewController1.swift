@@ -9,6 +9,7 @@ import UIKit
 
 class SignUpViewController1: UIViewController {
     
+    private let signUpViewModel1 = SignUpViewModel1()
     private let spacing = 24.0
     private var fieldsView = UIView()
     private var welcomeLabel = UILabel()
@@ -16,6 +17,7 @@ class SignUpViewController1: UIViewController {
     private var lastNameTextField = UITextField()
     private var userNameTextField = UITextField()
     private var nextButton = UIButton()
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -26,6 +28,8 @@ class SignUpViewController1: UIViewController {
         updateLastNameTextField()
         updateUserNameTextField()
         updateNextButton()
+        
+        signUpViewModel1.delegate = self
     }
     
     func updateFieldsView() {
@@ -119,17 +123,33 @@ class SignUpViewController1: UIViewController {
 
 extension SignUpViewController1 {
     @objc func didTapNextButton() {
+        view.isUserInteractionEnabled = false
         guard let firstName = firstNameTextField.text?.trimmingCharacters(in: .whitespacesAndNewlines),
               let lastName = lastNameTextField.text?.trimmingCharacters(in: .whitespacesAndNewlines),
               let userName = userNameTextField.text?.trimmingCharacters(in: .whitespacesAndNewlines)
         else {
-            //TODO: show some error: i.g fields are not correct or not filled
             return
         }
+        signUpViewModel1.signUpStage1(username: userName, firstname: firstName, lastname: lastName)
+    }
+}
+
+extension SignUpViewController1: SignUpViewModelDelegate1 {
+    func goToNextStage(username: String, firstname: String, lastname: String) {
         navigationController?.pushViewController(SignUpViewController2(
-                                                    firstName: firstName,
-                                                    lastName: lastName,
-                                                    userName: userName),
+                                                    firstName: firstname,
+                                                    lastName: lastname,
+                                                    userName: username),
                                                     animated: true)
+        view.isUserInteractionEnabled = true
+    }
+    func showErrorAlert(title: String, message: String) {
+        let alert = UIAlertController(
+            title: title,
+            message: message,
+            preferredStyle: .alert
+        )
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+        present(alert, animated: true, completion: nil)
     }
 }

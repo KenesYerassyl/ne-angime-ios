@@ -32,7 +32,7 @@
 		87DC194425D7B4CC00C67EB4 /* ConversationsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87DC194325D7B4CC00C67EB4 /* ConversationsViewModel.swift */; };
 		87EE868225D9031F00F89605 /* SignUpViewController1.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87EE868125D9031F00F89605 /* SignUpViewController1.swift */; };
 		87EE868725D9070F00F89605 /* SignUpViewController2.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87EE868625D9070F00F89605 /* SignUpViewController2.swift */; };
-		87EE868C25D9476D00F89605 /* SignUpViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87EE868B25D9476D00F89605 /* SignUpViewModel.swift */; };
+		87EE868C25D9476D00F89605 /* SignUpViewModel1.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87EE868B25D9476D00F89605 /* SignUpViewModel1.swift */; };
 		87EE869125D973EB00F89605 /* SignUpViewModel2.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87EE869025D973EB00F89605 /* SignUpViewModel2.swift */; };
 /* End PBXBuildFile section */
 
@@ -85,7 +85,7 @@
 		87DC194325D7B4CC00C67EB4 /* ConversationsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationsViewModel.swift; sourceTree = "<group>"; };
 		87EE868125D9031F00F89605 /* SignUpViewController1.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignUpViewController1.swift; sourceTree = "<group>"; };
 		87EE868625D9070F00F89605 /* SignUpViewController2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignUpViewController2.swift; sourceTree = "<group>"; };
-		87EE868B25D9476D00F89605 /* SignUpViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignUpViewModel.swift; sourceTree = "<group>"; };
+		87EE868B25D9476D00F89605 /* SignUpViewModel1.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignUpViewModel1.swift; sourceTree = "<group>"; };
 		87EE869025D973EB00F89605 /* SignUpViewModel2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignUpViewModel2.swift; sourceTree = "<group>"; };
 		A8D45F3542CC0CA1A385586F /* Pods-Ne Angime?-Ne Angime?UITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Ne Angime?-Ne Angime?UITests.release.xcconfig"; path = "Target Support Files/Pods-Ne Angime?-Ne Angime?UITests/Pods-Ne Angime?-Ne Angime?UITests.release.xcconfig"; sourceTree = "<group>"; };
 		B396BD6E97E88CBF868504E8 /* Pods_Ne_Angime_Tests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Ne_Angime_Tests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -315,7 +315,7 @@
 		879A7F4F25D82AA400C70171 /* View Model */ = {
 			isa = PBXGroup;
 			children = (
-				87EE868B25D9476D00F89605 /* SignUpViewModel.swift */,
+				87EE868B25D9476D00F89605 /* SignUpViewModel1.swift */,
 				87EE869025D973EB00F89605 /* SignUpViewModel2.swift */,
 			);
 			path = "View Model";
@@ -607,7 +607,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				879A7F2625D7DD5500C70171 /* FriendsViewController.swift in Sources */,
-				87EE868C25D9476D00F89605 /* SignUpViewModel.swift in Sources */,
+				87EE868C25D9476D00F89605 /* SignUpViewModel1.swift in Sources */,
 				879A7F5625D82CDE00C70171 /* SignInViewModel.swift in Sources */,
 				873CE19C25D7A85E0007E066 /* TabBarController.swift in Sources */,
 				879A7F3425D7ECCB00C70171 /* FriendsCollectionViewCell.swift in Sources */,

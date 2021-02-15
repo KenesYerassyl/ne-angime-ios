@@ -20,10 +20,16 @@ class TabBarController: UITabBarController {
         friendsViewController.tabBarItem = UITabBarItem(tabBarSystemItem: .contacts, tag: 2)
         findViewController.tabBarItem = UITabBarItem(tabBarSystemItem: .search, tag: 3)
         viewControllers = [conversationsViewController, friendsViewController, findViewController]
+        
+        navigationItem.leftBarButtonItem = UIBarButtonItem(
+            barButtonSystemItem: .done,
+            target: self,
+            action: #selector(signOut)
+        )
     }
-
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
         if UserDefaults.standard.string(forKey: "username") == nil {
             let navigationController = UINavigationController(rootViewController: SignInViewController())
             navigationController.modalPresentationStyle = .fullScreen
@@ -32,3 +38,14 @@ class TabBarController: UITabBarController {
     }
 }
 
+extension TabBarController {
+    @objc func signOut() {
+        UserDefaults.standard.removeObject(forKey: "username")
+        UserDefaults.standard.removeObject(forKey: "firstname")
+        UserDefaults.standard.removeObject(forKey: "lastname")
+        UserDefaults.standard.removeObject(forKey: "email")
+        let navigationController = UINavigationController(rootViewController: SignInViewController())
+        navigationController.modalPresentationStyle = .fullScreen
+        present(navigationController, animated: true)
+    }
+}

@@ -38,6 +38,8 @@ class SignUpViewController2: UIViewController {
         updatePasswordTextField1()
         updatePasswordTextField2()
         updateSignUpButton()
+        
+        signUpViewModel2.delegate = self
     }
     
     func updateFieldsView() {
@@ -133,16 +135,33 @@ class SignUpViewController2: UIViewController {
 
 extension SignUpViewController2 {
     @objc func didTapSignUpButton() {
+        view.isUserInteractionEnabled = false
         guard let email = emailTextField.text?.trimmingCharacters(in: .whitespacesAndNewlines),
               let password1 = passwordTextField1.text?.trimmingCharacters(in: .whitespacesAndNewlines),
               let password2 = passwordTextField2.text?.trimmingCharacters(in: .whitespacesAndNewlines)
         else {
-            //TODO: show some error: i.g. not all fields are filled
             return
         }
         signUpViewModel2.email = email
         signUpViewModel2.password1 = password1
         signUpViewModel2.password2 = password2
         signUpViewModel2.signUp()
+    }
+}
+
+extension SignUpViewController2: SignUpViewModelDelegate2 {
+    func goToMainPage() {
+        navigationController?.dismiss(animated: true)
+        view.isUserInteractionEnabled = true
+    }
+    
+    func showErrorAlert(title: String, message: String) {
+        let alert = UIAlertController(
+            title: title,
+            message: message,
+            preferredStyle: .alert
+        )
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+        present(alert, animated: true, completion: nil)
     }
 }
