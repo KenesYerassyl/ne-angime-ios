@@ -136,7 +136,6 @@ extension SignInViewController {
         guard let username = userNameTextField.text?.trimmingCharacters(in: .whitespacesAndNewlines),
               let password = passwordTextField.text?.trimmingCharacters(in: .whitespacesAndNewlines)
         else {
-            //TODO: show error –> i.e not all fields are filled
             return
         }
         signInViewModel.signIn(username: username, password: password)
@@ -148,5 +147,13 @@ extension SignInViewController {
 }
 
 extension SignInViewController: SignInViewModelDelegate {
-    
+    func showErrorAlert(title: String, message: String) {
+        let alert = UIAlertController(
+            title: title,
+            message: message,
+            preferredStyle: .alert
+        )
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+        present(alert, animated: true, completion: nil)
+    }
 }

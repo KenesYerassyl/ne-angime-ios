@@ -20,8 +20,15 @@ class TabBarController: UITabBarController {
         friendsViewController.tabBarItem = UITabBarItem(tabBarSystemItem: .contacts, tag: 2)
         findViewController.tabBarItem = UITabBarItem(tabBarSystemItem: .search, tag: 3)
         viewControllers = [conversationsViewController, friendsViewController, findViewController]
-        
     }
 
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        if UserDefaults.standard.string(forKey: "username") == nil {
+            let navigationController = UINavigationController(rootViewController: SignInViewController())
+            navigationController.modalPresentationStyle = .fullScreen
+            present(navigationController, animated: false)
+        }
+    }
 }
 
