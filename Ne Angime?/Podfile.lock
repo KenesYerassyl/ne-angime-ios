@@ -1,26 +1,32 @@
 PODS:
-  - InputBarAccessoryView (5.2.0):
-    - InputBarAccessoryView/Core (= 5.2.0)
-  - InputBarAccessoryView/Core (5.2.0)
-  - MessageKit (3.4.1):
-    - InputBarAccessoryView (~> 5.2.0)
+  - InputBarAccessoryView (5.2.3):
+    - InputBarAccessoryView/Core (= 5.2.3)
+  - InputBarAccessoryView/Core (5.2.3)
+  - MessageKit (3.5.0):
+    - InputBarAccessoryView (~> 5.2.1)
+  - NVActivityIndicatorView (5.1.1):
+    - NVActivityIndicatorView/Base (= 5.1.1)
+  - NVActivityIndicatorView/Base (5.1.1)
   - SnapKit (5.0.1)
 
 DEPENDENCIES:
   - MessageKit
+  - NVActivityIndicatorView
   - SnapKit (~> 5.0.0)
 
 SPEC REPOS:
   trunk:
     - InputBarAccessoryView
     - MessageKit
+    - NVActivityIndicatorView
     - SnapKit
 
 SPEC CHECKSUMS:
-  InputBarAccessoryView: ac1bc2a11508fc2490c2322beb1d4c9f05c8e634
-  MessageKit: aa047ad093f022189ed5a0d1cea04fc59f064c93
+  InputBarAccessoryView: f814a0317d47687fafc6bac9e4df6015eaf5b764
+  MessageKit: fb539583599cd914e8e2d41fe7bdceb4bf686565
+  NVActivityIndicatorView: 1f6c5687f1171810aa27a3296814dc2d7dec3667
   SnapKit: 97b92857e3df3a0c71833cce143274bf6ef8e5eb
 
-PODFILE CHECKSUM: b36d6e682233c9486c1cf6af889f3b35aa090323
+PODFILE CHECKSUM: 683e778714d8355f2cd82bfc3f8994e1f2d27b33
 
 COCOAPODS: 1.9.3

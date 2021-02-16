@@ -26,22 +26,30 @@ class SignInViewModel {
         request.httpMethod = "POST"
         request.httpBody = jsonData
         request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+//        request.addValue(<#T##value: String##String#>, forHTTPHeaderField: <#T##String#>)
         
         let task = URLSession.shared.dataTask(with: request) { (data, response, error) in
-            if let data = data, let response = response as? HTTPURLResponse {
+            if let data = data,
+               let response = response as? HTTPURLResponse,
+               let url = response.url,
+               let allHeadersField = response.allHeaderFields as? [String : String] {
                 do {
                     if let json = try JSONSerialization.jsonObject(with: data) as? [String: Any] {
                         if 200 <= response.statusCode && response.statusCode <= 299 {
+                            let cookies = HTTPCookie.cookies(withResponseHeaderFields: allHeadersField, for: url)
                             guard let userData = json["data"] as? [String : String],
                                   let username = userData["username"],
                                   let firstname = userData["firstname"],
                                   let lastname = userData["lastname"],
-                                  let email = userData["email"] else { return }
-
+                                  let email = userData["email"],
+                                  let cookieValue = cookies.first?.value else { return }
+                            
                             UserDefaults.standard.set(username, forKey: "username")
                             UserDefaults.standard.set(firstname, forKey: "firstname")
                             UserDefaults.standard.set(lastname, forKey: "lastname")
                             UserDefaults.standard.set(email, forKey: "email")
+                            UserDefaults.standard.set(cookieValue, forKey: "token")
+                            
                             DispatchQueue.main.async {
                                 self.delegate?.goToMainPage()
                             }

@@ -45,12 +45,19 @@ class SignUpViewModel2 {
         request.addValue("application/json", forHTTPHeaderField: "Content-Type")
         
         let task = URLSession.shared.dataTask(with: request) { (data, response, error) in
-            if let data = data, let response = response as? HTTPURLResponse {
+            if let data = data,
+               let response = response as? HTTPURLResponse,
+               let url = response.url,
+               let allHeaders = response.allHeaderFields as? [String : String] {
                 if 200 <= response.statusCode && response.statusCode <= 299 {
+                    let cookies = HTTPCookie.cookies(withResponseHeaderFields: allHeaders, for: url)
+                    guard let cookieValue = cookies.first?.value else { return }
                     UserDefaults.standard.set(userName, forKey: "username")
                     UserDefaults.standard.set(firstName, forKey: "firstname")
                     UserDefaults.standard.set(lastName, forKey: "lastname")
                     UserDefaults.standard.set(email, forKey: "email")
+                    UserDefaults.standard.set(cookieValue, forKey: "token")
+                    
                     DispatchQueue.main.async {
                         self.delegate?.goToMainPage()
                     }

@@ -129,17 +129,17 @@ class SignInViewController: UIViewController {
         let tap = UITapGestureRecognizer(target: self, action: #selector(didTapSignUpLabel))
         signUpLabel.addGestureRecognizer(tap)
     }
+
 }
 
 extension SignInViewController {
     @objc func didTapSignInButton() {
-        print("CLICK")
+        view.isUserInteractionEnabled = false
         guard let username = userNameTextField.text?.trimmingCharacters(in: .whitespacesAndNewlines),
               let password = passwordTextField.text?.trimmingCharacters(in: .whitespacesAndNewlines)
         else {
             return
         }
-        view.isUserInteractionEnabled = false
         signInViewModel.signIn(username: username, password: password)
     }
     
