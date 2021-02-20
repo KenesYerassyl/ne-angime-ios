@@ -10,6 +10,7 @@ import Foundation
 protocol SignUpViewModelDelegate2: class {
     func showErrorAlert(title: String, message: String)
     func goToMainPage()
+    func userMayInteract()
 }
 
 class SignUpViewModel2 {
@@ -59,6 +60,7 @@ class SignUpViewModel2 {
                     UserDefaults.standard.set(cookieValue, forKey: "token")
                     
                     DispatchQueue.main.async {
+                        self.delegate?.userMayInteract()
                         self.delegate?.goToMainPage()
                     }
                 } else {
@@ -79,6 +81,7 @@ class SignUpViewModel2 {
     
     func signUpError(message: String) {
         DispatchQueue.main.async {
+            self.delegate?.userMayInteract()
             self.delegate?.showErrorAlert(
                 title: "Something went wrong",
                 message: message

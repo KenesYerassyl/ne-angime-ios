@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import NVActivityIndicatorView
 
 class SignUpViewController1: UIViewController {
     
@@ -17,6 +18,14 @@ class SignUpViewController1: UIViewController {
     private var lastNameTextField = UITextField()
     private var userNameTextField = UITextField()
     private var nextButton = UIButton()
+    private let activityIndicator: NVActivityIndicatorView = {
+        var temp = NVActivityIndicatorView(frame: .zero,
+                                           type: .circleStrokeSpin,
+                                           color: .blue,
+                                           padding: nil)
+        return temp
+    }()
+    private let backView = UIView()
     
     
     override func viewDidLoad() {
@@ -28,11 +37,12 @@ class SignUpViewController1: UIViewController {
         updateLastNameTextField()
         updateUserNameTextField()
         updateNextButton()
+        updateActivityIndicator()
         
         signUpViewModel1.delegate = self
     }
     
-    func updateFieldsView() {
+    private func updateFieldsView() {
         view.addSubview(fieldsView)
         fieldsView.backgroundColor = .white
         fieldsView.snp.makeConstraints { make in
@@ -43,7 +53,7 @@ class SignUpViewController1: UIViewController {
         fieldsView.layer.cornerRadius = 30
     }
     
-    func updateWelcomeLabel() {
+    private func updateWelcomeLabel() {
         view.addSubview(welcomeLabel)
         welcomeLabel.font = UIFont(name: "Avenir Black", size: 24)
         welcomeLabel.text = "Thank you for joining us!"
@@ -54,7 +64,7 @@ class SignUpViewController1: UIViewController {
         }
     }
     
-    func updateFirstNameTextField() {
+    private func updateFirstNameTextField() {
         view.addSubview(firstNameTextField)
         firstNameTextField.snp.makeConstraints { make in
             make.height.equalTo(view.bounds.height * 0.09)
@@ -71,7 +81,7 @@ class SignUpViewController1: UIViewController {
         firstNameTextField.placeholder = "Insert your First Name"
     }
     
-    func updateLastNameTextField() {
+    private func updateLastNameTextField() {
         view.addSubview(lastNameTextField)
         lastNameTextField.snp.makeConstraints { make in
             make.height.equalTo(view.bounds.height * 0.09)
@@ -88,7 +98,7 @@ class SignUpViewController1: UIViewController {
         lastNameTextField.placeholder = "Insert your Last Name"
     }
     
-    func updateUserNameTextField() {
+    private func updateUserNameTextField() {
         view.addSubview(userNameTextField)
         userNameTextField.snp.makeConstraints { make in
             make.height.equalTo(view.bounds.height * 0.09)
@@ -105,7 +115,7 @@ class SignUpViewController1: UIViewController {
         userNameTextField.placeholder = "Insert the username"
     }
     
-    func updateNextButton() {
+    private func updateNextButton() {
         view.addSubview(nextButton)
         nextButton.backgroundColor = UIColor(hex: "#4fa1d6")
         nextButton.snp.makeConstraints { make in
@@ -119,10 +129,34 @@ class SignUpViewController1: UIViewController {
         nextButton.titleLabel?.font = UIFont(name: "Avenir Heavy", size: 20)
         nextButton.addTarget(self, action: #selector(didTapNextButton), for: .touchUpInside)
     }
+    
+    private func updateActivityIndicator() {
+        view.addSubview(backView)
+        backView.snp.makeConstraints { make in
+            make.centerX.equalTo(view)
+            make.centerY.equalTo(view)
+            make.width.equalTo(view.bounds.width * 0.25)
+            make.height.equalTo(view.bounds.width * 0.25)
+        }
+        backView.isHidden = true
+        backView.layer.cornerRadius = 10
+        backView.backgroundColor = UIColor(hex: "#5896f2")
+        backView.layer.opacity = 0.8
+        
+        view.addSubview(activityIndicator)
+        activityIndicator.snp.makeConstraints { make in
+            make.centerX.equalTo(view)
+            make.centerY.equalTo(view)
+            make.width.equalTo(view.bounds.width * 0.15)
+            make.height.equalTo(view.bounds.width * 0.15)
+        }
+    }
 }
 
 extension SignUpViewController1 {
-    @objc func didTapNextButton() {
+    @objc private func didTapNextButton() {
+        activityIndicator.startAnimating()
+        backView.isHidden = false
         view.isUserInteractionEnabled = false
         guard let firstName = firstNameTextField.text?.trimmingCharacters(in: .whitespacesAndNewlines),
               let lastName = lastNameTextField.text?.trimmingCharacters(in: .whitespacesAndNewlines),
@@ -135,13 +169,18 @@ extension SignUpViewController1 {
 }
 
 extension SignUpViewController1: SignUpViewModelDelegate1 {
+    func userMayInteract() {
+        activityIndicator.stopAnimating()
+        backView.isHidden = true
+        view.isUserInteractionEnabled = true
+    }
+    
     func goToNextStage(username: String, firstname: String, lastname: String) {
         navigationController?.pushViewController(SignUpViewController2(
                                                     firstName: firstname,
                                                     lastName: lastname,
                                                     userName: username),
                                                     animated: true)
-        view.isUserInteractionEnabled = true
     }
     func showErrorAlert(title: String, message: String) {
         let alert = UIAlertController(

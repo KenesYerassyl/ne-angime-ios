@@ -10,6 +10,7 @@ import SnapKit
 class FriendsCollectionViewCell: UICollectionViewCell {
     static let id = "FriendsCollectionViewCell"
     var userImageView = UIImageView()
+    var userInfo = User(username: "", firstname: "", lastname: "", email: nil, userID: 0, avatar: "")
     var userNameLabel: UILabel = {
         var temp = UILabel()
         temp.font = UIFont(name: "Avenir", size: 20)

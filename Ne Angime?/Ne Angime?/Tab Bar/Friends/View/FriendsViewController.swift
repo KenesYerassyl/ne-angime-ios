@@ -31,9 +31,11 @@ class FriendsViewController: UIViewController {
         view.backgroundColor = UIColor(hex: "#f4f5fa")
         collectionView.delegate = self
         collectionView.dataSource = self
+        friendsViewModel.delegate = self
         
         configureCollectionView()
         configureTitleLabel()
+        friendsViewModel.fetchAllUsers()
     }
     
     func configureCollectionView() {
@@ -72,10 +74,9 @@ extension FriendsViewController: UICollectionViewDataSource {
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let collectionViewCell = collectionView.dequeueReusableCell(withReuseIdentifier: FriendsCollectionViewCell.id, for: indexPath) as? FriendsCollectionViewCell
-        guard let cell = collectionViewCell else {
-            return UICollectionViewCell()
-        }
-        cell.userNameLabel.text = friendsViewModel.getUser(at: indexPath.row)
+        guard let cell = collectionViewCell else { return UICollectionViewCell() }
+        cell.userInfo = friendsViewModel.users[indexPath.row]
+        cell.userNameLabel.text = "\(friendsViewModel.users[indexPath.row].firstname) \(friendsViewModel.users[indexPath.row].lastname)"
         return cell
     }
 }
@@ -83,6 +84,22 @@ extension FriendsViewController: UICollectionViewDataSource {
 extension FriendsViewController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         return CGSize(width: UIScreen.main.bounds.width * 0.9, height: 90)
+    }
+}
+
+extension FriendsViewController: FriendsViewModelDelegate {
+    func updateCollectionView() {
+        collectionView.reloadData()
+    }
+    
+    func showErrorAlert(title: String, message: String) {
+        let alert = UIAlertController(
+            title: title,
+            message: message,
+            preferredStyle: .alert
+        )
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+        present(alert, animated: true, completion: nil)
     }
 }
 

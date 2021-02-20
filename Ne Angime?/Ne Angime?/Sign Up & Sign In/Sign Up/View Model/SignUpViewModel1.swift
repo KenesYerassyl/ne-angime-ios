@@ -10,6 +10,7 @@ import Foundation
 protocol SignUpViewModelDelegate1: class {
     func showErrorAlert(title: String, message: String)
     func goToNextStage(username: String, firstname: String, lastname: String)
+    func userMayInteract()
 }
 
 class SignUpViewModel1 {    
@@ -30,6 +31,7 @@ class SignUpViewModel1 {
             if let data = data, let response = response as? HTTPURLResponse {
                 if 200 <= response.statusCode && response.statusCode <= 299 {
                     DispatchQueue.main.async {
+                        self.delegate?.userMayInteract()
                         self.delegate?.goToNextStage(
                             username: username,
                             firstname: firstname,
@@ -55,6 +57,7 @@ class SignUpViewModel1 {
     
     func signUpError(message: String) {
         DispatchQueue.main.async {
+            self.delegate?.userMayInteract()
             self.delegate?.showErrorAlert(
                 title: "Something went wrong",
                 message: message

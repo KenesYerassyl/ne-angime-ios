@@ -10,6 +10,7 @@ import Foundation
 protocol SignInViewModelDelegate: class {
     func showErrorAlert(title: String, message: String)
     func goToMainPage()
+    func userMayInteract()
 }
 
 class SignInViewModel {
@@ -37,20 +38,19 @@ class SignInViewModel {
                     if let json = try JSONSerialization.jsonObject(with: data) as? [String: Any] {
                         if 200 <= response.statusCode && response.statusCode <= 299 {
                             let cookies = HTTPCookie.cookies(withResponseHeaderFields: allHeadersField, for: url)
-                            guard let userData = json["data"] as? [String : String],
+                            guard let userData = json["data"] as? [String : Any],
                                   let username = userData["username"],
                                   let firstname = userData["firstname"],
                                   let lastname = userData["lastname"],
                                   let email = userData["email"],
                                   let cookieValue = cookies.first?.value else { return }
-                            
                             UserDefaults.standard.set(username, forKey: "username")
                             UserDefaults.standard.set(firstname, forKey: "firstname")
                             UserDefaults.standard.set(lastname, forKey: "lastname")
                             UserDefaults.standard.set(email, forKey: "email")
                             UserDefaults.standard.set(cookieValue, forKey: "token")
-                            
                             DispatchQueue.main.async {
+                                self.delegate?.userMayInteract()
                                 self.delegate?.goToMainPage()
                             }
                         } else {
@@ -71,6 +71,7 @@ class SignInViewModel {
     
     func signInError(message: String) {
         DispatchQueue.main.async {
+            self.delegate?.userMayInteract()
             self.delegate?.showErrorAlert(
                 title: "Something went wrong",
                 message: message

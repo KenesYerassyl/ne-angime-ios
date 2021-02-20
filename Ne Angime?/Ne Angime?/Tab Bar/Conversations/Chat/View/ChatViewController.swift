@@ -29,8 +29,16 @@ struct Message: MessageType {
 class ChatViewController: MessagesViewController {
     
     private var counter = 1
-    private let currentUser = Sender(senderId: "kenesyerassyl", displayName: "Ne Angime")
-    private let otherUser = Sender(senderId: "Soultan", displayName: "Ne Angime")
+    private let currentUser: Sender = {
+        if let username = UserDefaults.standard.string(forKey: "username"),
+           let firstname = UserDefaults.standard.string(forKey: "firstname"),
+           let lastname = UserDefaults.standard.string(forKey: "lastname") {
+            return Sender(senderId: username, displayName: "\(firstname) \(lastname)")
+        } else {
+            return Sender(senderId: "undefined", displayName: "undefined")
+        }
+    }()
+
     private let chatViewModel = ChatViewModel()
     
     var messages = [MessageType]()
@@ -70,14 +78,8 @@ extension ChatViewController: MessagesDisplayDelegate {}
 
 extension ChatViewController: InputBarAccessoryViewDelegate {
     func inputBar(_ inputBar: InputBarAccessoryView, didPressSendButtonWith text: String) {
-        print(text)
         guard !text.replacingOccurrences(of: " ", with: "").isEmpty else { return }
-        if counter % 2 == 0 {
-            messages.append(Message(sender: otherUser, messageId: "\(counter)", sentDate: Date(), kind: .text(text)))
-        } else {
-            messages.append(Message(sender: currentSender(), messageId: "\(counter)", sentDate: Date(), kind: .text(text)))
-        }
-        counter += 1
+
         messageInputBar.inputTextView.text = nil
         messagesCollectionView.reloadDataAndKeepOffset()
         messagesCollectionView.scrollToLastItem()

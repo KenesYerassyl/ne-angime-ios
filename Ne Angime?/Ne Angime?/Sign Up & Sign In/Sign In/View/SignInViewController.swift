@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import NVActivityIndicatorView
 
 class SignInViewController: UIViewController {
     
@@ -17,6 +18,14 @@ class SignInViewController: UIViewController {
     private let passwordTextField = UITextField()
     private let signInButton = UIButton()
     private let signUpLabel = UILabel()
+    private let activityIndicator: NVActivityIndicatorView = {
+        var temp = NVActivityIndicatorView(frame: .zero,
+                                           type: .circleStrokeSpin,
+                                           color: .blue,
+                                           padding: nil)
+        return temp
+    }()
+    private let backView = UIView()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -29,6 +38,7 @@ class SignInViewController: UIViewController {
         updatePasswordTextField()
         updateSignInButton()
         updateSignUpLabel()
+        updateActivityIndicator()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -36,7 +46,7 @@ class SignInViewController: UIViewController {
         navigationController?.setNavigationBarHidden(true, animated: false)
     }
     
-    func updateFieldsView() {
+    private func updateFieldsView() {
         view.addSubview(fieldsView)
         fieldsView.backgroundColor = .white
         fieldsView.snp.makeConstraints { make in
@@ -47,7 +57,7 @@ class SignInViewController: UIViewController {
         fieldsView.layer.cornerRadius = 30
     }
     
-    func updateWelcomeLabel() {
+    private func updateWelcomeLabel() {
         view.addSubview(welcomeLabel)
         welcomeLabel.font = UIFont(name: "Avenir Black", size: 24)
         welcomeLabel.text = "Welcome negroe!"
@@ -58,7 +68,7 @@ class SignInViewController: UIViewController {
         }
     }
     
-    func updateUserNameTextField() {
+    private func updateUserNameTextField() {
         view.addSubview(userNameTextField)
         userNameTextField.snp.makeConstraints { make in
             make.height.equalTo(view.bounds.height * 0.09)
@@ -75,7 +85,7 @@ class SignInViewController: UIViewController {
         userNameTextField.placeholder = "Insert your username"
     }
     
-    func updatePasswordTextField() {
+    private func updatePasswordTextField() {
         view.addSubview(passwordTextField)
         passwordTextField.snp.makeConstraints { make in
             make.height.equalTo(view.bounds.height * 0.09)
@@ -93,7 +103,7 @@ class SignInViewController: UIViewController {
         passwordTextField.isSecureTextEntry = true
     }
     
-    func updateSignInButton() {
+    private func updateSignInButton() {
         view.addSubview(signInButton)
         signInButton.backgroundColor = UIColor(hex: "#4fa1d6")
         signInButton.snp.makeConstraints { make in
@@ -108,7 +118,7 @@ class SignInViewController: UIViewController {
         signInButton.addTarget(self, action: #selector(didTapSignInButton), for: .touchUpInside)
     }
     
-    func updateSignUpLabel() {
+    private func updateSignUpLabel() {
         let customTextLabel = UILabel()
         view.addSubview(customTextLabel)
         view.addSubview(signUpLabel)
@@ -129,11 +139,35 @@ class SignInViewController: UIViewController {
         let tap = UITapGestureRecognizer(target: self, action: #selector(didTapSignUpLabel))
         signUpLabel.addGestureRecognizer(tap)
     }
+    
+    private func updateActivityIndicator() {
+        view.addSubview(backView)
+        backView.snp.makeConstraints { make in
+            make.centerX.equalTo(view)
+            make.centerY.equalTo(view)
+            make.width.equalTo(view.bounds.width * 0.25)
+            make.height.equalTo(view.bounds.width * 0.25)
+        }
+        backView.isHidden = true
+        backView.layer.cornerRadius = 10
+        backView.backgroundColor = UIColor(hex: "#5896f2")
+        backView.layer.opacity = 0.8
+        
+        view.addSubview(activityIndicator)
+        activityIndicator.snp.makeConstraints { make in
+            make.centerX.equalTo(view)
+            make.centerY.equalTo(view)
+            make.width.equalTo(view.bounds.width * 0.15)
+            make.height.equalTo(view.bounds.width * 0.15)
+        }
+    }
 
 }
 
 extension SignInViewController {
-    @objc func didTapSignInButton() {
+    @objc private func didTapSignInButton() {
+        activityIndicator.startAnimating()
+        backView.isHidden = false
         view.isUserInteractionEnabled = false
         guard let username = userNameTextField.text?.trimmingCharacters(in: .whitespacesAndNewlines),
               let password = passwordTextField.text?.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -143,12 +177,19 @@ extension SignInViewController {
         signInViewModel.signIn(username: username, password: password)
     }
     
-    @objc func didTapSignUpLabel() {
+    @objc private func didTapSignUpLabel() {
         navigationController?.pushViewController(SignUpViewController1(), animated: true)
     }
 }
 
 extension SignInViewController: SignInViewModelDelegate {
+
+    func userMayInteract() {
+        view.isUserInteractionEnabled = true
+        activityIndicator.stopAnimating()
+        backView.isHidden = true
+    }
+    
     func showErrorAlert(title: String, message: String) {
         let alert = UIAlertController(
             title: title,
@@ -161,6 +202,5 @@ extension SignInViewController: SignInViewModelDelegate {
     
     func goToMainPage() {
         navigationController?.dismiss(animated: true)
-        view.isUserInteractionEnabled = true
     }
 }
