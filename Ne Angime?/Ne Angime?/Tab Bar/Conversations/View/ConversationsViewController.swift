@@ -27,6 +27,7 @@ class ConversationsViewController: UIViewController {
         view.backgroundColor = UIColor(hex: "#f4f5fa")
         collectionView.delegate = self
         collectionView.dataSource = self
+        conversationsViewModel.delegate = self
         
         configureCollectionView()
         configureTitleLabel()
@@ -74,11 +75,18 @@ extension ConversationsViewController: UICollectionViewDataSource {
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let collectionViewCell = collectionView.dequeueReusableCell(withReuseIdentifier: ConversationsCollectionViewCell.id, for: indexPath) as? ConversationsCollectionViewCell
-        guard let cell = collectionViewCell else {
+        guard let cell = collectionViewCell,
+              let otherUsername = conversationsViewModel.conversations[indexPath.row].recipientUsername else {
             return UICollectionViewCell()
         }
-        cell.userNameLabel.text = conversationsViewModel.getUser(at: indexPath.row)
-        cell.userMessageLabel.text = conversationsViewModel.getMessage(at: indexPath.row)
+        UserManager.shared.getUser(username: otherUsername) { (user) in
+            if let user = user {
+                cell.userNameLabel.text = "\(user.firstname) \(user.lastname)"
+            } else {
+                cell.userNameLabel.text = "undefined undefined"
+            }
+        }
+        cell.userMessageLabel.text = conversationsViewModel.getLastMessage(at: indexPath.row)
         return cell
     }
 }
@@ -86,5 +94,11 @@ extension ConversationsViewController: UICollectionViewDataSource {
 extension ConversationsViewController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         return CGSize(width: UIScreen.main.bounds.width * 0.9, height: 90)
+    }
+}
+
+extension ConversationsViewController: ConversationsViewModelDelegate {
+    func updateCollectionView() {
+        collectionView.reloadData()
     }
 }

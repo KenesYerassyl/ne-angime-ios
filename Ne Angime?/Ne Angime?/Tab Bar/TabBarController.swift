@@ -45,7 +45,7 @@ extension TabBarController {
         UserDefaults.standard.removeObject(forKey: "lastname")
         UserDefaults.standard.removeObject(forKey: "email")
         UserDefaults.standard.removeObject(forKey: "token")
-        
+        WebSocket.shared.disconnect()
         let navigationController = UINavigationController(rootViewController: SignInViewController())
         navigationController.modalPresentationStyle = .fullScreen
         present(navigationController, animated: true)

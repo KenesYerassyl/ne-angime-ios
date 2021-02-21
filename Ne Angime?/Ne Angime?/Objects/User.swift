@@ -32,6 +32,8 @@ struct User: Codable {
         self.userID = userID
         self.avatar = avatar
     }
+    
+    
 }
 
 extension User: Equatable {

@@ -201,6 +201,7 @@ extension SignInViewController: SignInViewModelDelegate {
     }
     
     func goToMainPage() {
+        WebSocket.shared.connect()
         navigationController?.dismiss(animated: true)
     }
 }

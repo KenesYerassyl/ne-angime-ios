@@ -27,22 +27,8 @@ struct Message: MessageType {
 }
 
 class ChatViewController: MessagesViewController {
-    
-    private var counter = 1
-    private let currentUser: Sender = {
-        if let username = UserDefaults.standard.string(forKey: "username"),
-           let firstname = UserDefaults.standard.string(forKey: "firstname"),
-           let lastname = UserDefaults.standard.string(forKey: "lastname") {
-            return Sender(senderId: username, displayName: "\(firstname) \(lastname)")
-        } else {
-            return Sender(senderId: "undefined", displayName: "undefined")
-        }
-    }()
 
-    private let chatViewModel = ChatViewModel()
-    
-    var messages = [MessageType]()
-    
+    var chatViewModel = ChatViewModel()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -61,15 +47,15 @@ class ChatViewController: MessagesViewController {
 
 extension ChatViewController: MessagesDataSource {
     func currentSender() -> SenderType {
-        return currentUser
+        return chatViewModel.getCurrentUser()
     }
     
     func messageForItem(at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> MessageType {
-        return messages[indexPath.section]
+        return chatViewModel.getMessage(at: indexPath.section)
     }
     
     func numberOfSections(in messagesCollectionView: MessagesCollectionView) -> Int {
-        return messages.count
+        return chatViewModel.getNumberOfMessages()
     }
 }
 
@@ -79,8 +65,9 @@ extension ChatViewController: MessagesDisplayDelegate {}
 extension ChatViewController: InputBarAccessoryViewDelegate {
     func inputBar(_ inputBar: InputBarAccessoryView, didPressSendButtonWith text: String) {
         guard !text.replacingOccurrences(of: " ", with: "").isEmpty else { return }
-
+        chatViewModel.didTapSendButton(text)
         messageInputBar.inputTextView.text = nil
+        //TODO: send to the back-end via web sockets
         messagesCollectionView.reloadDataAndKeepOffset()
         messagesCollectionView.scrollToLastItem()
     }

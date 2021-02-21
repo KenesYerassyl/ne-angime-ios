@@ -63,7 +63,13 @@ class FriendsViewController: UIViewController {
 
 extension FriendsViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        //Make Clickable
+        let chatViewController = ChatViewController()
+        let user = friendsViewModel.getUser(at: indexPath.row)
+        chatViewController.chatViewModel.otherUser = Sender(
+            senderId: user.username,
+            displayName: "\(user.firstname) \(user.lastname)"
+        )
+        navigationController?.pushViewController(chatViewController, animated: true)
     }
 }
 
@@ -75,8 +81,8 @@ extension FriendsViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let collectionViewCell = collectionView.dequeueReusableCell(withReuseIdentifier: FriendsCollectionViewCell.id, for: indexPath) as? FriendsCollectionViewCell
         guard let cell = collectionViewCell else { return UICollectionViewCell() }
-        cell.userInfo = friendsViewModel.users[indexPath.row]
-        cell.userNameLabel.text = "\(friendsViewModel.users[indexPath.row].firstname) \(friendsViewModel.users[indexPath.row].lastname)"
+        cell.userInfo = friendsViewModel.getUser(at: indexPath.row)
+        cell.userNameLabel.text = "\(cell.userInfo.firstname) \(cell.userInfo.lastname)"
         return cell
     }
 }
@@ -90,16 +96,6 @@ extension FriendsViewController: UICollectionViewDelegateFlowLayout {
 extension FriendsViewController: FriendsViewModelDelegate {
     func updateCollectionView() {
         collectionView.reloadData()
-    }
-    
-    func showErrorAlert(title: String, message: String) {
-        let alert = UIAlertController(
-            title: title,
-            message: message,
-            preferredStyle: .alert
-        )
-        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
-        present(alert, animated: true, completion: nil)
     }
 }
 

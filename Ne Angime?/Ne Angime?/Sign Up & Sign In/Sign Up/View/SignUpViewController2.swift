@@ -192,6 +192,7 @@ extension SignUpViewController2: SignUpViewModelDelegate2 {
     }
     
     func goToMainPage() {
+        WebSocket.shared.connect()
         navigationController?.dismiss(animated: true)
     }
     

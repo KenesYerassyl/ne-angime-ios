@@ -2,7 +2,7 @@
 //  MessageCoreData+CoreDataProperties.swift
 //  Ne Angime?
 //
-//  Created by Kenes Yerassyl on 2/19/21.
+//  Created by Kenes Yerassyl on 2/21/21.
 //
 //
 
@@ -16,9 +16,10 @@ extension MessageCoreData {
         return NSFetchRequest<MessageCoreData>(entityName: "MessageCoreData")
     }
 
-    @NSManaged public var messageID: String?
     @NSManaged public var isSenderMe: Bool
     @NSManaged public var message: String?
+    @NSManaged public var messageID: String?
+    @NSManaged public var createdAt: Double
     @NSManaged public var conversation: Conversation?
 
 }
