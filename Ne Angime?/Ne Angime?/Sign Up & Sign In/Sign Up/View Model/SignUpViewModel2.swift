@@ -50,27 +50,34 @@ class SignUpViewModel2 {
                let response = response as? HTTPURLResponse,
                let url = response.url,
                let allHeaders = response.allHeaderFields as? [String : String] {
-                if 200 <= response.statusCode && response.statusCode <= 299 {
-                    let cookies = HTTPCookie.cookies(withResponseHeaderFields: allHeaders, for: url)
-                    guard let cookieValue = cookies.first?.value else { return }
-                    UserDefaults.standard.set(userName, forKey: "username")
-                    UserDefaults.standard.set(firstName, forKey: "firstname")
-                    UserDefaults.standard.set(lastName, forKey: "lastname")
-                    UserDefaults.standard.set(email, forKey: "email")
-                    UserDefaults.standard.set(cookieValue, forKey: "token")
-                    
-                    DispatchQueue.main.async {
-                        self.delegate?.userMayInteract()
-                        self.delegate?.goToMainPage()
+                do {
+                    if let json = try JSONSerialization.jsonObject(with: data) as? [String: Any] {
+                        if 200 <= response.statusCode && response.statusCode <= 299 {
+                            let cookies = HTTPCookie.cookies(withResponseHeaderFields: allHeaders, for: url)
+                            guard let userData = json["data"] as? [String : Any],
+                                  let username = userData["username"],
+                                  let firstname = userData["firstname"],
+                                  let lastname = userData["lastname"],
+                                  let email = userData["email"],
+                                  let userID = userData["user_id"],
+                                  let cookieValue = cookies.first?.value else { return }
+                            UserDefaults.standard.set(username, forKey: "username")
+                            UserDefaults.standard.set(firstname, forKey: "firstname")
+                            UserDefaults.standard.set(lastname, forKey: "lastname")
+                            UserDefaults.standard.set(email, forKey: "email")
+                            UserDefaults.standard.set(userID, forKey: "userID")
+                            UserDefaults.standard.set(cookieValue, forKey: "token")
+                            DispatchQueue.main.async {
+                                self.delegate?.userMayInteract()
+                                self.delegate?.goToMainPage()
+                            }
+                        } else {
+                            guard let message = json["message"] as? String else { return }
+                            self.signUpError(message: message)
+                        }
                     }
-                } else {
-                    do {
-                        guard let json = try JSONSerialization.jsonObject(with: data) as? [String : String],
-                              let message = json["message"] else { return }
-                        self.signUpError(message: message)
-                    } catch {
-                        self.signUpError(message: error.localizedDescription)
-                    }
+                } catch {
+                    self.signUpError(message: error.localizedDescription)
                 }
             } else if let error = error {
                 self.signUpError(message: error.localizedDescription)

@@ -10,6 +10,7 @@
 		184E359CD16985D403668897 /* Pods_Ne_Angime__Ne_Angime_UITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 22ACDC3173C71910B96C2F01 /* Pods_Ne_Angime__Ne_Angime_UITests.framework */; };
 		2A079019245B50100D16AD61 /* Pods_Ne_Angime_.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FFCDB66AF8DB440C2C33093A /* Pods_Ne_Angime_.framework */; };
 		46374A231AF0F9A343EFE6F0 /* Pods_Ne_Angime_Tests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B396BD6E97E88CBF868504E8 /* Pods_Ne_Angime_Tests.framework */; };
+		871023CD25E2CBEA00B4895C /* DataWebSocket.swift in Sources */ = {isa = PBXBuildFile; fileRef = 871023CC25E2CBEA00B4895C /* DataWebSocket.swift */; };
 		87131FD825D849B700FE342A /* UITextField+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87131FD725D849B700FE342A /* UITextField+Extension.swift */; };
 		8729774025E194DE00F0EC72 /* UserManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8729773F25E194DE00F0EC72 /* UserManager.swift */; };
 		8729774B25E1A13700F0EC72 /* CoreDataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8729774A25E1A13700F0EC72 /* CoreDataManager.swift */; };
@@ -19,6 +20,7 @@
 		8729777525E1AAE500F0EC72 /* MessageCoreData+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8729777125E1AAE500F0EC72 /* MessageCoreData+CoreDataProperties.swift */; };
 		8729777A25E24B1B00F0EC72 /* Notification+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8729777925E24B1B00F0EC72 /* Notification+Extensions.swift */; };
 		8729777F25E258F100F0EC72 /* WebSocket.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8729777E25E258F100F0EC72 /* WebSocket.swift */; };
+		873C16D025E2DCC300574BA1 /* MessageHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 873C16CF25E2DCC300574BA1 /* MessageHandler.swift */; };
 		873CE19825D7A85E0007E066 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 873CE19725D7A85E0007E066 /* AppDelegate.swift */; };
 		873CE19A25D7A85E0007E066 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 873CE19925D7A85E0007E066 /* SceneDelegate.swift */; };
 		873CE19C25D7A85E0007E066 /* TabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 873CE19B25D7A85E0007E066 /* TabBarController.swift */; };
@@ -68,6 +70,7 @@
 		155414FA4BF097D262C7CD5F /* Pods-Ne Angime?.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Ne Angime?.release.xcconfig"; path = "Target Support Files/Pods-Ne Angime?/Pods-Ne Angime?.release.xcconfig"; sourceTree = "<group>"; };
 		22ACDC3173C71910B96C2F01 /* Pods_Ne_Angime__Ne_Angime_UITests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Ne_Angime__Ne_Angime_UITests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		3625DC80AF09459E7F84F67E /* Pods-Ne Angime?.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Ne Angime?.debug.xcconfig"; path = "Target Support Files/Pods-Ne Angime?/Pods-Ne Angime?.debug.xcconfig"; sourceTree = "<group>"; };
+		871023CC25E2CBEA00B4895C /* DataWebSocket.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataWebSocket.swift; sourceTree = "<group>"; };
 		87131FD725D849B700FE342A /* UITextField+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UITextField+Extension.swift"; sourceTree = "<group>"; };
 		8729773F25E194DE00F0EC72 /* UserManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserManager.swift; sourceTree = "<group>"; };
 		8729774A25E1A13700F0EC72 /* CoreDataManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataManager.swift; sourceTree = "<group>"; };
@@ -77,6 +80,7 @@
 		8729777125E1AAE500F0EC72 /* MessageCoreData+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MessageCoreData+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		8729777925E24B1B00F0EC72 /* Notification+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Notification+Extensions.swift"; sourceTree = "<group>"; };
 		8729777E25E258F100F0EC72 /* WebSocket.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebSocket.swift; sourceTree = "<group>"; };
+		873C16CF25E2DCC300574BA1 /* MessageHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageHandler.swift; sourceTree = "<group>"; };
 		873CE19425D7A85E0007E066 /* Ne Angime?.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Ne Angime?.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		873CE19725D7A85E0007E066 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		873CE19925D7A85E0007E066 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -187,13 +191,13 @@
 				873CE19925D7A85E0007E066 /* SceneDelegate.swift */,
 				879A7F4925D8281800C70171 /* Sign Up & Sign In */,
 				87DC192A25D7AFDA00C67EB4 /* Tab Bar */,
-				879BF3F725DEF7AE006B40A2 /* Core Data */,
+				879BF3F725DEF7AE006B40A2 /* Objects */,
 				873CE19D25D7A85E0007E066 /* Main.storyboard */,
 				873CE1A025D7A85F0007E066 /* Assets.xcassets */,
 				873CE1A225D7A85F0007E066 /* LaunchScreen.storyboard */,
 				879BF3E625DEF012006B40A2 /* Model.xcdatamodeld */,
 				873CE1A525D7A85F0007E066 /* Info.plist */,
-				877F993E25DA8991009761A3 /* Objects */,
+				877F993E25DA8991009761A3 /* Managers */,
 				879A7F1C25D7CAFC00C70171 /* Extensions */,
 			);
 			path = "Ne Angime?";
@@ -217,15 +221,15 @@
 			path = "Ne Angime?UITests";
 			sourceTree = "<group>";
 		};
-		877F993E25DA8991009761A3 /* Objects */ = {
+		877F993E25DA8991009761A3 /* Managers */ = {
 			isa = PBXGroup;
 			children = (
-				877F993F25DA89C7009761A3 /* User.swift */,
 				8729773F25E194DE00F0EC72 /* UserManager.swift */,
 				8729774A25E1A13700F0EC72 /* CoreDataManager.swift */,
 				8729777E25E258F100F0EC72 /* WebSocket.swift */,
+				873C16CF25E2DCC300574BA1 /* MessageHandler.swift */,
 			);
-			path = Objects;
+			path = Managers;
 			sourceTree = "<group>";
 		};
 		879A7F1C25D7CAFC00C70171 /* Extensions */ = {
@@ -349,15 +353,17 @@
 			path = "View Model";
 			sourceTree = "<group>";
 		};
-		879BF3F725DEF7AE006B40A2 /* Core Data */ = {
+		879BF3F725DEF7AE006B40A2 /* Objects */ = {
 			isa = PBXGroup;
 			children = (
 				8729776E25E1AAE500F0EC72 /* Conversation+CoreDataClass.swift */,
 				8729776F25E1AAE500F0EC72 /* Conversation+CoreDataProperties.swift */,
 				8729777025E1AAE500F0EC72 /* MessageCoreData+CoreDataClass.swift */,
 				8729777125E1AAE500F0EC72 /* MessageCoreData+CoreDataProperties.swift */,
+				871023CC25E2CBEA00B4895C /* DataWebSocket.swift */,
+				877F993F25DA89C7009761A3 /* User.swift */,
 			);
-			path = "Core Data";
+			path = Objects;
 			sourceTree = "<group>";
 		};
 		87DC192A25D7AFDA00C67EB4 /* Tab Bar */ = {
@@ -681,6 +687,7 @@
 				879A7F1825D7BFBD00C70171 /* ConversationsCollectionViewCell.swift in Sources */,
 				87DC194425D7B4CC00C67EB4 /* ConversationsViewModel.swift in Sources */,
 				873CE19825D7A85E0007E066 /* AppDelegate.swift in Sources */,
+				871023CD25E2CBEA00B4895C /* DataWebSocket.swift in Sources */,
 				879BF3E825DEF012006B40A2 /* Model.xcdatamodeld in Sources */,
 				8729777F25E258F100F0EC72 /* WebSocket.swift in Sources */,
 				8729777525E1AAE500F0EC72 /* MessageCoreData+CoreDataProperties.swift in Sources */,
@@ -688,6 +695,7 @@
 				8729777425E1AAE500F0EC72 /* MessageCoreData+CoreDataClass.swift in Sources */,
 				87EE869125D973EB00F89605 /* SignUpViewModel2.swift in Sources */,
 				879A7F1E25D7CB0E00C70171 /* UIColor+Extensions.swift in Sources */,
+				873C16D025E2DCC300574BA1 /* MessageHandler.swift in Sources */,
 				8729777225E1AAE500F0EC72 /* Conversation+CoreDataClass.swift in Sources */,
 				87131FD825D849B700FE342A /* UITextField+Extension.swift in Sources */,
 				879A7F4525D7EF7E00C70171 /* FindViewController.swift in Sources */,

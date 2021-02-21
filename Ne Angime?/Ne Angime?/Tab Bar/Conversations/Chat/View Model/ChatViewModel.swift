@@ -8,10 +8,11 @@
 import MessageKit
 
 protocol ChatViewModelDelegate: class {
-
+    func updateCollectionView()
 }
 
 class ChatViewModel {
+    weak var delegate: ChatViewModelDelegate?
     var otherUser = Sender(senderId: "undefined", displayName: "undefined")
     let currentUser: Sender = {
         if let username = UserDefaults.standard.string(forKey: "username"),
@@ -38,26 +39,30 @@ class ChatViewModel {
     }
     
     func didTapSendButton(_ text: String) {
-        if CoreDataManager.shared.doesConversationExist("\(currentUser.senderId)&&\(otherUser.senderId)") ||
-            CoreDataManager.shared.doesConversationExist("\(otherUser.senderId)&&\(currentUser.senderId)") {
-            //TODO: apend to current conversation
-        } else {
-            let conversation = Conversation(entity: Conversation.entity(), insertInto: CoreDataManager.shared.context)
-            conversation.conversationID = "\(currentUser.senderId)&&\(otherUser.senderId)"
-            conversation.recipientUsername = "\(otherUser.senderId)"
-            let message = MessageCoreData(entity: MessageCoreData.entity(), insertInto: CoreDataManager.shared.context)
-            message.conversation = conversation
-            message.isSenderMe = true
-            message.messageID = UUID().uuidString
-            message.message = text
-            message.createdAt = Date().timeIntervalSince1970
-            conversation.messages = [message]
-            CoreDataManager.shared.saveContext()
-            NotificationCenter.default.post(
-                name: .newConversation,
-                object: nil,
-                userInfo: ["conversationID" : "\(currentUser.senderId)&&\(otherUser.senderId)"]
-            )
+        guard let userID = UserDefaults.standard.string(forKey: "userID") else { return }
+        let messageWebSocket = MessageWebSocket(
+            message: text,
+            messageID: UUID().uuidString,
+            userID: userID,
+            createdAt: Date().timeIntervalSince1970
+        )
+        let dataWebSocket = DataWebSocket(type: .sendMessage, username: otherUser.senderId, message: messageWebSocket)
+        MessageHandler.shared.handleMessage(dataWebSocket: dataWebSocket)
+        do {
+            let data = try JSONEncoder().encode(dataWebSocket)
+            WebSocket.shared.webSocketTask?.send(.data(data), completionHandler: { (error) in
+                guard let error = error else { return }
+                print("Error in sending data: \(error)")
+            })
+        } catch {
+            print("Error in encoding message: \(error)")
         }
+        messages.append(Message(
+            sender: currentUser,
+            messageId: messageWebSocket.messageID,
+            sentDate: Date(timeIntervalSince1970: messageWebSocket.createdAt),
+            kind: .text(text)
+        ))
+        delegate?.updateCollectionView()
     }
 }

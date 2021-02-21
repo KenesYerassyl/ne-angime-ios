@@ -37,6 +37,7 @@ class ChatViewController: MessagesViewController {
         messagesCollectionView.messagesLayoutDelegate = self
         messagesCollectionView.messagesDisplayDelegate = self
         messageInputBar.delegate = self
+        chatViewModel.delegate = self
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -65,9 +66,13 @@ extension ChatViewController: MessagesDisplayDelegate {}
 extension ChatViewController: InputBarAccessoryViewDelegate {
     func inputBar(_ inputBar: InputBarAccessoryView, didPressSendButtonWith text: String) {
         guard !text.replacingOccurrences(of: " ", with: "").isEmpty else { return }
-        chatViewModel.didTapSendButton(text)
         messageInputBar.inputTextView.text = nil
-        //TODO: send to the back-end via web sockets
+        chatViewModel.didTapSendButton(text)
+    }
+}
+
+extension ChatViewController: ChatViewModelDelegate {
+    func updateCollectionView() {
         messagesCollectionView.reloadDataAndKeepOffset()
         messagesCollectionView.scrollToLastItem()
     }
