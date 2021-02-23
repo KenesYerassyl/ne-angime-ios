@@ -27,36 +27,52 @@ struct Message: MessageType {
 }
 
 class ChatViewController: MessagesViewController {
-
-    var chatViewModel = ChatViewModel()
+    
+    var chatViewModel: ChatViewModel?
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         messagesCollectionView.messagesDataSource = self
         messagesCollectionView.messagesLayoutDelegate = self
         messagesCollectionView.messagesDisplayDelegate = self
         messageInputBar.delegate = self
-        chatViewModel.delegate = self
+        chatViewModel?.delegate = self
     }
     
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        messageInputBar.inputTextView.becomeFirstResponder()
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        chatViewModel?.fetchConversation()
     }
 }
 
 extension ChatViewController: MessagesDataSource {
     func currentSender() -> SenderType {
-        return chatViewModel.getCurrentUser()
+        if chatViewModel != nil {
+            return chatViewModel!.getCurrentUser()
+        } else {
+            return Sender(senderId: "undefined", displayName: "Ne Angime?")
+        }
     }
     
     func messageForItem(at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> MessageType {
-        return chatViewModel.getMessage(at: indexPath.section)
+        if chatViewModel != nil {
+            return chatViewModel!.getMessage(at: indexPath.section)
+        } else {
+            return Message(
+                sender: Sender(senderId: "undefined", displayName: "Ne Angime?"),
+                messageId: "undefined",
+                sentDate: Date(),
+                kind: .text("undefined")
+            )
+        }
     }
     
     func numberOfSections(in messagesCollectionView: MessagesCollectionView) -> Int {
-        return chatViewModel.getNumberOfMessages()
+        if chatViewModel != nil {
+            return chatViewModel!.getNumberOfMessages()
+        } else {
+            return 0
+        }
     }
 }
 
@@ -65,9 +81,9 @@ extension ChatViewController: MessagesDisplayDelegate {}
 
 extension ChatViewController: InputBarAccessoryViewDelegate {
     func inputBar(_ inputBar: InputBarAccessoryView, didPressSendButtonWith text: String) {
-        guard !text.replacingOccurrences(of: " ", with: "").isEmpty else { return }
+        guard !text.replacingOccurrences(of: " ", with: "").isEmpty, chatViewModel != nil else { return }
         messageInputBar.inputTextView.text = nil
-        chatViewModel.didTapSendButton(text)
+        chatViewModel!.didTapSendButton(text)
     }
 }
 

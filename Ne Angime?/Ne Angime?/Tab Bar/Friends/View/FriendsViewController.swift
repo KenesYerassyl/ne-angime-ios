@@ -6,6 +6,7 @@
 //
 
 import SnapKit
+import NVActivityIndicatorView
 
 class FriendsViewController: UIViewController {
     private let friendsViewModel = FriendsViewModel()
@@ -25,6 +26,14 @@ class FriendsViewController: UIViewController {
         temp.register(FriendsCollectionViewCell.self, forCellWithReuseIdentifier: FriendsCollectionViewCell.id)
         return temp
     }()
+    private let activityIndicator: NVActivityIndicatorView = {
+        var temp = NVActivityIndicatorView(frame: .zero,
+                                           type: .circleStrokeSpin,
+                                           color: .blue,
+                                           padding: nil)
+        return temp
+    }()
+    private let backView = UIView()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -35,7 +44,18 @@ class FriendsViewController: UIViewController {
         
         configureCollectionView()
         configureTitleLabel()
+        updateActivityIndicator()
         friendsViewModel.fetchAllUsers()
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        if friendsViewModel.users.isEmpty {
+            activityIndicator.startAnimating()
+            backView.isHidden = false
+            view.isUserInteractionEnabled = false
+            friendsViewModel.fetchAllUsers()
+        }
     }
     
     func configureCollectionView() {
@@ -59,15 +79,44 @@ class FriendsViewController: UIViewController {
         }
         titleLabel.text = "Friends"
     }
+    
+    private func updateActivityIndicator() {
+        view.addSubview(backView)
+        backView.snp.makeConstraints { make in
+            make.centerX.equalTo(view)
+            make.centerY.equalTo(view)
+            make.width.equalTo(view.bounds.width * 0.25)
+            make.height.equalTo(view.bounds.width * 0.25)
+        }
+        backView.isHidden = true
+        backView.layer.cornerRadius = 10
+        backView.backgroundColor = UIColor(hex: "#5896f2")
+        backView.layer.opacity = 0.8
+        
+        view.addSubview(activityIndicator)
+        activityIndicator.snp.makeConstraints { make in
+            make.centerX.equalTo(view)
+            make.centerY.equalTo(view)
+            make.width.equalTo(view.bounds.width * 0.15)
+            make.height.equalTo(view.bounds.width * 0.15)
+        }
+    }
 }
 
 extension FriendsViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let chatViewController = ChatViewController()
+        guard let currentUsername = UserDefaults.standard.string(forKey: "username") else { return }
         let user = friendsViewModel.getUser(at: indexPath.row)
-        chatViewController.chatViewModel.otherUser = Sender(
-            senderId: user.username,
-            displayName: "\(user.firstname) \(user.lastname)"
+        var conversationID = "\(currentUsername)&&\(user.username)"
+        
+        if CoreDataManager.shared.doesConversationExist("\(user.username)&&\(currentUsername)") {
+            conversationID = "\(currentUsername)&&\(user.username)"
+        }
+        
+        let chatViewController = ChatViewController()
+        chatViewController.chatViewModel = ChatViewModel(
+            conversationID: conversationID,
+            otherUser: Sender(senderId: user.username, displayName: "Ne Angime?")
         )
         navigationController?.pushViewController(chatViewController, animated: true)
     }
@@ -94,6 +143,12 @@ extension FriendsViewController: UICollectionViewDelegateFlowLayout {
 }
 
 extension FriendsViewController: FriendsViewModelDelegate {
+    func userMayInteract() {
+        view.isUserInteractionEnabled = true
+        activityIndicator.stopAnimating()
+        backView.isHidden = true
+    }
+    
     func updateCollectionView() {
         collectionView.reloadData()
     }

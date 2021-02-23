@@ -26,6 +26,7 @@ class SignInViewController: UIViewController {
         return temp
     }()
     private let backView = UIView()
+    private let webSocket = (UIApplication.shared.delegate as! AppDelegate).webSocket
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -201,7 +202,6 @@ extension SignInViewController: SignInViewModelDelegate {
     }
     
     func goToMainPage() {
-        WebSocket.shared.connect()
         navigationController?.dismiss(animated: true)
     }
 }

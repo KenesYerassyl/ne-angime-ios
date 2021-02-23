@@ -31,6 +31,7 @@ class ConversationsViewController: UIViewController {
         
         configureCollectionView()
         configureTitleLabel()
+        conversationsViewModel.fetchAllConversations()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -64,7 +65,14 @@ class ConversationsViewController: UIViewController {
 
 extension ConversationsViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        //Make Clickable
+        guard let conversationID = conversationsViewModel.conversations[indexPath.row].conversationID,
+              let recipientUsername = conversationsViewModel.conversations[indexPath.row].recipientUsername else { return }
+        let chatViewController = ChatViewController()
+        chatViewController.chatViewModel = ChatViewModel(
+            conversationID: conversationID,
+            otherUser: Sender(senderId: recipientUsername, displayName: "Ne Angime?")
+        )
+        navigationController?.pushViewController(chatViewController, animated: true)
     }
 }
 
@@ -83,6 +91,7 @@ extension ConversationsViewController: UICollectionViewDataSource {
             if let user = user {
                 cell.userNameLabel.text = "\(user.firstname) \(user.lastname)"
             } else {
+                print("This will not happen")
                 cell.userNameLabel.text = "undefined undefined"
             }
         }

@@ -9,6 +9,7 @@ import Foundation
 
 protocol FriendsViewModelDelegate: class {
     func updateCollectionView()
+    func userMayInteract()
 }
 
 class FriendsViewModel {
@@ -28,10 +29,11 @@ class FriendsViewModel {
             if let newUsers = newUsers {
                 self.users = newUsers
                 DispatchQueue.main.async {
+                    self.delegate?.userMayInteract()
                     self.delegate?.updateCollectionView()
                 }
             } else if let error = error {
-                print(error)
+                print("Erro in fetching all users: \(error)")
             }
         }
     }

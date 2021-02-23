@@ -6,12 +6,14 @@
 //
 
 import UIKit
+import CoreData
 
 class TabBarController: UITabBarController {
     
     private let conversationsViewController = ConversationsViewController()
     private let friendsViewController = FriendsViewController()
     private let findViewController = FindViewController()
+    private let webSocket = (UIApplication.shared.delegate as! AppDelegate).webSocket
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -20,12 +22,31 @@ class TabBarController: UITabBarController {
         friendsViewController.tabBarItem = UITabBarItem(tabBarSystemItem: .contacts, tag: 2)
         findViewController.tabBarItem = UITabBarItem(tabBarSystemItem: .search, tag: 3)
         viewControllers = [conversationsViewController, friendsViewController, findViewController]
-        
         navigationItem.leftBarButtonItem = UIBarButtonItem(
             barButtonSystemItem: .done,
             target: self,
             action: #selector(signOut)
         )
+        let request1 = Conversation.fetchRequest() as NSFetchRequest<Conversation>
+        do {
+            let results = try CoreDataManager.shared.context.fetch(request1) as [Conversation]
+            for item in results {
+                CoreDataManager.shared.context.delete(item)
+                CoreDataManager.shared.saveContext()
+            }
+        } catch {
+            print("Error in getting all conversations: \(error)")
+        }
+        let request2 = MessageCoreData.fetchRequest() as NSFetchRequest<MessageCoreData>
+        do {
+            let results = try CoreDataManager.shared.context.fetch(request2) as [MessageCoreData]
+            for item in results {
+                CoreDataManager.shared.context.delete(item)
+                CoreDataManager.shared.saveContext()
+            }
+        } catch {
+            print("Error in getting all conversations: \(error)")
+        }
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -46,7 +67,7 @@ extension TabBarController {
         UserDefaults.standard.removeObject(forKey: "email")
         UserDefaults.standard.removeObject(forKey: "userID")
         UserDefaults.standard.removeObject(forKey: "token")
-        WebSocket.shared.disconnect()
+        webSocket.disconnect()
         let navigationController = UINavigationController(rootViewController: SignInViewController())
         navigationController.modalPresentationStyle = .fullScreen
         present(navigationController, animated: true)

@@ -38,7 +38,7 @@
 		879A7F4525D7EF7E00C70171 /* FindViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 879A7F4425D7EF7E00C70171 /* FindViewController.swift */; };
 		879A7F5125D82B2E00C70171 /* SignInViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 879A7F5025D82B2E00C70171 /* SignInViewController.swift */; };
 		879A7F5625D82CDE00C70171 /* SignInViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 879A7F5525D82CDE00C70171 /* SignInViewModel.swift */; };
-		879BF3E825DEF012006B40A2 /* Model.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 879BF3E625DEF012006B40A2 /* Model.xcdatamodeld */; };
+		879BF3E825DEF012006B40A2 /* Ne Angime?.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 879BF3E625DEF012006B40A2 /* Ne Angime?.xcdatamodeld */; };
 		87DC193025D7B0FD00C67EB4 /* ConversationsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87DC192F25D7B0FD00C67EB4 /* ConversationsViewController.swift */; };
 		87DC194425D7B4CC00C67EB4 /* ConversationsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87DC194325D7B4CC00C67EB4 /* ConversationsViewModel.swift */; };
 		87EA164925DD303200F2F9F5 /* ChatViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87EA164825DD303200F2F9F5 /* ChatViewController.swift */; };
@@ -195,7 +195,7 @@
 				873CE19D25D7A85E0007E066 /* Main.storyboard */,
 				873CE1A025D7A85F0007E066 /* Assets.xcassets */,
 				873CE1A225D7A85F0007E066 /* LaunchScreen.storyboard */,
-				879BF3E625DEF012006B40A2 /* Model.xcdatamodeld */,
+				879BF3E625DEF012006B40A2 /* Ne Angime?.xcdatamodeld */,
 				873CE1A525D7A85F0007E066 /* Info.plist */,
 				877F993E25DA8991009761A3 /* Managers */,
 				879A7F1C25D7CAFC00C70171 /* Extensions */,
@@ -688,7 +688,7 @@
 				87DC194425D7B4CC00C67EB4 /* ConversationsViewModel.swift in Sources */,
 				873CE19825D7A85E0007E066 /* AppDelegate.swift in Sources */,
 				871023CD25E2CBEA00B4895C /* DataWebSocket.swift in Sources */,
-				879BF3E825DEF012006B40A2 /* Model.xcdatamodeld in Sources */,
+				879BF3E825DEF012006B40A2 /* Ne Angime?.xcdatamodeld in Sources */,
 				8729777F25E258F100F0EC72 /* WebSocket.swift in Sources */,
 				8729777525E1AAE500F0EC72 /* MessageCoreData+CoreDataProperties.swift in Sources */,
 				879A7F5125D82B2E00C70171 /* SignInViewController.swift in Sources */,
@@ -1051,13 +1051,13 @@
 /* End XCConfigurationList section */
 
 /* Begin XCVersionGroup section */
-		879BF3E625DEF012006B40A2 /* Model.xcdatamodeld */ = {
+		879BF3E625DEF012006B40A2 /* Ne Angime?.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
 				879BF3E725DEF012006B40A2 /* Model.xcdatamodel */,
 			);
 			currentVersion = 879BF3E725DEF012006B40A2 /* Model.xcdatamodel */;
-			path = Model.xcdatamodeld;
+			path = "Ne Angime?.xcdatamodeld";
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;
 		};

@@ -12,15 +12,28 @@ protocol ChatViewModelDelegate: class {
 }
 
 class ChatViewModel {
+    
+    var conversationID: String
+    var otherUser: Sender
+    
+    init(conversationID: String, otherUser: Sender) {
+        self.conversationID = conversationID
+        self.otherUser = otherUser
+        NotificationCenter.default.addObserver(self, selector: #selector(newMessageToHandle), name: .newMessage, object: nil)
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+    
+    private let webSocket = (UIApplication.shared.delegate as! AppDelegate).webSocket
     weak var delegate: ChatViewModelDelegate?
-    var otherUser = Sender(senderId: "undefined", displayName: "undefined")
     let currentUser: Sender = {
-        if let username = UserDefaults.standard.string(forKey: "username"),
-           let firstname = UserDefaults.standard.string(forKey: "firstname"),
-           let lastname = UserDefaults.standard.string(forKey: "lastname") {
-            return Sender(senderId: username, displayName: "\(firstname) \(lastname)")
+        if let username = UserDefaults.standard.string(forKey: "username") {
+            return Sender(senderId: username, displayName: "Ne Angime?")
         } else {
-            return Sender(senderId: "undefined", displayName: "undefined")
+            print("This will not happen")
+            return Sender(senderId: "undefined", displayName: "Ne Angime?")
         }
     }()
     
@@ -50,7 +63,7 @@ class ChatViewModel {
         MessageHandler.shared.handleMessage(dataWebSocket: dataWebSocket)
         do {
             let data = try JSONEncoder().encode(dataWebSocket)
-            WebSocket.shared.webSocketTask?.send(.data(data), completionHandler: { (error) in
+            webSocket.webSocketTask?.send(.data(data), completionHandler: { (error) in
                 guard let error = error else { return }
                 print("Error in sending data: \(error)")
             })
@@ -64,5 +77,44 @@ class ChatViewModel {
             kind: .text(text)
         ))
         delegate?.updateCollectionView()
+    }
+    
+    @objc private func newMessageToHandle(notification: Notification) {
+        guard let userInfo = notification.userInfo,
+              let conversationID = userInfo["conversationID"] as? String,
+              let dataWebSocket = userInfo["dataWebSocket"] as? DataWebSocket else { return }
+        if conversationID == self.conversationID && dataWebSocket.type == .receiveMessage {
+            messages.append(Message(
+                sender: Sender(senderId: dataWebSocket.username, displayName: "Ne Angime?"),
+                messageId: dataWebSocket.message.messageID,
+                sentDate: Date(timeIntervalSince1970: dataWebSocket.message.createdAt),
+                kind: .text(dataWebSocket.message.message)
+            ))
+            DispatchQueue.main.async {
+                self.delegate?.updateCollectionView()
+            }
+        }
+    }
+    
+    func fetchConversation() {
+        CoreDataManager.shared.getConversation(conversationID: conversationID) { (conversation, error) in
+            if let conversation = conversation, let messagesCoreData = conversation.messages?.allObjects as? [MessageCoreData] {
+                var messages = [MessageType]()
+                for item in messagesCoreData {
+                    messages.append(Message(
+                        sender: (item.isSenderMe ? self.currentUser : self.otherUser),
+                        messageId: item.messageID ?? "undefined",
+                        sentDate: Date(timeIntervalSince1970: item.createdAt),
+                        kind: .text(item.message ?? "undefined")
+                    ))
+                }
+                self.messages = messages
+                DispatchQueue.main.async {
+                    self.delegate?.updateCollectionView()
+                }
+            } else if let error = error {
+                print("Error in fetching a chat: \(error)")
+            }
+        }
     }
 }

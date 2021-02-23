@@ -17,6 +17,7 @@ class ConversationsViewModel {
     
     init() {
         NotificationCenter.default.addObserver(self, selector: #selector(newConversationCreated), name: .newConversation, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(newMessageToHandle), name: .newMessage, object: nil)
     }
     
     deinit {
@@ -31,8 +32,21 @@ class ConversationsViewModel {
     
     func getLastMessage(at index: Int) -> String {
         guard let messages = conversations[index].messages?.allObjects as? [MessageCoreData],
-              let message = messages.last?.message else { return "undefined" }
+              let message = messages.last?.message else { return "undefined"}
         return message
+    }
+    
+    func fetchAllConversations() {
+        CoreDataManager.shared.getAllConversations { (results, error) in
+            if let results = results {
+                self.conversations = results
+                DispatchQueue.main.async {
+                    self.delegate?.updateCollectionView()
+                }
+            } else if let error = error {
+                print("(Conversations VM) Error in fetching all conversations: \(error)")
+            }
+        }
     }
     
     @objc func newConversationCreated(notification: Notification) {
@@ -41,6 +55,25 @@ class ConversationsViewModel {
         CoreDataManager.shared.getConversation(conversationID: conversationID) { (conversation, error) in
             if let conversation = conversation {
                 self.conversations.append(conversation)
+                DispatchQueue.main.async {
+                    self.delegate?.updateCollectionView()
+                }
+            } else if let error = error {
+                print("Error in getting convo by ID: \(error)")
+            }
+        }
+    }
+    
+    @objc func newMessageToHandle(notification: Notification) {
+        guard let userInfo = notification.userInfo,
+              let conversationID = userInfo["conversationID"] as? String else { return }
+        CoreDataManager.shared.getConversation(conversationID: conversationID) { (conversation, error) in
+            if let conversation = conversation {
+                for index in 0...self.conversations.count - 1 {
+                    if self.conversations[index].conversationID == conversationID {
+                        self.conversations[index] = conversation
+                    }
+                }
                 DispatchQueue.main.async {
                     self.delegate?.updateCollectionView()
                 }

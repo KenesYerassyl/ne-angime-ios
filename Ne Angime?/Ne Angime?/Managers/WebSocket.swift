@@ -8,23 +8,16 @@
 import Foundation
 
 class WebSocket: NSObject{
-    public static let shared = WebSocket()
     private var urlSession: URLSession?
     var webSocketTask: URLSessionWebSocketTask?
     
     override init() {
         super.init()
-        guard let url = URL(string: "ws://kenesyerassyl-kenesyerassyl-node-chat-app.zeet.app:80/?token=tokenFromLogin"),
-              let token = UserDefaults.standard.string(forKey: "token") else { return }
-        var request = URLRequest(url: url)
-        request.addValue("token=\(token)", forHTTPHeaderField: "Cookie")
+        guard let token = UserDefaults.standard.string(forKey: "token"),
+              let url = URL(string: "ws://kenesyerassyl-kenesyerassyl-node-chat-app.zeet.app:80/?token=\(token)") else { return }
         self.urlSession = URLSession(configuration: .default, delegate: self, delegateQueue: nil)
-        webSocketTask = urlSession?.webSocketTask(with: request)
-    }
-    
-    public func connect() {
+        webSocketTask = urlSession?.webSocketTask(with: url)
         webSocketTask?.resume()
-        
     }
     
     private func ping() {
@@ -46,10 +39,12 @@ class WebSocket: NSObject{
             case .success(let message):
                 switch message {
                 case .data(let data):
-                    self.distributeData(data: data)
-                    print("Data received")
+                    print("Data received: \(data)")
                 case .string(let text):
                     print("Text received: \(text)")
+                    let dataFromText = text.data(using: .utf8)
+                    guard let dataToSend = dataFromText else { return }
+                    self.distributeData(data: dataToSend)
                 @unknown default:
                     fatalError()
                 }

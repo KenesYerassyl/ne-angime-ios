@@ -26,6 +26,7 @@ class SignUpViewController2: UIViewController {
         return temp
     }()
     private let backView = UIView()
+    private let webSocket = (UIApplication.shared.delegate as! AppDelegate).webSocket
     
     init(firstName: String, lastName: String, userName: String) {
         super.init(nibName: nil, bundle: nil)
@@ -192,7 +193,6 @@ extension SignUpViewController2: SignUpViewModelDelegate2 {
     }
     
     func goToMainPage() {
-        WebSocket.shared.connect()
         navigationController?.dismiss(animated: true)
     }
     

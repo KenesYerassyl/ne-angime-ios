@@ -51,13 +51,30 @@ class CoreDataManager {
     func getConversation(conversationID: String, _ completion: @escaping(Conversation?, Error?) -> Void) {
         let request = Conversation.fetchRequest() as NSFetchRequest<Conversation>
         request.predicate = NSPredicate(format: "conversationID == %@", conversationID)
-        var results = [NSManagedObject]()
         do {
-            results = try context.fetch(request)
-            guard let conversation = results.first as? Conversation else { return }
+            let results = try context.fetch(request) as [Conversation]
+            var resultConversation: Conversation?
+            for conversation in results {
+                if conversation.conversationID == conversationID {
+                    resultConversation = conversation
+                    break
+                }
+            }
+            guard let conversation = resultConversation else { return }
             completion(conversation, nil)
         } catch {
-            print("Checking for existence \(conversationID) error: \(error)")
+            print("Error in getting conversation by ID error: \(error)")
+            completion(nil, error)
+        }
+    }
+    
+    func getAllConversations(_ completion: @escaping([Conversation]?, Error?) -> Void) {
+        let request = Conversation.fetchRequest() as NSFetchRequest<Conversation>
+        do {
+            let results = try context.fetch(request) as [Conversation]
+            completion(results, nil)
+        } catch {
+            print("Error in getting all conversations: \(error)")
             completion(nil, error)
         }
     }

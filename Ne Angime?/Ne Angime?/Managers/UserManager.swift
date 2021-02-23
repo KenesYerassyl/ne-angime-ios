@@ -24,10 +24,11 @@ class UserManager {
         let task = URLSession.shared.dataTask(with: request) { (data, response, error) in
             if let data = data, let response = response as? HTTPURLResponse, 200 <= response.statusCode && response.statusCode <= 299 {
                 do {
-                    let user = try JSONDecoder().decode(User.self, from: data)
+                    let userDict = try JSONDecoder().decode([String : User].self, from: data)
+                    guard let user = userDict["user"] else { return }
                     DispatchQueue.main.async { completion(user) }
                 } catch {
-                    print("Error in fetching a user: \(error)")
+                    print("Error in decoding a user: \(error)")
                     DispatchQueue.main.async { completion(nil) }
                 }
             } else if let error = error {
