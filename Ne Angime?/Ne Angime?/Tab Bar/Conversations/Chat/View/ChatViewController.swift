@@ -88,8 +88,18 @@ extension ChatViewController: InputBarAccessoryViewDelegate {
 }
 
 extension ChatViewController: ChatViewModelDelegate {
+    
+    func scrollToBottom() {
+        if chatViewModel != nil {
+            guard !chatViewModel!.messages.isEmpty else { return }
+            let lastIndex = chatViewModel!.messages.count - 1
+            messagesCollectionView.scrollToItem(at: IndexPath(item: lastIndex, section: 0), at: .centeredVertically, animated: true)
+        }
+    }
+    
     func updateCollectionView() {
-        messagesCollectionView.reloadDataAndKeepOffset()
+        messagesCollectionView.reloadData()
+//        scrollToBottom()
         messagesCollectionView.scrollToLastItem()
     }
 }

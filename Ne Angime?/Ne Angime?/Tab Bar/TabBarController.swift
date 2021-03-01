@@ -27,26 +27,26 @@ class TabBarController: UITabBarController {
             target: self,
             action: #selector(signOut)
         )
-        let request1 = Conversation.fetchRequest() as NSFetchRequest<Conversation>
-        do {
-            let results = try CoreDataManager.shared.context.fetch(request1) as [Conversation]
-            for item in results {
-                CoreDataManager.shared.context.delete(item)
-                CoreDataManager.shared.saveContext()
-            }
-        } catch {
-            print("Error in getting all conversations: \(error)")
-        }
-        let request2 = MessageCoreData.fetchRequest() as NSFetchRequest<MessageCoreData>
-        do {
-            let results = try CoreDataManager.shared.context.fetch(request2) as [MessageCoreData]
-            for item in results {
-                CoreDataManager.shared.context.delete(item)
-                CoreDataManager.shared.saveContext()
-            }
-        } catch {
-            print("Error in getting all conversations: \(error)")
-        }
+//        let request1 = Conversation.fetchRequest() as NSFetchRequest<Conversation>
+//        do {
+//            let results = try CoreDataManager.shared.context.fetch(request1) as [Conversation]
+//            for item in results {
+//                CoreDataManager.shared.context.delete(item)
+//                CoreDataManager.shared.saveContext()
+//            }
+//        } catch {
+//            print("Error in getting all conversations: \(error)")
+//        }
+//        let request2 = MessageCoreData.fetchRequest() as NSFetchRequest<MessageCoreData>
+//        do {
+//            let results = try CoreDataManager.shared.context.fetch(request2) as [MessageCoreData]
+//            for item in results {
+//                CoreDataManager.shared.context.delete(item)
+//                CoreDataManager.shared.saveContext()
+//            }
+//        } catch {
+//            print("Error in getting all conversations: \(error)")
+//        }
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -55,6 +55,9 @@ class TabBarController: UITabBarController {
             let navigationController = UINavigationController(rootViewController: SignInViewController())
             navigationController.modalPresentationStyle = .fullScreen
             present(navigationController, animated: false)
+        }
+        if(webSocket.webSocketTask?.state != URLSessionWebSocketTask.State.running) {
+            webSocket.connect()
         }
     }
 }

@@ -15,9 +15,8 @@ class WebSocket: NSObject{
         super.init()
         guard let token = UserDefaults.standard.string(forKey: "token"),
               let url = URL(string: "ws://kenesyerassyl-kenesyerassyl-node-chat-app.zeet.app:80/?token=\(token)") else { return }
-        self.urlSession = URLSession(configuration: .default, delegate: self, delegateQueue: nil)
+        self.urlSession = URLSession(configuration: .default, delegate: self, delegateQueue: OperationQueue())
         webSocketTask = urlSession?.webSocketTask(with: url)
-        webSocketTask?.resume()
     }
     
     private func ping() {
@@ -69,9 +68,16 @@ class WebSocket: NSObject{
         }
     }
     
+    public func connect() {
+        print("trying to connect...")
+        webSocketTask?.resume()
+    }
+    
     public func disconnect() {
-        let reason = "Closing connection".data(using: .utf8)
-        webSocketTask?.cancel(with: .goingAway, reason: reason)
+//        let reason = "disconnecting".data(using: .utf8)
+//        webSocketTask?.cancel(with: .goingAway, reason: reason)
+        print("trying to suspend...")
+        webSocketTask?.suspend()
     }
 }
 

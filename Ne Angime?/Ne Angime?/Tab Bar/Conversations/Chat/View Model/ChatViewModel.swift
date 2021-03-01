@@ -108,6 +108,9 @@ class ChatViewModel {
                         kind: .text(item.message ?? "undefined")
                     ))
                 }
+                messages.sort { (messageType1, messageType2) -> Bool in
+                    return messageType1.sentDate < messageType2.sentDate
+                }
                 self.messages = messages
                 DispatchQueue.main.async {
                     self.delegate?.updateCollectionView()
