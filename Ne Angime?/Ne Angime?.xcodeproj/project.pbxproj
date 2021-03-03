@@ -10,6 +10,7 @@
 		184E359CD16985D403668897 /* Pods_Ne_Angime__Ne_Angime_UITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 22ACDC3173C71910B96C2F01 /* Pods_Ne_Angime__Ne_Angime_UITests.framework */; };
 		2A079019245B50100D16AD61 /* Pods_Ne_Angime_.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FFCDB66AF8DB440C2C33093A /* Pods_Ne_Angime_.framework */; };
 		46374A231AF0F9A343EFE6F0 /* Pods_Ne_Angime_Tests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B396BD6E97E88CBF868504E8 /* Pods_Ne_Angime_Tests.framework */; };
+		8706206F25EE7A2000A8F0C4 /* ProfileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8706206E25EE7A2000A8F0C4 /* ProfileViewController.swift */; };
 		871023CD25E2CBEA00B4895C /* DataWebSocket.swift in Sources */ = {isa = PBXBuildFile; fileRef = 871023CC25E2CBEA00B4895C /* DataWebSocket.swift */; };
 		87131FD825D849B700FE342A /* UITextField+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87131FD725D849B700FE342A /* UITextField+Extension.swift */; };
 		8729774025E194DE00F0EC72 /* UserManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8729773F25E194DE00F0EC72 /* UserManager.swift */; };
@@ -70,6 +71,7 @@
 		155414FA4BF097D262C7CD5F /* Pods-Ne Angime?.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Ne Angime?.release.xcconfig"; path = "Target Support Files/Pods-Ne Angime?/Pods-Ne Angime?.release.xcconfig"; sourceTree = "<group>"; };
 		22ACDC3173C71910B96C2F01 /* Pods_Ne_Angime__Ne_Angime_UITests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Ne_Angime__Ne_Angime_UITests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		3625DC80AF09459E7F84F67E /* Pods-Ne Angime?.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Ne Angime?.debug.xcconfig"; path = "Target Support Files/Pods-Ne Angime?/Pods-Ne Angime?.debug.xcconfig"; sourceTree = "<group>"; };
+		8706206E25EE7A2000A8F0C4 /* ProfileViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewController.swift; sourceTree = "<group>"; };
 		871023CC25E2CBEA00B4895C /* DataWebSocket.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataWebSocket.swift; sourceTree = "<group>"; };
 		87131FD725D849B700FE342A /* UITextField+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UITextField+Extension.swift"; sourceTree = "<group>"; };
 		8729773F25E194DE00F0EC72 /* UserManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserManager.swift; sourceTree = "<group>"; };
@@ -160,6 +162,30 @@
 				BC954D28220E3E17F873F45B /* Pods-Ne Angime?Tests.release.xcconfig */,
 			);
 			path = Pods;
+			sourceTree = "<group>";
+		};
+		8706206B25EE79DA00A8F0C4 /* Profile */ = {
+			isa = PBXGroup;
+			children = (
+				8706206C25EE79EA00A8F0C4 /* View Model */,
+				8706206D25EE79F100A8F0C4 /* View */,
+			);
+			path = Profile;
+			sourceTree = "<group>";
+		};
+		8706206C25EE79EA00A8F0C4 /* View Model */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = "View Model";
+			sourceTree = "<group>";
+		};
+		8706206D25EE79F100A8F0C4 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				8706206E25EE7A2000A8F0C4 /* ProfileViewController.swift */,
+			);
+			path = View;
 			sourceTree = "<group>";
 		};
 		873CE18B25D7A85E0007E066 = {
@@ -370,6 +396,7 @@
 			isa = PBXGroup;
 			children = (
 				873CE19B25D7A85E0007E066 /* TabBarController.swift */,
+				8706206B25EE79DA00A8F0C4 /* Profile */,
 				879A7F4125D7EF5C00C70171 /* Find */,
 				879A7F2225D7DD3200C70171 /* Friends */,
 				87DC192E25D7B09200C67EB4 /* Conversations */,
@@ -683,6 +710,7 @@
 				879A7F5625D82CDE00C70171 /* SignInViewModel.swift in Sources */,
 				8729777A25E24B1B00F0EC72 /* Notification+Extensions.swift in Sources */,
 				873CE19C25D7A85E0007E066 /* TabBarController.swift in Sources */,
+				8706206F25EE7A2000A8F0C4 /* ProfileViewController.swift in Sources */,
 				879A7F3425D7ECCB00C70171 /* FriendsCollectionViewCell.swift in Sources */,
 				879A7F1825D7BFBD00C70171 /* ConversationsCollectionViewCell.swift in Sources */,
 				87DC194425D7B4CC00C67EB4 /* ConversationsViewModel.swift in Sources */,

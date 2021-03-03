@@ -110,7 +110,7 @@ extension FriendsViewController: UICollectionViewDelegate {
         var conversationID = "\(currentUsername)&&\(user.username)"
         
         if CoreDataManager.shared.doesConversationExist("\(user.username)&&\(currentUsername)") {
-            conversationID = "\(currentUsername)&&\(user.username)"
+            conversationID = "\(user.username)&&\(currentUsername)"
         }
         
         let chatViewController = ChatViewController()

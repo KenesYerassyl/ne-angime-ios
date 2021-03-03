@@ -13,6 +13,7 @@ class TabBarController: UITabBarController {
     private let conversationsViewController = ConversationsViewController()
     private let friendsViewController = FriendsViewController()
     private let findViewController = FindViewController()
+    private let profileViewController = ProfileViewController()
     private let webSocket = (UIApplication.shared.delegate as! AppDelegate).webSocket
     
     override func viewDidLoad() {
@@ -21,7 +22,8 @@ class TabBarController: UITabBarController {
         conversationsViewController.tabBarItem = UITabBarItem(tabBarSystemItem: .bookmarks, tag: 1)
         friendsViewController.tabBarItem = UITabBarItem(tabBarSystemItem: .contacts, tag: 2)
         findViewController.tabBarItem = UITabBarItem(tabBarSystemItem: .search, tag: 3)
-        viewControllers = [conversationsViewController, friendsViewController, findViewController]
+        profileViewController.tabBarItem = UITabBarItem(tabBarSystemItem: .favorites, tag: 4)
+        viewControllers = [conversationsViewController, friendsViewController, findViewController, profileViewController]
         navigationItem.leftBarButtonItem = UIBarButtonItem(
             barButtonSystemItem: .done,
             target: self,

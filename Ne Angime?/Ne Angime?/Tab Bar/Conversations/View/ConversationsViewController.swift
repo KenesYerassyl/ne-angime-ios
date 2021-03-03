@@ -34,11 +34,6 @@ class ConversationsViewController: UIViewController {
         conversationsViewModel.fetchAllConversations()
     }
     
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-//        navigationController?.setNavigationBarHidden(true, animated: false)
-    }
-    
     func configureCollectionView() {
         view.addSubview(collectionView)
         collectionView.backgroundColor = .clear

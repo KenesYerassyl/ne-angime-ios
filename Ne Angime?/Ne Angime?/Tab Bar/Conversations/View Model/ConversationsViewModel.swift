@@ -31,9 +31,19 @@ class ConversationsViewModel {
     }
     
     func getLastMessage(at index: Int) -> String {
-        guard let messages = conversations[index].messages?.allObjects as? [MessageCoreData],
-              let message = messages.last?.message else { return "undefined"}
-        return message
+        guard let messages = conversations[index].messages?.allObjects as? [MessageCoreData] else { return "undefined" }
+        var dateOfLastMessage: Double = 0
+        var lastMessage = "undefined"
+        
+        for item in messages {
+            if item.createdAt > dateOfLastMessage {
+                guard let message = item.message else { return "undefined" }
+                lastMessage = message
+                dateOfLastMessage = item.createdAt
+            }
+        }
+        
+        return lastMessage
     }
     
     func fetchAllConversations() {
@@ -72,6 +82,7 @@ class ConversationsViewModel {
                 for index in 0...self.conversations.count - 1 {
                     if self.conversations[index].conversationID == conversationID {
                         self.conversations[index] = conversation
+                        break
                     }
                 }
                 DispatchQueue.main.async {
