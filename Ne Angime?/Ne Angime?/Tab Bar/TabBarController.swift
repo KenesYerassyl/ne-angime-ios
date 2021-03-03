@@ -9,12 +9,10 @@ import UIKit
 import CoreData
 
 class TabBarController: UITabBarController {
-    
     private let conversationsViewController = ConversationsViewController()
     private let friendsViewController = FriendsViewController()
     private let findViewController = FindViewController()
     private let profileViewController = ProfileViewController()
-    private let webSocket = (UIApplication.shared.delegate as! AppDelegate).webSocket
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -29,38 +27,8 @@ class TabBarController: UITabBarController {
             target: self,
             action: #selector(signOut)
         )
-//        let request1 = Conversation.fetchRequest() as NSFetchRequest<Conversation>
-//        do {
-//            let results = try CoreDataManager.shared.context.fetch(request1) as [Conversation]
-//            for item in results {
-//                CoreDataManager.shared.context.delete(item)
-//                CoreDataManager.shared.saveContext()
-//            }
-//        } catch {
-//            print("Error in getting all conversations: \(error)")
-//        }
-//        let request2 = MessageCoreData.fetchRequest() as NSFetchRequest<MessageCoreData>
-//        do {
-//            let results = try CoreDataManager.shared.context.fetch(request2) as [MessageCoreData]
-//            for item in results {
-//                CoreDataManager.shared.context.delete(item)
-//                CoreDataManager.shared.saveContext()
-//            }
-//        } catch {
-//            print("Error in getting all conversations: \(error)")
-//        }
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        if UserDefaults.standard.string(forKey: "username") == nil {
-            let navigationController = UINavigationController(rootViewController: SignInViewController())
-            navigationController.modalPresentationStyle = .fullScreen
-            present(navigationController, animated: false)
-        }
-        if(webSocket.webSocketTask?.state != URLSessionWebSocketTask.State.running) {
-            webSocket.connect()
-        }
+        WebSocket.shared.resetTask()
+        WebSocket.shared.connect()
     }
 }
 
@@ -70,11 +38,34 @@ extension TabBarController {
         UserDefaults.standard.removeObject(forKey: "firstname")
         UserDefaults.standard.removeObject(forKey: "lastname")
         UserDefaults.standard.removeObject(forKey: "email")
-        UserDefaults.standard.removeObject(forKey: "userID")
         UserDefaults.standard.removeObject(forKey: "token")
-        webSocket.disconnect()
-        let navigationController = UINavigationController(rootViewController: SignInViewController())
-        navigationController.modalPresentationStyle = .fullScreen
-        present(navigationController, animated: true)
+        WebSocket.shared.disconnect()
+        
+        let fetchRequest1: NSFetchRequest<NSFetchRequestResult> = NSFetchRequest(entityName: "Conversation")
+        let deleteRequest1 = NSBatchDeleteRequest(fetchRequest: fetchRequest1)
+        do {
+            try CoreDataManager.shared.context.persistentStoreCoordinator?.execute(
+                deleteRequest1,
+                with: CoreDataManager.shared.context
+            )
+        } catch {
+            print("Error in deleting conversations: \(error)")
+        }
+        
+        let fetchRequest2: NSFetchRequest<NSFetchRequestResult> = NSFetchRequest(entityName: "Conversation")
+        let deleteRequest2 = NSBatchDeleteRequest(fetchRequest: fetchRequest2)
+        do {
+            try CoreDataManager.shared.context.persistentStoreCoordinator?.execute(
+                deleteRequest2,
+                with: CoreDataManager.shared.context
+            )
+        } catch {
+            print("Error in deleting conversations: \(error)")
+        }
+        conversationsViewController.conversationsViewModel.conversations.removeAll()
+        conversationsViewController.wereConversationsFetched = false
+        conversationsViewController.updateCollectionView()
+        
+        navigationController?.popViewController(animated: true)
     }
 }

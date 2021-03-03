@@ -11,22 +11,20 @@ class MessageHandler {
     public static let shared = MessageHandler()
     private init(){}
     
-    public func handleMessage(dataWebSocket: DataWebSocket) {
-        guard let currentUsername = UserDefaults.standard.string(forKey: "username") else { return }
-        let senderUsername = (dataWebSocket.type == .sendMessage ? currentUsername : dataWebSocket.username)
-        let recipientUsername = (dataWebSocket.type == .receiveMessage ? currentUsername : dataWebSocket.username)
+    public func handleMessage(messageWebSocket: MessageWebSocket) {
         var conversationID = "undefined"
-        if CoreDataManager.shared.doesConversationExist("\(senderUsername)&&\(recipientUsername)") {
-            conversationID = "\(senderUsername)&&\(recipientUsername)"
-        } else if CoreDataManager.shared.doesConversationExist("\(recipientUsername)&&\(senderUsername)") {
-            conversationID = "\(recipientUsername)&&\(senderUsername)"
+        if CoreDataManager.shared.doesConversationExist("\(messageWebSocket.senderUsername)&&\(messageWebSocket.recipientUsername)") {
+            conversationID = "\(messageWebSocket.senderUsername)&&\(messageWebSocket.recipientUsername)"
+        } else if CoreDataManager.shared.doesConversationExist("\(messageWebSocket.recipientUsername)&&\(messageWebSocket.senderUsername)") {
+            conversationID = "\(messageWebSocket.recipientUsername)&&\(messageWebSocket.senderUsername)"
         }
         
         let message = MessageCoreData(entity: MessageCoreData.entity(), insertInto: CoreDataManager.shared.context)
-        message.isSenderMe = (senderUsername == currentUsername)
-        message.messageID = dataWebSocket.message.messageID
-        message.message = dataWebSocket.message.message
-        message.createdAt = dataWebSocket.message.createdAt
+        message.messageID = messageWebSocket.messageID
+        message.message = messageWebSocket.message
+        message.createdAt = messageWebSocket.createdAt
+        message.recipientUsername = messageWebSocket.recipientUsername
+        message.senderUsername = messageWebSocket.senderUsername
         
         if conversationID != "undefined" {
             CoreDataManager.shared.getConversation(conversationID: conversationID) { (conversation, error) in
@@ -39,7 +37,7 @@ class MessageHandler {
                         object: nil,
                         userInfo: [
                             "conversationID" : conversationID,
-                            "dataWebSocket" : dataWebSocket
+                            "messageWebSocket" : messageWebSocket
                         ]
                     )
                 } else if let error = error {
@@ -48,15 +46,14 @@ class MessageHandler {
             }
         } else {
             let conversation = Conversation(entity: Conversation.entity(), insertInto: CoreDataManager.shared.context)
-            conversation.conversationID = "\(senderUsername)&&\(recipientUsername)"
-            conversation.recipientUsername = dataWebSocket.username
+            conversation.conversationID = "\(messageWebSocket.senderUsername)&&\(messageWebSocket.recipientUsername)"
             message.conversation = conversation
             conversation.addToMessages(message)
             CoreDataManager.shared.saveContext()
             NotificationCenter.default.post(
                 name: .newConversation,
                 object: nil,
-                userInfo: ["conversationID" : "\(senderUsername)&&\(recipientUsername)"]
+                userInfo: ["conversationID" : "\(messageWebSocket.senderUsername)&&\(messageWebSocket.recipientUsername)"]
             )
         }
     }

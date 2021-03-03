@@ -26,7 +26,6 @@ class ChatViewModel {
         NotificationCenter.default.removeObserver(self)
     }
     
-    private let webSocket = (UIApplication.shared.delegate as! AppDelegate).webSocket
     weak var delegate: ChatViewModelDelegate?
     let currentUser: Sender = {
         if let username = UserDefaults.standard.string(forKey: "username") {
@@ -52,18 +51,19 @@ class ChatViewModel {
     }
     
     func didTapSendButton(_ text: String) {
-        guard let userID = UserDefaults.standard.string(forKey: "userID") else { return }
         let messageWebSocket = MessageWebSocket(
+            type: .sendMessage,
             message: text,
             messageID: UUID().uuidString,
-            userID: userID,
+            conversationID: conversationID,
+            senderUsername: currentUser.senderId,
+            recipientUsername: otherUser.senderId,
             createdAt: Date().timeIntervalSince1970
         )
-        let dataWebSocket = DataWebSocket(type: .sendMessage, username: otherUser.senderId, message: messageWebSocket)
-        MessageHandler.shared.handleMessage(dataWebSocket: dataWebSocket)
+        MessageHandler.shared.handleMessage(messageWebSocket: messageWebSocket)
         do {
-            let data = try JSONEncoder().encode(dataWebSocket)
-            webSocket.webSocketTask?.send(.data(data), completionHandler: { (error) in
+            let data = try JSONEncoder().encode(messageWebSocket)
+            WebSocket.shared.webSocketTask?.send(.data(data), completionHandler: { (error) in
                 guard let error = error else { return }
                 print("Error in sending data: \(error)")
             })
@@ -82,13 +82,13 @@ class ChatViewModel {
     @objc private func newMessageToHandle(notification: Notification) {
         guard let userInfo = notification.userInfo,
               let conversationID = userInfo["conversationID"] as? String,
-              let dataWebSocket = userInfo["dataWebSocket"] as? DataWebSocket else { return }
+              let dataWebSocket = userInfo["messageWebSocket"] as? MessageWebSocket else { return }
         if conversationID == self.conversationID && dataWebSocket.type == .receiveMessage {
             messages.append(Message(
-                sender: Sender(senderId: dataWebSocket.username, displayName: "Ne Angime?"),
-                messageId: dataWebSocket.message.messageID,
-                sentDate: Date(timeIntervalSince1970: dataWebSocket.message.createdAt),
-                kind: .text(dataWebSocket.message.message)
+                sender: Sender(senderId: dataWebSocket.senderUsername, displayName: "Ne Angime?"),
+                messageId: dataWebSocket.messageID,
+                sentDate: Date(timeIntervalSince1970: dataWebSocket.createdAt),
+                kind: .text(dataWebSocket.message)
             ))
             DispatchQueue.main.async {
                 self.delegate?.updateCollectionView()
@@ -102,7 +102,7 @@ class ChatViewModel {
                 var messages = [MessageType]()
                 for item in messagesCoreData {
                     messages.append(Message(
-                        sender: (item.isSenderMe ? self.currentUser : self.otherUser),
+                        sender: Sender(senderId: item.senderUsername ?? "undefined", displayName: "Ne Angime?"),
                         messageId: item.messageID ?? "undefined",
                         sentDate: Date(timeIntervalSince1970: item.createdAt),
                         kind: .text(item.message ?? "undefined")

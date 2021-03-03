@@ -42,6 +42,11 @@ class SignUpViewController1: UIViewController {
         signUpViewModel1.delegate = self
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.setNavigationBarHidden(true, animated: false)
+    }
+    
     private func updateFieldsView() {
         view.addSubview(fieldsView)
         fieldsView.backgroundColor = .white

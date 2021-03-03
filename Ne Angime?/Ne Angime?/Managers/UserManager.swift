@@ -11,6 +11,30 @@ class UserManager {
     public static let shared = UserManager()
     private init(){}
     
+    public func getOtherUsername(by conversationID: String) -> String {
+        var firstUsername = "", secondUsername = ""
+        var isAmpercanMet1 = false
+        var isAmpercanMet2 = false
+        for item in conversationID {
+            if item == "&" {
+                if isAmpercanMet1 {
+                    isAmpercanMet2 = true
+                } else {
+                    isAmpercanMet1 = true
+                }
+            } else {
+                if isAmpercanMet2 {
+                    secondUsername.append(item)
+                } else {
+                    firstUsername.append(item)
+                }
+            }
+        }
+        
+        guard let currentUsername = UserDefaults.standard.string(forKey: "username") else { return "undefined" }
+        return (firstUsername == currentUsername ? secondUsername : firstUsername)
+    }
+    
     public func getUser(username: String, _ completion: @escaping(User?) -> Void) {
         guard let url = URL(string: "https://kenesyerassyl-kenesyerassyl-node-chat-app.zeet.app/api/users/user/\(username)"),
               let cookie = UserDefaults.standard.string(forKey: "token")

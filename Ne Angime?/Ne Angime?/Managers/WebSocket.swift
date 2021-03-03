@@ -8,11 +8,22 @@
 import Foundation
 
 class WebSocket: NSObject{
+    public static let shared = WebSocket()
     private var urlSession: URLSession?
     var webSocketTask: URLSessionWebSocketTask?
     
     override init() {
         super.init()
+        guard let token = UserDefaults.standard.string(forKey: "token"),
+              let url = URL(string: "ws://kenesyerassyl-kenesyerassyl-node-chat-app.zeet.app:80/?token=\(token)") else { return }
+        self.urlSession = URLSession(configuration: .default, delegate: self, delegateQueue: OperationQueue())
+        webSocketTask = urlSession?.webSocketTask(with: url)
+    }
+    
+    public func resetTask() {
+        urlSession = nil
+        webSocketTask = nil
+        
         guard let token = UserDefaults.standard.string(forKey: "token"),
               let url = URL(string: "ws://kenesyerassyl-kenesyerassyl-node-chat-app.zeet.app:80/?token=\(token)") else { return }
         self.urlSession = URLSession(configuration: .default, delegate: self, delegateQueue: OperationQueue())
@@ -56,10 +67,10 @@ class WebSocket: NSObject{
     
     private func distributeData(data: Data) {
         do {
-            let dataWebSocket = try JSONDecoder().decode(DataWebSocket.self, from: data)
-            switch dataWebSocket.type {
+            let messageWebSocket = try JSONDecoder().decode(MessageWebSocket.self, from: data)
+            switch messageWebSocket.type {
             case .receiveMessage:
-                MessageHandler.shared.handleMessage(dataWebSocket: dataWebSocket)
+                MessageHandler.shared.handleMessage(messageWebSocket: messageWebSocket)
             case .sendMessage:
                 print("This will not happen")
             }
@@ -74,10 +85,8 @@ class WebSocket: NSObject{
     }
     
     public func disconnect() {
-//        let reason = "disconnecting".data(using: .utf8)
-//        webSocketTask?.cancel(with: .goingAway, reason: reason)
-        print("trying to suspend...")
-        webSocketTask?.suspend()
+        let reason = "disconnecting".data(using: .utf8)
+        webSocketTask?.cancel(with: .goingAway, reason: reason)
     }
 }
 

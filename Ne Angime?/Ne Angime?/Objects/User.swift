@@ -11,8 +11,8 @@ struct User: Codable {
     var username: String
     var firstname: String
     var lastname: String
-    var userID: String
-    var avatar: String
+    var userID: String?
+    var avatar: String?
     
     enum CodingKeys: String, CodingKey {
         case username
@@ -22,7 +22,7 @@ struct User: Codable {
         case avatar
     }
     
-    init(username: String, firstname: String, lastname: String, userID: String, avatar: String) {
+    init(username: String, firstname: String, lastname: String, userID: String?, avatar: String?) {
         self.username = username
         self.firstname = firstname
         self.lastname = lastname

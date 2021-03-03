@@ -30,6 +30,14 @@ class ConversationsViewModel {
         return conversations.count
     }
     
+    func getConversationID(at index: Int) -> String {
+        if let conversationID = conversations[index].conversationID {
+            return conversationID
+        } else {
+            return "undefined"
+        }
+    }
+    
     func getLastMessage(at index: Int) -> String {
         guard let messages = conversations[index].messages?.allObjects as? [MessageCoreData] else { return "undefined" }
         var dateOfLastMessage: Double = 0
@@ -53,6 +61,31 @@ class ConversationsViewModel {
                 DispatchQueue.main.async {
                     self.delegate?.updateCollectionView()
                 }
+                ConversationManager.shared.getAllConversations { (conversations, error) in
+                    if let conversationsFromDB = conversations {
+                        if conversationsFromDB.count != self.conversations.count {
+                            self.conversations = conversationsFromDB
+                            DispatchQueue.main.async {
+                                self.delegate?.updateCollectionView()
+                            }
+                        } else {
+                            var index = 0
+                            while index < self.conversations.count {
+                                if self.conversations[index].messages?.count != conversationsFromDB[index].messages?.count {
+                                    self.conversations = conversationsFromDB
+                                    DispatchQueue.main.async {
+                                        self.delegate?.updateCollectionView()
+                                    }
+                                    break
+                                }
+                                index += 1
+                            }
+                        }
+                    } else if let error = error {
+                        print("Error in fetching all conversations from DB: \(error)")
+                    }
+                }
+                
             } else if let error = error {
                 print("(Conversations VM) Error in fetching all conversations: \(error)")
             }

@@ -26,7 +26,6 @@ class SignInViewController: UIViewController {
         return temp
     }()
     private let backView = UIView()
-    private let webSocket = (UIApplication.shared.delegate as! AppDelegate).webSocket
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -45,6 +44,10 @@ class SignInViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(true, animated: false)
+        if UserDefaults.standard.string(forKey: "username") != nil {
+            navigationController?.setNavigationBarHidden(false, animated: true)
+            navigationController?.pushViewController(TabBarController(), animated: false)
+        }
     }
     
     private func updateFieldsView() {
@@ -179,7 +182,9 @@ extension SignInViewController {
     }
     
     @objc private func didTapSignUpLabel() {
-        navigationController?.pushViewController(SignUpViewController1(), animated: true)
+        let navigationController = UINavigationController(rootViewController: SignUpViewController1())
+        navigationController.modalPresentationStyle = .fullScreen
+        present(navigationController, animated: true)
     }
 }
 
@@ -202,6 +207,9 @@ extension SignInViewController: SignInViewModelDelegate {
     }
     
     func goToMainPage() {
-        navigationController?.dismiss(animated: true)
+        userNameTextField.text = nil
+        passwordTextField.text = nil
+        navigationController?.setNavigationBarHidden(false, animated: true)
+        navigationController?.pushViewController(TabBarController(), animated: true)
     }
 }

@@ -26,7 +26,6 @@ class SignUpViewController2: UIViewController {
         return temp
     }()
     private let backView = UIView()
-    private let webSocket = (UIApplication.shared.delegate as! AppDelegate).webSocket
     
     init(firstName: String, lastName: String, userName: String) {
         super.init(nibName: nil, bundle: nil)
@@ -51,6 +50,11 @@ class SignUpViewController2: UIViewController {
         updateActivityIndicator()
         
         signUpViewModel2.delegate = self
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.setNavigationBarHidden(true, animated: false)
     }
     
     private func updateFieldsView() {

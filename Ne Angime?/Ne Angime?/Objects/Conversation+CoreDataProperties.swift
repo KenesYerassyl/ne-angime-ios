@@ -2,7 +2,7 @@
 //  Conversation+CoreDataProperties.swift
 //  Ne Angime?
 //
-//  Created by Kenes Yerassyl on 2/21/21.
+//  Created by Kenes Yerassyl on 3/3/21.
 //
 //
 
@@ -17,7 +17,6 @@ extension Conversation {
     }
 
     @NSManaged public var conversationID: String?
-    @NSManaged public var recipientUsername: String?
     @NSManaged public var messages: NSSet?
 
 }
