@@ -69,11 +69,7 @@ class ConversationsViewController: UIViewController {
 extension ConversationsViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let conversationID = conversationsViewModel.getConversationID(at: indexPath.row)
-        let chatViewController = ChatViewController()
-        chatViewController.chatViewModel = ChatViewModel(
-            conversationID: conversationID,
-            otherUser: Sender(senderId: UserManager.shared.getOtherUsername(by: conversationID), displayName: "Ne Angime?")
-        )
+        let chatViewController = ChatViewController(conversationID: conversationID)
         navigationController?.pushViewController(chatViewController, animated: true)
     }
 }

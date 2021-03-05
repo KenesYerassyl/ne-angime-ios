@@ -11,6 +11,8 @@
 		2A079019245B50100D16AD61 /* Pods_Ne_Angime_.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FFCDB66AF8DB440C2C33093A /* Pods_Ne_Angime_.framework */; };
 		46374A231AF0F9A343EFE6F0 /* Pods_Ne_Angime_Tests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B396BD6E97E88CBF868504E8 /* Pods_Ne_Angime_Tests.framework */; };
 		8706206F25EE7A2000A8F0C4 /* ProfileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8706206E25EE7A2000A8F0C4 /* ProfileViewController.swift */; };
+		870E92BA25F2B95000ECB435 /* Sender.swift in Sources */ = {isa = PBXBuildFile; fileRef = 870E92B925F2B95000ECB435 /* Sender.swift */; };
+		870E92C225F2B98A00ECB435 /* Message.swift in Sources */ = {isa = PBXBuildFile; fileRef = 870E92C125F2B98A00ECB435 /* Message.swift */; };
 		871023CD25E2CBEA00B4895C /* MessageWebSocket.swift in Sources */ = {isa = PBXBuildFile; fileRef = 871023CC25E2CBEA00B4895C /* MessageWebSocket.swift */; };
 		87131FD825D849B700FE342A /* UITextField+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87131FD725D849B700FE342A /* UITextField+Extension.swift */; };
 		8729774025E194DE00F0EC72 /* UserManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8729773F25E194DE00F0EC72 /* UserManager.swift */; };
@@ -74,6 +76,8 @@
 		22ACDC3173C71910B96C2F01 /* Pods_Ne_Angime__Ne_Angime_UITests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Ne_Angime__Ne_Angime_UITests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		3625DC80AF09459E7F84F67E /* Pods-Ne Angime?.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Ne Angime?.debug.xcconfig"; path = "Target Support Files/Pods-Ne Angime?/Pods-Ne Angime?.debug.xcconfig"; sourceTree = "<group>"; };
 		8706206E25EE7A2000A8F0C4 /* ProfileViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewController.swift; sourceTree = "<group>"; };
+		870E92B925F2B95000ECB435 /* Sender.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sender.swift; sourceTree = "<group>"; };
+		870E92C125F2B98A00ECB435 /* Message.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Message.swift; sourceTree = "<group>"; };
 		871023CC25E2CBEA00B4895C /* MessageWebSocket.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageWebSocket.swift; sourceTree = "<group>"; };
 		87131FD725D849B700FE342A /* UITextField+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UITextField+Extension.swift"; sourceTree = "<group>"; };
 		8729773F25E194DE00F0EC72 /* UserManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserManager.swift; sourceTree = "<group>"; };
@@ -192,6 +196,17 @@
 			path = View;
 			sourceTree = "<group>";
 		};
+		870E92B825F2B92200ECB435 /* Core Data */ = {
+			isa = PBXGroup;
+			children = (
+				87A7937125EF8A70006F5CC2 /* Conversation+CoreDataClass.swift */,
+				87A7937325EF8A70006F5CC2 /* MessageCoreData+CoreDataClass.swift */,
+				87A7937225EF8A70006F5CC2 /* Conversation+CoreDataProperties.swift */,
+				87A7937425EF8A70006F5CC2 /* MessageCoreData+CoreDataProperties.swift */,
+			);
+			path = "Core Data";
+			sourceTree = "<group>";
+		};
 		873CE18B25D7A85E0007E066 = {
 			isa = PBXGroup;
 			children = (
@@ -222,6 +237,7 @@
 				879A7F4925D8281800C70171 /* Sign Up & Sign In */,
 				87DC192A25D7AFDA00C67EB4 /* Tab Bar */,
 				879BF3F725DEF7AE006B40A2 /* Objects */,
+				870E92B825F2B92200ECB435 /* Core Data */,
 				873CE19D25D7A85E0007E066 /* Main.storyboard */,
 				873CE1A025D7A85F0007E066 /* Assets.xcassets */,
 				873CE1A225D7A85F0007E066 /* LaunchScreen.storyboard */,
@@ -388,12 +404,10 @@
 		879BF3F725DEF7AE006B40A2 /* Objects */ = {
 			isa = PBXGroup;
 			children = (
-				87A7937125EF8A70006F5CC2 /* Conversation+CoreDataClass.swift */,
-				87A7937325EF8A70006F5CC2 /* MessageCoreData+CoreDataClass.swift */,
-				87A7937225EF8A70006F5CC2 /* Conversation+CoreDataProperties.swift */,
-				87A7937425EF8A70006F5CC2 /* MessageCoreData+CoreDataProperties.swift */,
 				871023CC25E2CBEA00B4895C /* MessageWebSocket.swift */,
 				877F993F25DA89C7009761A3 /* User.swift */,
+				870E92B925F2B95000ECB435 /* Sender.swift */,
+				870E92C125F2B98A00ECB435 /* Message.swift */,
 			);
 			path = Objects;
 			sourceTree = "<group>";
@@ -716,6 +730,7 @@
 				87EE868C25D9476D00F89605 /* SignUpViewModel1.swift in Sources */,
 				879A7F5625D82CDE00C70171 /* SignInViewModel.swift in Sources */,
 				8729777A25E24B1B00F0EC72 /* Notification+Extensions.swift in Sources */,
+				870E92BA25F2B95000ECB435 /* Sender.swift in Sources */,
 				873CE19C25D7A85E0007E066 /* TabBarController.swift in Sources */,
 				8706206F25EE7A2000A8F0C4 /* ProfileViewController.swift in Sources */,
 				879A7F3425D7ECCB00C70171 /* FriendsCollectionViewCell.swift in Sources */,
@@ -737,6 +752,7 @@
 				87DC193025D7B0FD00C67EB4 /* ConversationsViewController.swift in Sources */,
 				87A7937625EF8A70006F5CC2 /* Conversation+CoreDataProperties.swift in Sources */,
 				87EE868225D9031F00F89605 /* SignUpViewController1.swift in Sources */,
+				870E92C225F2B98A00ECB435 /* Message.swift in Sources */,
 				87EE868725D9070F00F89605 /* SignUpViewController2.swift in Sources */,
 				873CE19A25D7A85E0007E066 /* SceneDelegate.swift in Sources */,
 				87A7937725EF8A70006F5CC2 /* MessageCoreData+CoreDataClass.swift in Sources */,

@@ -16,9 +16,9 @@ class ChatViewModel {
     var conversationID: String
     var otherUser: Sender
     
-    init(conversationID: String, otherUser: Sender) {
+    init(conversationID: String) {
         self.conversationID = conversationID
-        self.otherUser = otherUser
+        self.otherUser = Sender(senderId: UserManager.shared.getOtherUsername(by: conversationID), displayName: "Ne Angime?")
         NotificationCenter.default.addObserver(self, selector: #selector(newMessageToHandle), name: .newMessage, object: nil)
     }
     

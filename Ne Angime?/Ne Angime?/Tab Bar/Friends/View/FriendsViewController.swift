@@ -113,11 +113,7 @@ extension FriendsViewController: UICollectionViewDelegate {
             conversationID = "\(user.username)&&\(currentUsername)"
         }
         
-        let chatViewController = ChatViewController()
-        chatViewController.chatViewModel = ChatViewModel(
-            conversationID: conversationID,
-            otherUser: Sender(senderId: user.username, displayName: "Ne Angime?")
-        )
+        let chatViewController = ChatViewController(conversationID: conversationID)
         navigationController?.pushViewController(chatViewController, animated: true)
     }
 }

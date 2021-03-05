@@ -9,26 +9,18 @@ import UIKit
 import MessageKit
 import InputBarAccessoryView
 
-struct Sender: SenderType {
-    var senderId: String
-    var displayName: String
-    
-    init(senderId: String, displayName: String) {
-        self.senderId = senderId
-        self.displayName = displayName
-    }
-}
-
-struct Message: MessageType {
-    var sender: SenderType
-    var messageId: String
-    var sentDate: Date
-    var kind: MessageKind
-}
-
 class ChatViewController: MessagesViewController {
     
-    var chatViewModel: ChatViewModel?
+    var chatViewModel: ChatViewModel
+    
+    init(conversationID: String) {
+        self.chatViewModel = ChatViewModel(conversationID: conversationID)
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -36,54 +28,49 @@ class ChatViewController: MessagesViewController {
         messagesCollectionView.messagesLayoutDelegate = self
         messagesCollectionView.messagesDisplayDelegate = self
         messageInputBar.delegate = self
-        chatViewModel?.delegate = self
+        chatViewModel.delegate = self
+        
+        updateInputBar()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        chatViewModel?.fetchConversation()
+        chatViewModel.fetchConversation()
+    }
+    
+    private func updateInputBar() {
+        messageInputBar.inputTextView.backgroundColor = UIColor(hex: "#f2f2f2")
+        messageInputBar.separatorLine.height = 50
     }
 }
 
 extension ChatViewController: MessagesDataSource {
     func currentSender() -> SenderType {
-        if chatViewModel != nil {
-            return chatViewModel!.getCurrentUser()
-        } else {
-            return Sender(senderId: "undefined", displayName: "Ne Angime?")
-        }
+        return chatViewModel.getCurrentUser()
     }
     
     func messageForItem(at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> MessageType {
-        if chatViewModel != nil {
-            return chatViewModel!.getMessage(at: indexPath.section)
-        } else {
-            return Message(
-                sender: Sender(senderId: "undefined", displayName: "Ne Angime?"),
-                messageId: "undefined",
-                sentDate: Date(),
-                kind: .text("undefined")
-            )
-        }
+        return chatViewModel.getMessage(at: indexPath.section)
     }
     
     func numberOfSections(in messagesCollectionView: MessagesCollectionView) -> Int {
-        if chatViewModel != nil {
-            return chatViewModel!.getNumberOfMessages()
-        } else {
-            return 0
-        }
+        return chatViewModel.getNumberOfMessages()
     }
 }
 
-extension ChatViewController: MessagesLayoutDelegate {}
-extension ChatViewController: MessagesDisplayDelegate {}
-
-extension ChatViewController: InputBarAccessoryViewDelegate {
+extension ChatViewController: InputBarAccessoryViewDelegate, MessagesDisplayDelegate, MessagesLayoutDelegate {
     func inputBar(_ inputBar: InputBarAccessoryView, didPressSendButtonWith text: String) {
-        guard !text.replacingOccurrences(of: " ", with: "").isEmpty, chatViewModel != nil else { return }
+        guard !text.replacingOccurrences(of: " ", with: "").isEmpty else { return }
         messageInputBar.inputTextView.text = nil
-        chatViewModel!.didTapSendButton(text)
+        chatViewModel.didTapSendButton(text)
+    }
+    
+    func backgroundColor(for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> UIColor {
+        if message.sender as? Sender == chatViewModel.currentUser {
+            return UIColor(hex: "#8f87ff")
+        } else {
+            return UIColor(hex: "#f2f2f2")
+        }
     }
 }
 

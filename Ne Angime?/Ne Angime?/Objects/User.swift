@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct User: Codable {
+struct User: Codable, Equatable {
     var username: String
     var firstname: String
     var lastname: String
@@ -30,10 +30,6 @@ struct User: Codable {
         self.avatar = avatar
     }
     
-    
-}
-
-extension User: Equatable {
     static func == (left: User, right: User) -> Bool {
         return (left.username == right.username)
     }
