@@ -12,12 +12,13 @@ import InputBarAccessoryView
 class ChatViewController: MessagesViewController {
     
     var chatViewModel: ChatViewModel
+    private var customInputBarView = UIView()
     
     init(conversationID: String) {
         self.chatViewModel = ChatViewModel(conversationID: conversationID)
         super.init(nibName: nil, bundle: nil)
     }
-
+    
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -39,8 +40,21 @@ class ChatViewController: MessagesViewController {
     }
     
     private func updateInputBar() {
-        messageInputBar.inputTextView.backgroundColor = UIColor(hex: "#f2f2f2")
-        messageInputBar.separatorLine.height = 50
+        messageInputBar.backgroundView.backgroundColor = UIColor(hex: "#f2f2f2")
+        messageInputBar.inputTextView.textContainerInset.bottom = view.bounds.height * 0.01
+        messageInputBar.inputTextView.textContainerInset.top = view.bounds.height * 0.01
+        messageInputBar.inputTextView.textContainerInset.left = view.bounds.width * 0.05
+        
+        messageInputBar.backgroundView.layer.cornerRadius = 25
+        messageInputBar.backgroundView.bottomAnchor.constraint(
+            equalTo: messageInputBar.contentView.bottomAnchor,
+            constant: view.bounds.height * 0.01
+        ).isActive = true
+        messageInputBar.inputTextView.placeholder = "Write your message here..."
+        messageInputBar.separatorLine.isHidden = true
+        
+        messageInputBar.sendButton.setImage(UIImage(named: "send_button_normal"), for: .normal)
+        messageInputBar.sendButton.setTitle(nil, for: .normal)
     }
 }
 
@@ -70,6 +84,13 @@ extension ChatViewController: InputBarAccessoryViewDelegate, MessagesDisplayDele
             return UIColor(hex: "#8f87ff")
         } else {
             return UIColor(hex: "#f2f2f2")
+        }
+    }
+    func inputBar(_ inputBar: InputBarAccessoryView, textViewTextDidChangeTo text: String) {
+        if text.isEmpty {
+            messageInputBar.sendButton.setImage(UIImage(named: "send_button_normal"), for: .normal)
+        } else {
+            messageInputBar.sendButton.setImage(UIImage(named: "send_button_tapped"), for: .normal)
         }
     }
 }

@@ -65,6 +65,7 @@ class ConversationsViewModel {
                     if let conversationsFromDB = conversations {
                         if conversationsFromDB.count != self.conversations.count {
                             self.conversations = conversationsFromDB
+//                            CoreDataManager.shared.updateConversations(conversations: conversationsFromDB)
                             DispatchQueue.main.async {
                                 self.delegate?.updateCollectionView()
                             }
@@ -73,6 +74,7 @@ class ConversationsViewModel {
                             while index < self.conversations.count {
                                 if self.conversations[index].messages?.count != conversationsFromDB[index].messages?.count {
                                     self.conversations = conversationsFromDB
+//                                    CoreDataManager.shared.updateConversations(conversations: conversationsFromDB)
                                     DispatchQueue.main.async {
                                         self.delegate?.updateCollectionView()
                                     }

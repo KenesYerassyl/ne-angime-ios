@@ -72,7 +72,7 @@ class WebSocket: NSObject{
             case .receiveMessage:
                 MessageHandler.shared.handleMessage(messageWebSocket: messageWebSocket)
             case .sendMessage:
-                print("This will not happen")
+                print("This will not happen 3")
             }
         } catch {
             print("Error in distributing data: \(error)")

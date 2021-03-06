@@ -31,7 +31,7 @@ class ChatViewModel {
         if let username = UserDefaults.standard.string(forKey: "username") {
             return Sender(senderId: username, displayName: "Ne Angime?")
         } else {
-            print("This will not happen")
+            print("This will not happen 1")
             return Sender(senderId: "undefined", displayName: "Ne Angime?")
         }
     }()

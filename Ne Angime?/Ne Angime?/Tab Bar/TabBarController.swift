@@ -16,11 +16,27 @@ class TabBarController: UITabBarController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        tabBar.tintColor = UIColor(hex: "#aba7f3")
-        conversationsViewController.tabBarItem = UITabBarItem(tabBarSystemItem: .bookmarks, tag: 1)
-        friendsViewController.tabBarItem = UITabBarItem(tabBarSystemItem: .contacts, tag: 2)
-        findViewController.tabBarItem = UITabBarItem(tabBarSystemItem: .search, tag: 3)
-        profileViewController.tabBarItem = UITabBarItem(tabBarSystemItem: .favorites, tag: 4)
+        tabBar.tintColor = UIColor(hex: "#30289f")
+        conversationsViewController.tabBarItem = UITabBarItem(
+            title: "Conversations",
+            image: UIImage(named: "conversations_tab_bar_icon"),
+            tag: 1
+        )
+        friendsViewController.tabBarItem = UITabBarItem(
+            title: "Friends",
+            image: UIImage(named: "friends_tab_bar_icon"),
+            tag: 2
+        )
+        findViewController.tabBarItem = UITabBarItem(
+            title: "Find",
+            image: UIImage(named: "find_tab_bar_icon"),
+            tag: 3
+        )
+        profileViewController.tabBarItem = UITabBarItem(
+            title: "Profile",
+            image: UIImage(named: "profile_tab_bar_icon"),
+            tag: 4
+        )
         viewControllers = [conversationsViewController, friendsViewController, findViewController, profileViewController]
         navigationItem.leftBarButtonItem = UIBarButtonItem(
             barButtonSystemItem: .done,
@@ -40,31 +56,7 @@ extension TabBarController {
         UserDefaults.standard.removeObject(forKey: "email")
         UserDefaults.standard.removeObject(forKey: "token")
         WebSocket.shared.disconnect()
-        
-        let fetchRequest1: NSFetchRequest<NSFetchRequestResult> = NSFetchRequest(entityName: "Conversation")
-        let deleteRequest1 = NSBatchDeleteRequest(fetchRequest: fetchRequest1)
-        do {
-            try CoreDataManager.shared.context.persistentStoreCoordinator?.execute(
-                deleteRequest1,
-                with: CoreDataManager.shared.context
-            )
-        } catch {
-            print("Error in deleting conversations: \(error)")
-        }
-        
-        let fetchRequest2: NSFetchRequest<NSFetchRequestResult> = NSFetchRequest(entityName: "Conversation")
-        let deleteRequest2 = NSBatchDeleteRequest(fetchRequest: fetchRequest2)
-        do {
-            try CoreDataManager.shared.context.persistentStoreCoordinator?.execute(
-                deleteRequest2,
-                with: CoreDataManager.shared.context
-            )
-        } catch {
-            print("Error in deleting conversations: \(error)")
-        }
-        conversationsViewController.conversationsViewModel.conversations.removeAll()
-        conversationsViewController.wereConversationsFetched = false
-        conversationsViewController.updateCollectionView()
+        CoreDataManager.shared.deleteAllData()
         
         navigationController?.popViewController(animated: true)
     }

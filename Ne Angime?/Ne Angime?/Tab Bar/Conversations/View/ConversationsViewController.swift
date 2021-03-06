@@ -9,7 +9,6 @@ import SnapKit
 
 class ConversationsViewController: UIViewController {
     let conversationsViewModel = ConversationsViewModel()
-    var wereConversationsFetched = false
     private let titleLabel = UILabel()
     private lazy var collectionViewFlowLayout: UICollectionViewFlowLayout = {
         var temp = UICollectionViewFlowLayout()
@@ -29,17 +28,9 @@ class ConversationsViewController: UIViewController {
         collectionView.delegate = self
         collectionView.dataSource = self
         conversationsViewModel.delegate = self
-        
+        conversationsViewModel.fetchAllConversations()
         configureCollectionView()
         configureTitleLabel()
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        if !wereConversationsFetched {
-            conversationsViewModel.fetchAllConversations()
-            wereConversationsFetched = true
-        }
     }
     
     func configureCollectionView() {
@@ -92,7 +83,7 @@ extension ConversationsViewController: UICollectionViewDataSource {
             if let user = user {
                 cell.userNameLabel.text = "\(user.firstname) \(user.lastname)"
             } else {
-                print("This will not happen")
+                print("This will not happen 2")
                 cell.userNameLabel.text = "undefined undefined"
             }
         }
