@@ -11,7 +11,7 @@ class UserManager {
     public static let shared = UserManager()
     private init(){}
     
-    public func getOtherUsername(by conversationID: String) -> String {
+    public func getOtherUsername(from conversationID: String) -> String {
         var firstUsername = "", secondUsername = ""
         var isAmpercanMet1 = false
         var isAmpercanMet2 = false

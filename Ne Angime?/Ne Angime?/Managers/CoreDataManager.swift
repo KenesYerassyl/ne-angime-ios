@@ -37,7 +37,7 @@ class CoreDataManager {
     }
     
     public func doesConversationExist(_ conversationID: String) -> Bool {
-        let request = Conversation.fetchRequest() as NSFetchRequest<Conversation>
+        let request = ConversationCoreData.fetchRequest() as NSFetchRequest<ConversationCoreData>
         request.predicate = NSPredicate(format: "conversationID == %@", conversationID)
         var results = [NSManagedObject]()
         do {
@@ -48,12 +48,12 @@ class CoreDataManager {
         return results.count > 0
     }
     
-    public func getConversation(conversationID: String, _ completion: @escaping(Conversation?, Error?) -> Void) {
-        let request = Conversation.fetchRequest() as NSFetchRequest<Conversation>
+    public func getConversation(conversationID: String, _ completion: @escaping(ConversationCoreData?, Error?) -> Void) {
+        let request = ConversationCoreData.fetchRequest() as NSFetchRequest<ConversationCoreData>
         request.predicate = NSPredicate(format: "conversationID == %@", conversationID)
         do {
-            let results = try context.fetch(request) as [Conversation]
-            var resultConversation: Conversation?
+            let results = try context.fetch(request) as [ConversationCoreData]
+            var resultConversation: ConversationCoreData?
             for conversation in results {
                 if conversation.conversationID == conversationID {
                     resultConversation = conversation
@@ -68,10 +68,10 @@ class CoreDataManager {
         }
     }
     
-    public func getAllConversations(_ completion: @escaping([Conversation]?, Error?) -> Void) {
-        let request = Conversation.fetchRequest() as NSFetchRequest<Conversation>
+    public func getAllConversations(_ completion: @escaping([ConversationCoreData]?, Error?) -> Void) {
+        let request = ConversationCoreData.fetchRequest() as NSFetchRequest<ConversationCoreData>
         do {
-            let results = try context.fetch(request) as [Conversation]
+            let results = try context.fetch(request) as [ConversationCoreData]
             completion(results, nil)
         } catch {
             print("Error in getting all conversations: \(error)")
@@ -80,27 +80,7 @@ class CoreDataManager {
     }
     
     public func deleteAllData() {
-//        let request1 = Conversation.fetchRequest() as NSFetchRequest<Conversation>
-//        do {
-//            let results = try context.fetch(request1) as [Conversation]
-//            for item in results {
-//                context.delete(item)
-//                saveContext()
-//            }
-//        } catch {
-//            print("Error in getting all conversations: \(error)")
-//        }
-//        let request2 = MessageCoreData.fetchRequest() as NSFetchRequest<MessageCoreData>
-//        do {
-//            let results = try context.fetch(request2) as [MessageCoreData]
-//            for item in results {
-//                context.delete(item)
-//                saveContext()
-//            }
-//        } catch {
-//            print("Error in getting all conversations: \(error)")
-//        }
-        let fetchRequest1: NSFetchRequest<NSFetchRequestResult> = NSFetchRequest(entityName: "Conversation")
+        let fetchRequest1: NSFetchRequest<NSFetchRequestResult> = NSFetchRequest(entityName: "ConversationCoreData")
         let deleteRequest1 = NSBatchDeleteRequest(fetchRequest: fetchRequest1)
         do {
             try CoreDataManager.shared.context.persistentStoreCoordinator?.execute(
@@ -111,7 +91,7 @@ class CoreDataManager {
             print("Error in deleting conversations: \(error)")
         }
 
-        let fetchRequest2: NSFetchRequest<NSFetchRequestResult> = NSFetchRequest(entityName: "Conversation")
+        let fetchRequest2: NSFetchRequest<NSFetchRequestResult> = NSFetchRequest(entityName: "ConversationCoreData")
         let deleteRequest2 = NSBatchDeleteRequest(fetchRequest: fetchRequest2)
         do {
             try CoreDataManager.shared.context.persistentStoreCoordinator?.execute(
@@ -122,23 +102,33 @@ class CoreDataManager {
             print("Error in deleting conversations: \(error)")
         }
     }
+    
     public func updateConversations(conversations: [Conversation]) {
         deleteAllData()
+        let group = DispatchGroup()
         for conversation in conversations {
-            let newConversation = Conversation(context: context)
-            newConversation.conversationID = conversation.conversationID
-            guard let messages = conversation.messages as? Set<MessageCoreData> else { return }
-            for message in messages {
-                let newMessage = MessageCoreData(context: context)
-                newMessage.conversation = newConversation
-                newMessage.createdAt = message.createdAt
-                newMessage.message = message.message
-                newMessage.messageID = message.messageID
-                newMessage.recipientUsername = message.recipientUsername
-                newMessage.senderUsername = message.senderUsername
-                newConversation.addToMessages(newMessage)
+            let conversationCoreData = ConversationCoreData(entity: ConversationCoreData.entity(), insertInto: context)
+            group.enter()
+            UserManager.shared.getUser(username: UserManager.shared.getOtherUsername(from: conversation.conversationID)) { user in
+                guard let user = user else { return }
+                conversationCoreData.firstNameOfRecipient = user.firstname
+                conversationCoreData.lastNameOfRecipient = user.lastname
+                group.leave()
             }
-            saveContext()
+            group.notify(queue: .main) {
+                conversationCoreData.conversationID = conversation.conversationID
+                for message in conversation.messages {
+                    let messageCoreData = MessageCoreData(entity: MessageCoreData.entity(), insertInto: self.context)
+                    messageCoreData.createdAt = message.createdAt
+                    messageCoreData.message = message.message
+                    messageCoreData.messageID = message.messageID
+                    messageCoreData.recipientUsername = message.recipientUsername
+                    messageCoreData.senderUsername = message.senderUsername
+                    conversationCoreData.addToMessages(messageCoreData)
+                }
+                self.saveContext()
+            }
+            print(conversationCoreData)
         }
     }
 }

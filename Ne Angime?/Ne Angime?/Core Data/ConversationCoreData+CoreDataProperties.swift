@@ -1,8 +1,8 @@
 //
-//  Conversation+CoreDataProperties.swift
+//  ConversationCoreData+CoreDataProperties.swift
 //  Ne Angime?
 //
-//  Created by Kenes Yerassyl on 3/3/21.
+//  Created by Kenes Yerassyl on 3/6/21.
 //
 //
 
@@ -10,19 +10,21 @@ import Foundation
 import CoreData
 
 
-extension Conversation {
+extension ConversationCoreData {
 
-    @nonobjc public class func fetchRequest() -> NSFetchRequest<Conversation> {
-        return NSFetchRequest<Conversation>(entityName: "Conversation")
+    @nonobjc public class func fetchRequest() -> NSFetchRequest<ConversationCoreData> {
+        return NSFetchRequest<ConversationCoreData>(entityName: "ConversationCoreData")
     }
 
     @NSManaged public var conversationID: String?
+    @NSManaged public var firstNameOfRecipient: String?
+    @NSManaged public var lastNameOfRecipient: String?
     @NSManaged public var messages: NSSet?
 
 }
 
 // MARK: Generated accessors for messages
-extension Conversation {
+extension ConversationCoreData {
 
     @objc(addMessagesObject:)
     @NSManaged public func addToMessages(_ value: MessageCoreData)
@@ -38,6 +40,6 @@ extension Conversation {
 
 }
 
-extension Conversation : Identifiable {
+extension ConversationCoreData : Identifiable {
 
 }

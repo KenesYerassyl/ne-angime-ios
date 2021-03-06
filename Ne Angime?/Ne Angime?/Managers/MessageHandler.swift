@@ -29,7 +29,6 @@ class MessageHandler {
         if conversationID != "undefined" {
             CoreDataManager.shared.getConversation(conversationID: conversationID) { (conversation, error) in
                 if let conversation = conversation {
-                    message.conversation = conversation
                     conversation.addToMessages(message)
                     CoreDataManager.shared.saveContext()
                     NotificationCenter.default.post(
@@ -45,9 +44,13 @@ class MessageHandler {
                 }
             }
         } else {
-            let conversation = Conversation(entity: Conversation.entity(), insertInto: CoreDataManager.shared.context)
+            let conversation = ConversationCoreData(entity: ConversationCoreData.entity(), insertInto: CoreDataManager.shared.context)
+            UserManager.shared.getUser(username: messageWebSocket.recipientUsername) { user in
+                guard let user = user else { return }
+                conversation.firstNameOfRecipient = user.firstname
+                conversation.lastNameOfRecipient = user.lastname
+            }
             conversation.conversationID = "\(messageWebSocket.senderUsername)&&\(messageWebSocket.recipientUsername)"
-            message.conversation = conversation
             conversation.addToMessages(message)
             CoreDataManager.shared.saveContext()
             NotificationCenter.default.post(

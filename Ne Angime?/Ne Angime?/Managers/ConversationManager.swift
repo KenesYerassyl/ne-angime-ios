@@ -21,7 +21,6 @@ class ConversationManager {
             if let data = data, let response = response as? HTTPURLResponse, 200 <= response.statusCode && response.statusCode <= 299 {
                 do {
                     let decoder = JSONDecoder()
-                    decoder.userInfo[CodingUserInfoKey.context] = CoreDataManager.shared.context
                     let conversations = try decoder.decode([Conversation].self, from: data)
                     DispatchQueue.main.async { completion(conversations, nil) }
                 } catch {
@@ -32,5 +31,24 @@ class ConversationManager {
             }
         }
         task.resume()
+    }
+    
+    public func convertToConversation(from conversationCoreData: ConversationCoreData) -> Conversation {
+        var conversation = Conversation(
+            conversationID: conversationCoreData.conversationID ?? "undefined",
+            messages: []
+        )
+        guard let messages = conversationCoreData.messages as? Set<MessageCoreData> else { return conversation }
+        for messageCoreData in messages {
+            let message = Message(
+                createdAt: messageCoreData.createdAt,
+                message: messageCoreData.message ?? "undefined",
+                messageID: messageCoreData.messageID ?? "undefined",
+                recipientUsername: messageCoreData.recipientUsername ?? "undefined",
+                senderUsername: messageCoreData.senderUsername ?? "undefined"
+            )
+            conversation.messages.append(message)
+        }
+        return conversation
     }
 }

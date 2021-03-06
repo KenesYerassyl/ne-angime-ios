@@ -78,16 +78,11 @@ extension ConversationsViewController: UICollectionViewDataSource {
         cell.userMessageLabel.text = ""
         cell.userNameLabel.text = ""
         
-        let otherUsername = UserManager.shared.getOtherUsername(by: conversationsViewModel.getConversationID(at: indexPath.row))
-        UserManager.shared.getUser(username: otherUsername) { (user) in
-            if let user = user {
-                cell.userNameLabel.text = "\(user.firstname) \(user.lastname)"
-            } else {
-                print("This will not happen 2")
-                cell.userNameLabel.text = "undefined undefined"
-            }
-        }
+        
         cell.userMessageLabel.text = conversationsViewModel.getLastMessage(at: indexPath.row)
+        conversationsViewModel.getFullNameOfRecipient(at: indexPath.row) { name in
+            cell.userNameLabel.text = name
+        }
         return cell
     }
 }

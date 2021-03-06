@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="17192" systemVersion="19G2021" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="Ne Angime?">
-    <entity name="Conversation" representedClassName=".Conversation" syncable="YES">
+    <entity name="ConversationCoreData" representedClassName=".ConversationCoreData" syncable="YES">
         <attribute name="conversationID" optional="YES" attributeType="String"/>
+        <attribute name="firstNameOfRecipient" optional="YES" attributeType="String"/>
+        <attribute name="lastNameOfRecipient" optional="YES" attributeType="String"/>
         <relationship name="messages" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="MessageCoreData" inverseName="conversation" inverseEntity="MessageCoreData"/>
     </entity>
     <entity name="MessageCoreData" representedClassName=".MessageCoreData" syncable="YES">
@@ -10,10 +12,10 @@
         <attribute name="messageID" optional="YES" attributeType="String"/>
         <attribute name="recipientUsername" optional="YES" attributeType="String"/>
         <attribute name="senderUsername" optional="YES" attributeType="String"/>
-        <relationship name="conversation" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Conversation" inverseName="messages" inverseEntity="Conversation"/>
+        <relationship name="conversation" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="ConversationCoreData" inverseName="messages" inverseEntity="ConversationCoreData"/>
     </entity>
     <elements>
-        <element name="Conversation" positionX="-54" positionY="18" width="128" height="73"/>
+        <element name="ConversationCoreData" positionX="-54" positionY="18" width="128" height="103"/>
         <element name="MessageCoreData" positionX="-63" positionY="-18" width="128" height="133"/>
     </elements>
 </model>

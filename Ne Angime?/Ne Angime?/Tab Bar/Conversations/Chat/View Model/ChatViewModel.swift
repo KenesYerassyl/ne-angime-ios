@@ -18,7 +18,7 @@ class ChatViewModel {
     
     init(conversationID: String) {
         self.conversationID = conversationID
-        self.otherUser = Sender(senderId: UserManager.shared.getOtherUsername(by: conversationID), displayName: "Ne Angime?")
+        self.otherUser = Sender(senderId: UserManager.shared.getOtherUsername(from: conversationID), displayName: "Ne Angime?")
         NotificationCenter.default.addObserver(self, selector: #selector(newMessageToHandle), name: .newMessage, object: nil)
     }
     
@@ -70,7 +70,7 @@ class ChatViewModel {
         } catch {
             print("Error in encoding message: \(error)")
         }
-        messages.append(Message(
+        messages.append(MessageMessageKit(
             sender: currentUser,
             messageId: messageWebSocket.messageID,
             sentDate: Date(timeIntervalSince1970: messageWebSocket.createdAt),
@@ -84,7 +84,7 @@ class ChatViewModel {
               let conversationID = userInfo["conversationID"] as? String,
               let dataWebSocket = userInfo["messageWebSocket"] as? MessageWebSocket else { return }
         if conversationID == self.conversationID && dataWebSocket.type == .receiveMessage {
-            messages.append(Message(
+            messages.append(MessageMessageKit(
                 sender: Sender(senderId: dataWebSocket.senderUsername, displayName: "Ne Angime?"),
                 messageId: dataWebSocket.messageID,
                 sentDate: Date(timeIntervalSince1970: dataWebSocket.createdAt),
@@ -101,7 +101,7 @@ class ChatViewModel {
             if let conversation = conversation, let messagesCoreData = conversation.messages?.allObjects as? [MessageCoreData] {
                 var messages = [MessageType]()
                 for item in messagesCoreData {
-                    messages.append(Message(
+                    messages.append(MessageMessageKit(
                         sender: Sender(senderId: item.senderUsername ?? "undefined", displayName: "Ne Angime?"),
                         messageId: item.messageID ?? "undefined",
                         sentDate: Date(timeIntervalSince1970: item.createdAt),
