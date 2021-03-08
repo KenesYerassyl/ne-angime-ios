@@ -32,7 +32,8 @@ class ProfileViewModel {
     }
     
     func uploadImage(imageData: String, _ completion: @escaping(Bool) -> Void) {
-        guard let url = URL(string: "https://kenesyerassyl-kenesyerassyl-node-chat-app.zeet.app/api/auth/update/avatar_base64")
+        guard let url = URL(string: "https://kenesyerassyl-kenesyerassyl-node-chat-app.zeet.app/api/auth/update/avatar"),
+              let cookie = UserDefaults.standard.string(forKey: "token")
         else {
             completion(false)
             return
@@ -40,6 +41,7 @@ class ProfileViewModel {
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.addValue("token=\(cookie)", forHTTPHeaderField: "Cookie")
         do {
             let data = try JSONSerialization.data(withJSONObject: ["avatar" : imageData])
             request.httpBody = data
@@ -69,6 +71,8 @@ class ProfileViewModel {
                         self.delegate?.showErrorAlert(title: "Something went wrong", message: "It seems that you did not select an image.")
                         completion(false)
                     }
+                } else {
+                    DispatchQueue.main.async { completion(false) }
                 }
             } else if let error = error {
                 DispatchQueue.main.async { completion(false) }
