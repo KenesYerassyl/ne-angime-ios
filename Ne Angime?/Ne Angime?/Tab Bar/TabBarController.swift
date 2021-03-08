@@ -38,26 +38,7 @@ class TabBarController: UITabBarController {
             tag: 4
         )
         viewControllers = [conversationsViewController, friendsViewController, findViewController, profileViewController]
-        navigationItem.leftBarButtonItem = UIBarButtonItem(
-            barButtonSystemItem: .done,
-            target: self,
-            action: #selector(signOut)
-        )
         WebSocket.shared.resetTask()
         WebSocket.shared.connect()
-    }
-}
-
-extension TabBarController {
-    @objc func signOut() {
-        UserDefaults.standard.removeObject(forKey: "username")
-        UserDefaults.standard.removeObject(forKey: "firstname")
-        UserDefaults.standard.removeObject(forKey: "lastname")
-        UserDefaults.standard.removeObject(forKey: "email")
-        UserDefaults.standard.removeObject(forKey: "token")
-        WebSocket.shared.disconnect()
-        CoreDataManager.shared.deleteAllData()
-        
-        navigationController?.popViewController(animated: true)
     }
 }

@@ -48,13 +48,9 @@ class SignUpViewController2: UIViewController {
         updatePasswordTextField2()
         updateSignUpButton()
         updateActivityIndicator()
+        addBackButton(didTapBackButton: #selector(didTapBackButton))
         
         signUpViewModel2.delegate = self
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        navigationController?.setNavigationBarHidden(true, animated: false)
     }
     
     private func updateFieldsView() {
@@ -171,7 +167,7 @@ class SignUpViewController2: UIViewController {
 }
 
 extension SignUpViewController2 {
-    @objc func didTapSignUpButton() {
+    @objc private func didTapSignUpButton() {
         activityIndicator.startAnimating()
         backView.isHidden = false
         view.isUserInteractionEnabled = false
@@ -185,6 +181,10 @@ extension SignUpViewController2 {
         signUpViewModel2.password1 = password1
         signUpViewModel2.password2 = password2
         signUpViewModel2.signUp()
+    }
+    
+    @objc private func didTapBackButton() {
+        navigationController?.popViewController(animated: true)
     }
 }
 

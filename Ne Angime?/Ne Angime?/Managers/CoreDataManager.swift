@@ -128,7 +128,6 @@ class CoreDataManager {
                 }
                 self.saveContext()
             }
-            print(conversationCoreData)
         }
     }
 }

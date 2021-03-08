@@ -29,9 +29,9 @@ class SignInViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        navigationController?.setNavigationBarHidden(true, animated: false)
         view.backgroundColor = UIColor(hex: "#30289f")
         signInViewModel.delegate = self
-        
         updateFieldsView()
         updateWelcomeLabel()
         updateUserNameTextField()
@@ -43,9 +43,7 @@ class SignInViewController: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        navigationController?.setNavigationBarHidden(true, animated: false)
         if UserDefaults.standard.string(forKey: "username") != nil {
-            navigationController?.setNavigationBarHidden(false, animated: true)
             navigationController?.pushViewController(TabBarController(), animated: false)
         }
     }
@@ -184,6 +182,7 @@ extension SignInViewController {
     @objc private func didTapSignUpLabel() {
         let navigationController = UINavigationController(rootViewController: SignUpViewController1())
         navigationController.modalPresentationStyle = .fullScreen
+        navigationController.setNavigationBarHidden(true, animated: false)
         present(navigationController, animated: true)
     }
 }
@@ -209,7 +208,6 @@ extension SignInViewController: SignInViewModelDelegate {
     func goToMainPage() {
         userNameTextField.text = nil
         passwordTextField.text = nil
-        navigationController?.setNavigationBarHidden(false, animated: true)
         navigationController?.pushViewController(TabBarController(), animated: true)
     }
 }

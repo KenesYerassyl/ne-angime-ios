@@ -26,11 +26,9 @@ class SignUpViewController1: UIViewController {
         return temp
     }()
     private let backView = UIView()
-    
-    
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = UIColor(hex: "#30289f")
+        view.backgroundColor = .clear
         updateFieldsView()
         updateWelcomeLabel()
         updateFirstNameTextField()
@@ -38,13 +36,14 @@ class SignUpViewController1: UIViewController {
         updateUserNameTextField()
         updateNextButton()
         updateActivityIndicator()
+        addBackButton(didTapBackButton: #selector(didTapBackButton))
         
         signUpViewModel1.delegate = self
     }
     
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        navigationController?.setNavigationBarHidden(true, animated: false)
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        view.backgroundColor = UIColor(hex: "#30289f")
     }
     
     private func updateFieldsView() {
@@ -170,6 +169,10 @@ extension SignUpViewController1 {
             return
         }
         signUpViewModel1.signUpStage1(username: userName, firstname: firstName, lastname: lastName)
+    }
+    
+    @objc private func didTapBackButton() {
+        navigationController?.dismiss(animated: true)
     }
 }
 
