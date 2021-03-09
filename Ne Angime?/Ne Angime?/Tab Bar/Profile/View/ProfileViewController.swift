@@ -35,6 +35,7 @@ class ProfileViewController: UIViewController {
         updateUserNameLabel()
         updateSignOutButton()
         updateActivityIndicator()
+        profileViewModel.downloadImage()
     }
     
     private func updateUserInfoView() {
@@ -135,6 +136,11 @@ extension ProfileViewController {
 }
 
 extension ProfileViewController: ProfileViewModelDelegate {
+    func setProfileImage(with data: Data) {
+        guard let image = UIImage(data: data) else { return }
+        profileImageView.image = image
+    }
+    
     func showErrorAlert(title: String, message: String) {
         let alert = UIAlertController(
             title: title,

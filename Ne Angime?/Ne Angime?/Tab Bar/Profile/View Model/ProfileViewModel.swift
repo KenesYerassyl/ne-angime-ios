@@ -9,6 +9,7 @@ import Foundation
 
 protocol ProfileViewModelDelegate: class {
     func showErrorAlert(title: String, message: String)
+    func setProfileImage(with data: Data)
 }
 
 class ProfileViewModel {
@@ -21,6 +22,7 @@ class ProfileViewModel {
         UserDefaults.standard.removeObject(forKey: "lastname")
         UserDefaults.standard.removeObject(forKey: "email")
         UserDefaults.standard.removeObject(forKey: "token")
+        UserDefaults.standard.removeObject(forKey: "avatar")
         WebSocket.shared.disconnect()
         CoreDataManager.shared.deleteAllData()
     }
@@ -29,6 +31,20 @@ class ProfileViewModel {
         guard let firstname = UserDefaults.standard.string(forKey: "firstname"),
               let lastname = UserDefaults.standard.string(forKey: "lastname") else { return ("undefined", "undefined") }
         return ("\(firstname)", "\(lastname)")
+    }
+    
+    func downloadImage() {
+        guard let avatar = UserDefaults.standard.string(forKey: "avatar"),
+              let url = URL(string: avatar) else { return }
+        URLSession.shared.dataTask(with: url) { (data, _, error) in
+            if let data = data {
+                DispatchQueue.main.async {
+                    self.delegate?.setProfileImage(with: data)
+                }
+            } else if let error = error {
+                print("Error in downloading a profile image: \(error)")
+            }
+        }.resume()
     }
     
     func uploadImage(imageData: String, _ completion: @escaping(Bool) -> Void) {

@@ -27,7 +27,6 @@ class SignInViewModel {
         request.httpMethod = "POST"
         request.httpBody = jsonData
         request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-        
         let task = URLSession.shared.dataTask(with: request) { (data, response, error) in
             if let data = data,
                let response = response as? HTTPURLResponse,
@@ -48,6 +47,9 @@ class SignInViewModel {
                             UserDefaults.standard.set(lastname, forKey: "lastname")
                             UserDefaults.standard.set(email, forKey: "email")
                             UserDefaults.standard.set(cookieValue, forKey: "token")
+                            if let avatar = userData["avatar"] {
+                                UserDefaults.standard.set(avatar, forKey: "avatar")
+                            }
                             DispatchQueue.main.async {
                                 self.delegate?.userMayInteract()
                                 self.delegate?.goToMainPage()
