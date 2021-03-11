@@ -19,55 +19,47 @@ class SignInViewModel {
     
     func signIn(username: String, password: String) {
         let signInData = ["username" : username, "password" : password]
-        
-        guard let url = URL(string: "https://kenesyerassyl-kenesyerassyl-node-chat-app.zeet.app/api/auth/login"),
-              let jsonData = try? JSONSerialization.data(withJSONObject: signInData) else { return }
-        
-        var request = URLRequest(url: url)
-        request.httpMethod = "POST"
-        request.httpBody = jsonData
-        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-        let task = URLSession.shared.dataTask(with: request) { (data, response, error) in
-            if let data = data,
-               let response = response as? HTTPURLResponse,
-               let url = response.url,
-               let allHeadersField = response.allHeaderFields as? [String : String] {
-                do {
-                    if let json = try JSONSerialization.jsonObject(with: data) as? [String: Any] {
-                        if 200 <= response.statusCode && response.statusCode <= 299 {
-                            let cookies = HTTPCookie.cookies(withResponseHeaderFields: allHeadersField, for: url)
-                            guard let userData = json["data"] as? [String : Any],
-                                  let username = userData["username"],
-                                  let firstname = userData["firstname"],
-                                  let lastname = userData["lastname"],
-                                  let email = userData["email"],
-                                  let cookieValue = cookies.first?.value else { return }
-                            UserDefaults.standard.set(username, forKey: "username")
-                            UserDefaults.standard.set(firstname, forKey: "firstname")
-                            UserDefaults.standard.set(lastname, forKey: "lastname")
-                            UserDefaults.standard.set(email, forKey: "email")
-                            UserDefaults.standard.set(cookieValue, forKey: "token")
-                            if let avatar = userData["avatar"] {
-                                UserDefaults.standard.set(avatar, forKey: "avatar")
-                            }
-                            DispatchQueue.main.async {
-                                self.delegate?.userMayInteract()
-                                self.delegate?.goToMainPage()
-                            }
-                        } else {
-                            guard let message = json["message"] as? String else { return }
-                            self.signInError(message: message)
-                        }
+        guard let data = try? JSONSerialization.data(withJSONObject: signInData) else {
+            signInError(message: "Unexpected error occured")
+            return
+        }
+        var request = APIRequest(method: .post, path: "auth/login")
+        request.headers = [HTTPHeader(field: "Content-Type", value: "application/json")]
+        request.body = data
+        APIClient().request(request) { [weak self] (data, response, error) in
+            if let data = data, let response = response,
+               let json = try? JSONSerialization.jsonObject(with: data) as? [String : Any] {
+                if let url = response.url,
+                   let allHeadersField = response.allHeaderFields as? [String : String],
+                   (200...299).contains(response.statusCode),
+                   let cookieValue = (HTTPCookie.cookies(withResponseHeaderFields: allHeadersField, for: url)).first?.value,
+                   let userData = json["data"] as? [String : Any],
+                   let username = userData["username"],
+                   let firstname = userData["firstname"],
+                   let lastname = userData["lastname"],
+                   let email = userData["email"] {
+                    UserDefaults.standard.set(username, forKey: "username")
+                    UserDefaults.standard.set(firstname, forKey: "firstname")
+                    UserDefaults.standard.set(lastname, forKey: "lastname")
+                    UserDefaults.standard.set(email, forKey: "email")
+                    UserDefaults.standard.set(cookieValue, forKey: "token")
+                    if let avatar = userData["avatar"] {
+                        UserDefaults.standard.set(avatar, forKey: "avatar")
                     }
-                } catch {
-                    self.signInError(message: error.localizedDescription)
+                    DispatchQueue.main.async {
+                        self?.delegate?.userMayInteract()
+                        self?.delegate?.goToMainPage()
+                    }
+                } else if !((200...299).contains(response.statusCode)), let message = json["message"] as? String {
+                    self?.signInError(message: message)
                 }
-            } else
-            if let error = error {
-                self.signInError(message: error.localizedDescription)
+            } else if let error = error {
+                print("Error in signing in: \(error)")
+                self?.signInError(message: error.localizedDescription)
+            } else {
+                self?.signInError(message: "Unexpected error occured")
             }
         }
-        task.resume()
     }
     
     func signInError(message: String) {

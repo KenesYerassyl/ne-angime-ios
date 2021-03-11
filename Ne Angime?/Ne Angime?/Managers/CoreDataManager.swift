@@ -24,7 +24,7 @@ class CoreDataManager {
     
     lazy var context = persistentContainer.viewContext
     
-    public func saveContext() {
+    func saveContext() {
         let context = persistentContainer.viewContext
         if context.hasChanges {
             do {
@@ -36,7 +36,19 @@ class CoreDataManager {
         }
     }
     
-    public func doesConversationExist(_ conversationID: String) -> Bool {
+    func doesCachedImageExist(_ imageID: String) -> Bool {
+        let request = CachedImage.fetchRequest() as NSFetchRequest<CachedImage>
+        request.predicate = NSPredicate(format: "imageID == %@", imageID)
+        var results = [NSManagedObject]()
+        do {
+            results = try context.fetch(request)
+        } catch {
+            print("Checking for existence \(imageID) error: \(error)")
+        }
+        return results.count > 0
+    }
+    
+    func doesConversationExist(_ conversationID: String) -> Bool {
         let request = ConversationCoreData.fetchRequest() as NSFetchRequest<ConversationCoreData>
         request.predicate = NSPredicate(format: "conversationID == %@", conversationID)
         var results = [NSManagedObject]()
@@ -48,7 +60,7 @@ class CoreDataManager {
         return results.count > 0
     }
     
-    public func getConversation(conversationID: String, _ completion: @escaping(ConversationCoreData?, Error?) -> Void) {
+    func getConversation(conversationID: String, _ completion: @escaping(ConversationCoreData?, Error?) -> Void) {
         let request = ConversationCoreData.fetchRequest() as NSFetchRequest<ConversationCoreData>
         request.predicate = NSPredicate(format: "conversationID == %@", conversationID)
         do {
@@ -68,7 +80,27 @@ class CoreDataManager {
         }
     }
     
-    public func getAllConversations(_ completion: @escaping([ConversationCoreData]?, Error?) -> Void) {
+    func getCachedImage(imageID: String, _ completion: @escaping(CachedImage?, Error?) -> Void) {
+        let request = CachedImage.fetchRequest() as NSFetchRequest<CachedImage>
+        request.predicate = NSPredicate(format: "imageID == %@", imageID)
+        do {
+            let results = try context.fetch(request) as [CachedImage]
+            var resultCachedImage: CachedImage?
+            for cachedImage in results {
+                if cachedImage.imageID == imageID {
+                    resultCachedImage = cachedImage
+                    break
+                }
+            }
+            guard let cachedImage = resultCachedImage else { return }
+            completion(cachedImage, nil)
+        } catch {
+            print("Error in getting conversation by ID error: \(error)")
+            completion(nil, error)
+        }
+    }
+    
+    func getAllConversations(_ completion: @escaping([ConversationCoreData]?, Error?) -> Void) {
         let request = ConversationCoreData.fetchRequest() as NSFetchRequest<ConversationCoreData>
         do {
             let results = try context.fetch(request) as [ConversationCoreData]
@@ -79,7 +111,7 @@ class CoreDataManager {
         }
     }
     
-    public func deleteAllData() {
+    func deleteAllData() {
         let fetchRequest1: NSFetchRequest<NSFetchRequestResult> = NSFetchRequest(entityName: "ConversationCoreData")
         let deleteRequest1 = NSBatchDeleteRequest(fetchRequest: fetchRequest1)
         do {
@@ -99,11 +131,22 @@ class CoreDataManager {
                 with: CoreDataManager.shared.context
             )
         } catch {
+            print("Error in deleting messages: \(error)")
+        }
+        
+        let fetchRequest3: NSFetchRequest<NSFetchRequestResult> = NSFetchRequest(entityName: "CachedImage")
+        let deleteRequest3 = NSBatchDeleteRequest(fetchRequest: fetchRequest3)
+        do {
+            try CoreDataManager.shared.context.persistentStoreCoordinator?.execute(
+                deleteRequest3,
+                with: CoreDataManager.shared.context
+            )
+        } catch {
             print("Error in deleting conversations: \(error)")
         }
     }
     
-    public func updateConversations(conversations: [Conversation]) {
+    func updateConversations(conversations: [Conversation]) {
         deleteAllData()
         let group = DispatchGroup()
         for conversation in conversations {

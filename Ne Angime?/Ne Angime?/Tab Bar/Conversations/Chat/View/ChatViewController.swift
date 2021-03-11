@@ -11,7 +11,9 @@ import InputBarAccessoryView
 
 class ChatViewController: MessagesViewController {
     
-    var chatViewModel: ChatViewModel
+    private var chatViewModel: ChatViewModel
+    var currentUserImage: UIImage?
+    var otherUserImage: UIImage?
     private var customInputBarView = UIView()
     
     init(conversationID: String) {
@@ -30,7 +32,6 @@ class ChatViewController: MessagesViewController {
         messagesCollectionView.messagesDisplayDelegate = self
         messageInputBar.delegate = self
         chatViewModel.delegate = self
-        
         updateInputBar()
     }
     
@@ -76,6 +77,14 @@ extension ChatViewController: MessagesDataSource {
     func numberOfSections(in messagesCollectionView: MessagesCollectionView) -> Int {
         return chatViewModel.getNumberOfMessages()
     }
+    
+    func configureAvatarView(_ avatarView: AvatarView, for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) {
+        if message.sender.senderId == chatViewModel.currentUser.senderId {
+            avatarView.image = currentUserImage
+        } else {
+            avatarView.image = otherUserImage
+        }
+    }
 }
 
 extension ChatViewController: InputBarAccessoryViewDelegate, MessagesDisplayDelegate, MessagesLayoutDelegate {
@@ -84,7 +93,6 @@ extension ChatViewController: InputBarAccessoryViewDelegate, MessagesDisplayDele
         messageInputBar.inputTextView.text = nil
         chatViewModel.didTapSendButton(text)
     }
-    
     func backgroundColor(for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> UIColor {
         if message.sender as? Sender == chatViewModel.currentUser {
             return UIColor(hex: "#8f87ff")
@@ -102,6 +110,7 @@ extension ChatViewController: InputBarAccessoryViewDelegate, MessagesDisplayDele
 }
 
 extension ChatViewController: ChatViewModelDelegate {
+    
     func updateCollectionView() {
         messagesCollectionView.reloadData()
         messagesCollectionView.scrollToLastItem()

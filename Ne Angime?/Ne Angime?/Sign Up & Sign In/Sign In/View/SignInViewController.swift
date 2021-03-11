@@ -39,6 +39,19 @@ class SignInViewController: UIViewController {
         updateSignInButton()
         updateSignUpLabel()
         updateActivityIndicator()
+        
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(keyboardWillShow),
+            name: UIResponder.keyboardWillShowNotification,
+            object: nil
+        )
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(keyboardWillHide),
+            name: UIResponder.keyboardWillHideNotification,
+            object: nil
+        )
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -85,6 +98,7 @@ class SignInViewController: UIViewController {
         userNameTextField.setLeftPaddingPoints(view.bounds.width * 0.08)
         userNameTextField.font = UIFont(name: "Avenir", size: 20)
         userNameTextField.placeholder = "Insert your username"
+        userNameTextField.addDoneButtonOnKeyboard()
     }
     
     private func updatePasswordTextField() {
@@ -103,6 +117,7 @@ class SignInViewController: UIViewController {
         passwordTextField.font = UIFont(name: "Avenir", size: 20)
         passwordTextField.placeholder = "Insert your password"
         passwordTextField.isSecureTextEntry = true
+        passwordTextField.addDoneButtonOnKeyboard()
     }
     
     private func updateSignInButton() {
@@ -184,6 +199,22 @@ extension SignInViewController {
         navigationController.modalPresentationStyle = .fullScreen
         navigationController.setNavigationBarHidden(true, animated: false)
         present(navigationController, animated: true)
+    }
+    
+    @objc private func keyboardWillShow(notification: Notification) {
+        if let keyboardSize = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue {
+            if passwordTextField.isFirstResponder {
+                view.frame.origin.y = -keyboardSize.height + (view.frame.height - passwordTextField.frame.origin.y - passwordTextField.frame.height)
+            } else if userNameTextField.isFirstResponder {
+                view.frame.origin.y = -keyboardSize.height + (view.frame.height - userNameTextField.frame.origin.y - userNameTextField.frame.height)
+            }
+        }
+    }
+    
+    @objc private func keyboardWillHide(notification: Notification) {
+        if view.frame.origin.y != 0 {
+            view.frame.origin.y = 0
+        }
     }
 }
 

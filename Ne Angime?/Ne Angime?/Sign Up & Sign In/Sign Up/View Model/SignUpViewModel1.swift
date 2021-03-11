@@ -19,40 +19,32 @@ class SignUpViewModel1 {
     
     func signUpStage1(username: String, firstname: String, lastname: String) {
         let signUpData1 = ["username" : username, "firstname" : firstname, "lastname" : lastname]
-        guard let url = URL(string: "https://kenesyerassyl-kenesyerassyl-node-chat-app.zeet.app/api/auth/register?stage=1"),
-              let jsonData = try? JSONSerialization.data(withJSONObject: signUpData1) else { return }
+        guard let data = try? JSONSerialization.data(withJSONObject: signUpData1) else { return }
+        var request = APIRequest(method: .post, path: "auth/register?stage=1")
+        request.headers = [HTTPHeader(field: "Content-Type", value: "application/json")]
+        request.body = data
         
-        var request = URLRequest(url: url)
-        request.httpBody = jsonData
-        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.httpMethod = "POST"
-        
-        let task = URLSession.shared.dataTask(with: request) { (data, response, error) in
-            if let data = data, let response = response as? HTTPURLResponse {
-                if 200 <= response.statusCode && response.statusCode <= 299 {
+        APIClient().request(request) { [weak self] (data, response, error) in
+            if let data = data, let response = response {
+                if (200...299).contains(response.statusCode) {
                     DispatchQueue.main.async {
-                        self.delegate?.userMayInteract()
-                        self.delegate?.goToNextStage(
+                        self?.delegate?.userMayInteract()
+                        self?.delegate?.goToNextStage(
                             username: username,
                             firstname: firstname,
                             lastname: lastname
                         )
                     }
-                } else {
-                    do {
-                        guard let json = try JSONSerialization.jsonObject(with: data) as? [String : String],
-                              let message = json["message"] else { return }
-                        self.signUpError(message: message)
-                    } catch {
-                        self.signUpError(message: error.localizedDescription)
-                    }
+                } else if !((200...299).contains(response.statusCode)),
+                          let json = try? JSONSerialization.jsonObject(with: data) as? [String : String],
+                          let message = json["message"] {
+                    self?.signUpError(message: message)
                 }
-            } else
-            if let error = error {
-                self.signUpError(message: error.localizedDescription)
+            } else if let error = error {
+                print("Error in signing up stage 1: \(error)")
+                self?.signUpError(message: error.localizedDescription)
             }
         }
-        task.resume()
     }
     
     func signUpError(message: String) {

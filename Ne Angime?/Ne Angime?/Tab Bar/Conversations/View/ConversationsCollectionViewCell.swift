@@ -34,6 +34,7 @@ class ConversationsCollectionViewCell: UICollectionViewCell {
             make.centerY.equalTo(contentView)
             make.leading.equalTo(contentView.bounds.height * 0.3 * 0.5)
         }
+        userImageView.layer.masksToBounds = true
         userImageView.layer.cornerRadius = contentView.bounds.height * 0.7 * 0.5
     }
     

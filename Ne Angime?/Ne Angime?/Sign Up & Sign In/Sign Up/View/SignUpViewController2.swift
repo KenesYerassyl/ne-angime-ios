@@ -51,6 +51,19 @@ class SignUpViewController2: UIViewController {
         addBackButton(didTapBackButton: #selector(didTapBackButton))
         
         signUpViewModel2.delegate = self
+        
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(keyboardWillShow),
+            name: UIResponder.keyboardWillShowNotification,
+            object: nil
+        )
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(keyboardWillHide),
+            name: UIResponder.keyboardWillHideNotification,
+            object: nil
+        )
     }
     
     private func updateFieldsView() {
@@ -90,6 +103,7 @@ class SignUpViewController2: UIViewController {
         emailTextField.setLeftPaddingPoints(view.bounds.width * 0.08)
         emailTextField.font = UIFont(name: "Avenir", size: 20)
         emailTextField.placeholder = "Insert your email"
+        emailTextField.addDoneButtonOnKeyboard()
     }
     
     private func updatePasswordTextField1() {
@@ -108,6 +122,7 @@ class SignUpViewController2: UIViewController {
         passwordTextField1.font = UIFont(name: "Avenir", size: 20)
         passwordTextField1.placeholder = "Insert the password"
         passwordTextField1.isSecureTextEntry = true
+        passwordTextField1.addDoneButtonOnKeyboard()
     }
     
     private func updatePasswordTextField2() {
@@ -126,6 +141,7 @@ class SignUpViewController2: UIViewController {
         passwordTextField2.font = UIFont(name: "Avenir", size: 20)
         passwordTextField2.placeholder = "Confirm your password"
         passwordTextField2.isSecureTextEntry = true
+        passwordTextField2.addDoneButtonOnKeyboard()
     }
     
     private func updateSignUpButton() {
@@ -185,6 +201,24 @@ extension SignUpViewController2 {
     
     @objc private func didTapBackButton() {
         navigationController?.popViewController(animated: true)
+    }
+    
+    @objc private func keyboardWillShow(notification: Notification) {
+        if let keyboardSize = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue {
+            if emailTextField.isFirstResponder {
+                view.frame.origin.y = -keyboardSize.height + (view.frame.height - emailTextField.frame.origin.y - emailTextField.frame.height)
+            } else if passwordTextField1.isFirstResponder {
+                view.frame.origin.y = -keyboardSize.height + (view.frame.height - passwordTextField1.frame.origin.y - passwordTextField1.frame.height)
+            } else if passwordTextField2.isFirstResponder {
+                view.frame.origin.y = -keyboardSize.height + (view.frame.height - passwordTextField2.frame.origin.y - passwordTextField2.frame.height)
+            }
+        }
+    }
+    
+    @objc private func keyboardWillHide(notification: Notification) {
+        if view.frame.origin.y != 0 {
+            view.frame.origin.y = 0
+        }
     }
 }
 

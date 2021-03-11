@@ -12,13 +12,24 @@ protocol ChatViewModelDelegate: class {
 }
 
 class ChatViewModel {
-    
     var conversationID: String
     var otherUser: Sender
+    let currentUser: Sender = {
+        if let username = UserDefaults.standard.string(forKey: "username"),
+           let firstname = UserDefaults.standard.string(forKey: "firstname"),
+           let lastname = UserDefaults.standard.string(forKey: "lastname"),
+           let avatar = UserDefaults.standard.string(forKey: "avatar") {
+            return Sender(senderId: username, displayName: "Ne Angime?")
+        } else {
+            print("Unexpected error 1")
+            return Sender.undefined
+        }
+    }()
     
     init(conversationID: String) {
         self.conversationID = conversationID
-        self.otherUser = Sender(senderId: UserManager.shared.getOtherUsername(from: conversationID), displayName: "Ne Angime?")
+        let otherUsername = UserManager.shared.getOtherUsername(from: conversationID)
+        self.otherUser = Sender(senderId: otherUsername, displayName: "Ne Angime?")
         NotificationCenter.default.addObserver(self, selector: #selector(newMessageToHandle), name: .newMessage, object: nil)
     }
     
@@ -27,14 +38,6 @@ class ChatViewModel {
     }
     
     weak var delegate: ChatViewModelDelegate?
-    let currentUser: Sender = {
-        if let username = UserDefaults.standard.string(forKey: "username") {
-            return Sender(senderId: username, displayName: "Ne Angime?")
-        } else {
-            print("This will not happen 1")
-            return Sender(senderId: "undefined", displayName: "Ne Angime?")
-        }
-    }()
     
     var messages = [MessageType]()
     
@@ -85,7 +88,7 @@ class ChatViewModel {
               let dataWebSocket = userInfo["messageWebSocket"] as? MessageWebSocket else { return }
         if conversationID == self.conversationID && dataWebSocket.type == .receiveMessage {
             messages.append(MessageMessageKit(
-                sender: Sender(senderId: dataWebSocket.senderUsername, displayName: "Ne Angime?"),
+                sender: dataWebSocket.senderUsername == otherUser.senderId ? otherUser : currentUser,
                 messageId: dataWebSocket.messageID,
                 sentDate: Date(timeIntervalSince1970: dataWebSocket.createdAt),
                 kind: .text(dataWebSocket.message)
@@ -97,12 +100,14 @@ class ChatViewModel {
     }
     
     func fetchConversation() {
-        CoreDataManager.shared.getConversation(conversationID: conversationID) { (conversation, error) in
+        CoreDataManager.shared.getConversation(conversationID: conversationID) { [weak self] (conversation, error) in
             if let conversation = conversation, let messagesCoreData = conversation.messages?.allObjects as? [MessageCoreData] {
                 var messages = [MessageType]()
                 for item in messagesCoreData {
+                    guard let senderUsername = item.senderUsername,
+                          let senderUser = senderUsername == self?.otherUser.senderId ? self?.otherUser : self?.currentUser else { return }
                     messages.append(MessageMessageKit(
-                        sender: Sender(senderId: item.senderUsername ?? "undefined", displayName: "Ne Angime?"),
+                        sender: senderUser,
                         messageId: item.messageID ?? "undefined",
                         sentDate: Date(timeIntervalSince1970: item.createdAt),
                         kind: .text(item.message ?? "undefined")
@@ -111,9 +116,9 @@ class ChatViewModel {
                 messages.sort { (messageType1, messageType2) -> Bool in
                     return messageType1.sentDate < messageType2.sentDate
                 }
-                self.messages = messages
+                self?.messages = messages
                 DispatchQueue.main.async {
-                    self.delegate?.updateCollectionView()
+                    self?.delegate?.updateCollectionView()
                 }
             } else if let error = error {
                 print("Error in fetching a chat: \(error)")

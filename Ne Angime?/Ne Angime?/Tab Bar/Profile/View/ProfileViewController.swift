@@ -35,7 +35,6 @@ class ProfileViewController: UIViewController {
         updateUserNameLabel()
         updateSignOutButton()
         updateActivityIndicator()
-        profileViewModel.downloadImage()
     }
     
     private func updateUserInfoView() {
@@ -73,6 +72,15 @@ class ProfileViewController: UIViewController {
         profileImageView.isUserInteractionEnabled = true
         let gesture = UITapGestureRecognizer(target: self, action: #selector(didTapProfileImageView))
         profileImageView.addGestureRecognizer(gesture)
+        profileImageView.image = UIImage(named: "profile_placeholder")
+        guard let username = UserDefaults.standard.string(forKey: "username"),
+              let avatar = UserDefaults.standard.string(forKey: "avatar") else { return }
+        UserManager.shared.getImageOfUser(with: username, avatar: avatar) { [weak self] data in
+            guard let data = data else { return }
+            DispatchQueue.main.async {
+                self?.profileImageView.image = UIImage(data: data)
+            }
+        }
     }
     
     private func updateUserNameLabel() {

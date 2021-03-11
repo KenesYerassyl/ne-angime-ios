@@ -8,25 +8,23 @@
 import Foundation
 
 struct User: Codable, Equatable {
+    public static let undefined = User(username: "undefined", firstname: "undefined", lastname: "undefined", avatar: nil)
     var username: String
     var firstname: String
     var lastname: String
-    var userID: String?
     var avatar: String?
     
     enum CodingKeys: String, CodingKey {
         case username
         case firstname
         case lastname
-        case userID = "user_id"
         case avatar
     }
     
-    init(username: String, firstname: String, lastname: String, userID: String?, avatar: String?) {
+    init(username: String, firstname: String, lastname: String, avatar: String?) {
         self.username = username
         self.firstname = firstname
         self.lastname = lastname
-        self.userID = userID
         self.avatar = avatar
     }
     

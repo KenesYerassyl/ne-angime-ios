@@ -126,8 +126,15 @@ extension FriendsViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let collectionViewCell = collectionView.dequeueReusableCell(withReuseIdentifier: FriendsCollectionViewCell.id, for: indexPath) as? FriendsCollectionViewCell
         guard let cell = collectionViewCell else { return UICollectionViewCell() }
-        cell.userInfo = friendsViewModel.getUser(at: indexPath.row)
-        cell.userNameLabel.text = "\(cell.userInfo.firstname) \(cell.userInfo.lastname)"
+        let user = friendsViewModel.getUser(at: indexPath.row)
+        cell.userNameLabel.text = "\(user.firstname) \(user.lastname)"
+        UserManager.shared.getImageOfUser(with: user.username, avatar: user.avatar) { (data) in
+            if let data = data {
+                DispatchQueue.main.async { cell.userImageView.image = UIImage(data: data) }
+            } else {
+                DispatchQueue.main.async { cell.userImageView.image = UIImage(named: "profile_placeholder") }
+            }
+        }
         return cell
     }
 }

@@ -9,7 +9,6 @@ import Foundation
 
 protocol ProfileViewModelDelegate: class {
     func showErrorAlert(title: String, message: String)
-    func setProfileImage(with data: Data)
 }
 
 class ProfileViewModel {
@@ -33,67 +32,42 @@ class ProfileViewModel {
         return ("\(firstname)", "\(lastname)")
     }
     
-    func downloadImage() {
-        guard let avatar = UserDefaults.standard.string(forKey: "avatar"),
-              let url = URL(string: avatar) else { return }
-        URLSession.shared.dataTask(with: url) { (data, _, error) in
-            if let data = data {
-                DispatchQueue.main.async {
-                    self.delegate?.setProfileImage(with: data)
-                }
-            } else if let error = error {
-                print("Error in downloading a profile image: \(error)")
-            }
-        }.resume()
-    }
-    
     func uploadImage(imageData: String, _ completion: @escaping(Bool) -> Void) {
-        guard let url = URL(string: "https://kenesyerassyl-kenesyerassyl-node-chat-app.zeet.app/api/auth/update/avatar"),
-              let cookie = UserDefaults.standard.string(forKey: "token")
-        else {
+        guard let cookie = UserDefaults.standard.string(forKey: "token"),
+              let data = try? JSONSerialization.data(withJSONObject: ["avatar" : imageData]) else {
             completion(false)
             return
         }
-        var request = URLRequest(url: url)
-        request.httpMethod = "POST"
-        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.addValue("token=\(cookie)", forHTTPHeaderField: "Cookie")
-        do {
-            let data = try JSONSerialization.data(withJSONObject: ["avatar" : imageData])
-            request.httpBody = data
-        } catch {
-            completion(false)
-            print("Error in decoding image data: \(error)")
-        }
-        URLSession.shared.dataTask(with: request) { (data, response, error) in
-            if let httpResponse = response as? HTTPURLResponse, let data = data {
-                if 200 <= httpResponse.statusCode && httpResponse.statusCode <= 299 {
+        var request = APIRequest(method: .post, path: "auth/update/avatar")
+        request.headers = [
+            HTTPHeader(field: "Cookie", value: "token=\(cookie)"),
+            HTTPHeader(field: "Content-Type", value: "application/json")
+        ]
+        request.body = data
+        APIClient().request(request) { (data, response, error) in
+            if let data = data, let response = response {
+                if (200...299).contains(response.statusCode) {
                     do {
                         guard let json = try JSONSerialization.jsonObject(with: data) as? [String : Any],
                               let url = json["url"] as? String else { return }
                         UserDefaults.standard.set(url, forKey: "avatar")
                         DispatchQueue.main.async { completion(true) }
                     } catch {
-                        DispatchQueue.main.async { completion(false) }
                         print("Error in decoding data from uploading profile image: \(error)")
+                        DispatchQueue.main.async { completion(false) }
                     }
-                } else if httpResponse.statusCode == 413 {
+                } else if response.statusCode == 413 {
                     DispatchQueue.main.async {
                         self.delegate?.showErrorAlert(title: "Something went wrong", message: "The size of an image should be less than 10 Mb. This image is too heavy, please choose another one.")
                         completion(false)
                     }
-                } else if httpResponse.statusCode == 404 {
-                    DispatchQueue.main.async {
-                        self.delegate?.showErrorAlert(title: "Something went wrong", message: "It seems that you did not select an image.")
-                        completion(false)
-                    }
                 } else {
-                    DispatchQueue.main.async { completion(false) }
+                    completion(false)
                 }
             } else if let error = error {
-                DispatchQueue.main.async { completion(false) }
                 print("Error in uploading a profile image: \(error)")
+                DispatchQueue.main.async { completion(false) }
             }
-        }.resume()
+        }
     }
 }

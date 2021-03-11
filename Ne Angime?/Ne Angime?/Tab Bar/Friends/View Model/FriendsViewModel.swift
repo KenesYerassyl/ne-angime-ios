@@ -25,15 +25,12 @@ class FriendsViewModel {
     }
     
     func fetchAllUsers() {
-        UserManager.shared.getAllUsers { (newUsers, error) in
-            if let newUsers = newUsers {
-                self.users = newUsers
-                DispatchQueue.main.async {
-                    self.delegate?.userMayInteract()
-                    self.delegate?.updateCollectionView()
-                }
-            } else if let error = error {
-                print("Erro in fetching all users: \(error)")
+        UserManager.shared.getAllUsers { [weak self] (newUsers) in
+            guard let newUsers = newUsers else { return }
+            self?.users = newUsers
+            DispatchQueue.main.async {
+                self?.delegate?.userMayInteract()
+                self?.delegate?.updateCollectionView()
             }
         }
     }

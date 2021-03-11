@@ -11,29 +11,32 @@ class ConversationManager {
     public static let shared = ConversationManager()
     private init(){}
     
-    public func getAllConversations(_ completion: @escaping([Conversation]?, Error?) -> Void) {
-        guard let url = URL(string: "https://kenesyerassyl-kenesyerassyl-node-chat-app.zeet.app/api/chat"),
-              let cookie = UserDefaults.standard.string(forKey: "token") else { return }
-        var request = URLRequest(url: url)
-        request.httpMethod = "GET"
-        request.addValue("token=\(cookie)", forHTTPHeaderField: "Cookie")
-        let task = URLSession.shared.dataTask(with: request) { (data, response, error) in
-            if let data = data, let response = response as? HTTPURLResponse, 200 <= response.statusCode && response.statusCode <= 299 {
+    func getAllConversations(_ completion: @escaping([Conversation]?) -> Void) {
+        guard let cookie = UserDefaults.standard.string(forKey: "token") else {
+            completion(nil)
+            return
+        }
+        var request = APIRequest(method: .get, path: "chat")
+        request.headers = [HTTPHeader(field: "Cookie", value: "token=\(cookie)")]
+        
+        APIClient().request(request) { (data, response, error) in
+            if let data = data, let response = response, (200...299).contains(response.statusCode) {
                 do {
                     let decoder = JSONDecoder()
                     let conversations = try decoder.decode([Conversation].self, from: data)
-                    DispatchQueue.main.async { completion(conversations, nil) }
+                    DispatchQueue.main.async { completion(conversations) }
                 } catch {
-                    DispatchQueue.main.async { completion(nil, error) }
+                    print("Error in decoding [Conversation] data: \(error)")
+                    DispatchQueue.main.async { completion(nil) }
                 }
             } else if let error = error {
-                DispatchQueue.main.async { completion(nil, error) }
+                print("Erro in all conversations: \(error)")
+                DispatchQueue.main.async { completion(nil) }
             }
         }
-        task.resume()
     }
     
-    public func convertToConversation(from conversationCoreData: ConversationCoreData) -> Conversation {
+    func convertToConversation(from conversationCoreData: ConversationCoreData) -> Conversation {
         var conversation = Conversation(
             conversationID: conversationCoreData.conversationID ?? "undefined",
             messages: []

@@ -2,7 +2,7 @@
 //  ConversationCoreData+CoreDataClass.swift
 //  Ne Angime?
 //
-//  Created by Kenes Yerassyl on 3/6/21.
+//  Created by Kenes Yerassyl on 3/11/21.
 //
 //
 

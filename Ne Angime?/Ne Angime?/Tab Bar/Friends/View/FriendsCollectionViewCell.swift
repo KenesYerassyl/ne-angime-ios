@@ -10,7 +10,6 @@ import SnapKit
 class FriendsCollectionViewCell: UICollectionViewCell {
     static let id = "FriendsCollectionViewCell"
     var userImageView = UIImageView()
-    var userInfo = User(username: "", firstname: "", lastname: "", userID: "0", avatar: "")
     var userNameLabel: UILabel = {
         var temp = UILabel()
         temp.font = UIFont(name: "Avenir", size: 20)
@@ -38,6 +37,7 @@ class FriendsCollectionViewCell: UICollectionViewCell {
             make.centerY.equalTo(contentView)
             make.leading.equalTo(contentView.bounds.height * 0.3 * 0.5)
         }
+        userImageView.layer.masksToBounds = true
         userImageView.layer.cornerRadius = contentView.bounds.height * 0.7 * 0.5
     }
     

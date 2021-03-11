@@ -3,6 +3,20 @@
     {
       "filename" : "send_24px.svg",
       "idiom" : "universal",
+      "resizing" : {
+        "cap-insets" : {
+          "bottom" : 0,
+          "left" : 0,
+          "right" : -1,
+          "top" : 0
+        },
+        "center" : {
+          "height" : 0,
+          "mode" : "tile",
+          "width" : 1
+        },
+        "mode" : "9-part"
+      },
       "scale" : "1x"
     },
     {

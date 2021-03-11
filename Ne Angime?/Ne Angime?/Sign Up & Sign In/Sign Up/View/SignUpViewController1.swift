@@ -39,6 +39,19 @@ class SignUpViewController1: UIViewController {
         addBackButton(didTapBackButton: #selector(didTapBackButton))
         
         signUpViewModel1.delegate = self
+        
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(keyboardWillShow),
+            name: UIResponder.keyboardWillShowNotification,
+            object: nil
+        )
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(keyboardWillHide),
+            name: UIResponder.keyboardWillHideNotification,
+            object: nil
+        )
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -83,6 +96,7 @@ class SignUpViewController1: UIViewController {
         firstNameTextField.setLeftPaddingPoints(view.bounds.width * 0.08)
         firstNameTextField.font = UIFont(name: "Avenir", size: 20)
         firstNameTextField.placeholder = "Insert your First Name"
+        firstNameTextField.addDoneButtonOnKeyboard()
     }
     
     private func updateLastNameTextField() {
@@ -100,6 +114,7 @@ class SignUpViewController1: UIViewController {
         lastNameTextField.setLeftPaddingPoints(view.bounds.width * 0.08)
         lastNameTextField.font = UIFont(name: "Avenir", size: 20)
         lastNameTextField.placeholder = "Insert your Last Name"
+        lastNameTextField.addDoneButtonOnKeyboard()
     }
     
     private func updateUserNameTextField() {
@@ -117,6 +132,7 @@ class SignUpViewController1: UIViewController {
         userNameTextField.setLeftPaddingPoints(view.bounds.width * 0.08)
         userNameTextField.font = UIFont(name: "Avenir", size: 20)
         userNameTextField.placeholder = "Insert the username"
+        userNameTextField.addDoneButtonOnKeyboard()
     }
     
     private func updateNextButton() {
@@ -173,6 +189,24 @@ extension SignUpViewController1 {
     
     @objc private func didTapBackButton() {
         navigationController?.dismiss(animated: true)
+    }
+    
+    @objc private func keyboardWillShow(notification: Notification) {
+        if let keyboardSize = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue {
+            if firstNameTextField.isFirstResponder {
+                view.frame.origin.y = -keyboardSize.height + (view.frame.height - firstNameTextField.frame.origin.y - firstNameTextField.frame.height)
+            } else if lastNameTextField.isFirstResponder {
+                view.frame.origin.y = -keyboardSize.height + (view.frame.height - lastNameTextField.frame.origin.y - lastNameTextField.frame.height)
+            } else if userNameTextField.isFirstResponder {
+                view.frame.origin.y = -keyboardSize.height + (view.frame.height - userNameTextField.frame.origin.y - userNameTextField.frame.height)
+            }
+        }
+    }
+    
+    @objc private func keyboardWillHide(notification: Notification) {
+        if view.frame.origin.y != 0 {
+            view.frame.origin.y = 0
+        }
     }
 }
 

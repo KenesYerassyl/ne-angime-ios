@@ -68,43 +68,40 @@ class ConversationsViewModel {
     }
     
     func fetchAllConversations() {
-        CoreDataManager.shared.getAllConversations { (results, error) in
+        CoreDataManager.shared.getAllConversations { [weak self] (results, error) in
             if let results = results {
-                self.conversations.removeAll()
+                self?.conversations.removeAll()
                 for conversationCoreData in results {
                     var conversationToAppend = ConversationManager.shared.convertToConversation(from: conversationCoreData)
                     conversationToAppend.messages.sort { (message1, message2) -> Bool in
                         return message1.createdAt < message2.createdAt
                     }
-                    self.conversations.append(conversationToAppend)
+                    self?.conversations.append(conversationToAppend)
                 }
                 DispatchQueue.main.async {
-                    self.delegate?.updateCollectionView()
+                    self?.delegate?.updateCollectionView()
                 }
-                ConversationManager.shared.getAllConversations { (conversations, error) in
-                    if let conversationsFromDB = conversations {
-                        if conversationsFromDB.count != self.conversations.count {
-                            self.conversations = conversationsFromDB
-                            CoreDataManager.shared.updateConversations(conversations: conversationsFromDB)
-                            DispatchQueue.main.async {
-                                self.delegate?.updateCollectionView()
-                            }
-                        } else {
-                            var index = 0
-                            while index < self.conversations.count {
-                                if self.conversations[index].messages.count != conversationsFromDB[index].messages.count {
-                                    self.conversations = conversationsFromDB
-                                    CoreDataManager.shared.updateConversations(conversations: conversationsFromDB)
-                                    DispatchQueue.main.async {
-                                        self.delegate?.updateCollectionView()
-                                    }
-                                    break
-                                }
-                                index += 1
-                            }
+                ConversationManager.shared.getAllConversations { [weak self] conversations in
+                    guard let conversationsFromDB = conversations else { return }
+                    if conversationsFromDB.count != self?.conversations.count {
+                        self?.conversations = conversationsFromDB
+                        CoreDataManager.shared.updateConversations(conversations: conversationsFromDB)
+                        DispatchQueue.main.async {
+                            self?.delegate?.updateCollectionView()
                         }
-                    } else if let error = error {
-                        print("Error in fetching all conversations from DB: \(error)")
+                    } else {
+                        var index = 0
+                        while index < (self?.conversations.count ?? 0) {
+                            if self?.conversations[index].messages.count != conversationsFromDB[index].messages.count {
+                                self?.conversations = conversationsFromDB
+                                CoreDataManager.shared.updateConversations(conversations: conversationsFromDB)
+                                DispatchQueue.main.async {
+                                    self?.delegate?.updateCollectionView()
+                                }
+                                break
+                            }
+                            index += 1
+                        }
                     }
                 }
                 
