@@ -15,10 +15,7 @@ class ChatViewModel {
     var conversationID: String
     var otherUser: Sender
     let currentUser: Sender = {
-        if let username = UserDefaults.standard.string(forKey: "username"),
-           let firstname = UserDefaults.standard.string(forKey: "firstname"),
-           let lastname = UserDefaults.standard.string(forKey: "lastname"),
-           let avatar = UserDefaults.standard.string(forKey: "avatar") {
+        if let username = UserDefaults.standard.string(forKey: "username") {
             return Sender(senderId: username, displayName: "Ne Angime?")
         } else {
             print("Unexpected error 1")
@@ -100,28 +97,25 @@ class ChatViewModel {
     }
     
     func fetchConversation() {
-        CoreDataManager.shared.getConversation(conversationID: conversationID) { [weak self] (conversation, error) in
-            if let conversation = conversation, let messagesCoreData = conversation.messages?.allObjects as? [MessageCoreData] {
-                var messages = [MessageType]()
-                for item in messagesCoreData {
-                    guard let senderUsername = item.senderUsername,
-                          let senderUser = senderUsername == self?.otherUser.senderId ? self?.otherUser : self?.currentUser else { return }
-                    messages.append(MessageMessageKit(
-                        sender: senderUser,
-                        messageId: item.messageID ?? "undefined",
-                        sentDate: Date(timeIntervalSince1970: item.createdAt),
-                        kind: .text(item.message ?? "undefined")
-                    ))
-                }
-                messages.sort { (messageType1, messageType2) -> Bool in
-                    return messageType1.sentDate < messageType2.sentDate
-                }
-                self?.messages = messages
-                DispatchQueue.main.async {
-                    self?.delegate?.updateCollectionView()
-                }
-            } else if let error = error {
-                print("Error in fetching a chat: \(error)")
+        CoreDataManager.shared.getConversation(conversationID: conversationID) { [weak self] (conversation) in
+            guard let conversation = conversation, let messagesCoreData = conversation.messages?.allObjects as? [MessageCoreData] else { return }
+            var messages = [MessageType]()
+            for item in messagesCoreData {
+                guard let senderUsername = item.senderUsername,
+                      let senderUser = senderUsername == self?.otherUser.senderId ? self?.otherUser : self?.currentUser else { return }
+                messages.append(MessageMessageKit(
+                    sender: senderUser,
+                    messageId: item.messageID ?? "undefined",
+                    sentDate: Date(timeIntervalSince1970: item.createdAt),
+                    kind: .text(item.message ?? "undefined")
+                ))
+            }
+            messages.sort { (messageType1, messageType2) -> Bool in
+                return messageType1.sentDate < messageType2.sentDate
+            }
+            self?.messages = messages
+            DispatchQueue.main.async {
+                self?.delegate?.updateCollectionView()
             }
         }
     }

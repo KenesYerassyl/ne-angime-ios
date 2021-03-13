@@ -65,11 +65,10 @@ class UserManager {
     
     func getImageOfUser(with username: String, avatar: String?, _ completion: @escaping(Data?) -> Void) {
         if CoreDataManager.shared.doesCachedImageExist("profile_image_\(username)") {
-            CoreDataManager.shared.getCachedImage(imageID: "profile_image_\(username)") {  (cachedImage, error) in
+            CoreDataManager.shared.getCachedImage(imageID: "profile_image_\(username)") { cachedImage in
                 if let cachedImage = cachedImage, let data = cachedImage.imageData {
                     completion(data)
-                } else if let error = error {
-                    print("Error in getting cached image: \(error)")
+                } else {
                     completion(nil)
                 }
             }

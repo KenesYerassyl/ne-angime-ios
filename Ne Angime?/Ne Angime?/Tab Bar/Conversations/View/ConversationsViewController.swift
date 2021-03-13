@@ -61,6 +61,10 @@ extension ConversationsViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let conversationID = conversationsViewModel.getConversationID(at: indexPath.row)
         let chatViewController = ChatViewController(conversationID: conversationID)
+        for index in 0...conversationsViewModel.conversations[indexPath.row].messages.count - 1 {
+            conversationsViewModel.conversations[indexPath.row].messages[index].isRead = true
+        }
+        CoreDataManager.shared.setMessagesToRead(conversationID: conversationsViewModel.getConversationID(at: indexPath.row))
         let group = DispatchGroup()
         guard let currentUsername = UserDefaults.standard.string(forKey: "username") else { return }
         let otherUsername = UserManager.shared.getOtherUsername(from: conversationsViewModel.getConversationID(at: indexPath.row))
@@ -106,6 +110,7 @@ extension ConversationsViewController: UICollectionViewDataSource {
         conversationsViewModel.getFullNameOfRecipient(at: indexPath.row) { name in
             cell.userNameLabel.text = name
         }
+        cell.newMessagesCounter = conversationsViewModel.getNumberOfUnreadMessages(at: indexPath.row)
         let username = UserManager.shared.getOtherUsername(from: conversationsViewModel.conversations[indexPath.row].conversationID)
         UserManager.shared.getImageOfUser(with: username, avatar: nil) { data in
             if let data = data {
@@ -114,6 +119,7 @@ extension ConversationsViewController: UICollectionViewDataSource {
                 DispatchQueue.main.async { cell.userImageView.image = UIImage(named: "profile_placeholder") }
             }
         }
+        
         return cell
     }
 }

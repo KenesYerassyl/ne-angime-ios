@@ -8,7 +8,7 @@
 import UIKit
 import NVActivityIndicatorView
 
-class ProfileViewController: UIViewController {
+class ProfileViewController: ViewController {
     
     private let userInfoView = UIView()
     private let profileView = UIView()
@@ -17,14 +17,6 @@ class ProfileViewController: UIViewController {
     private let signOutButton = UIButton()
     private let spacing = 24.0
     private let profileViewModel = ProfileViewModel()
-    private let activityIndicator: NVActivityIndicatorView = {
-        var temp = NVActivityIndicatorView(frame: .zero,
-                                           type: .circleStrokeSpin,
-                                           color: .blue,
-                                           padding: nil)
-        return temp
-    }()
-    private let backView = UIView()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -34,7 +26,6 @@ class ProfileViewController: UIViewController {
         updateProfileImageView()
         updateUserNameLabel()
         updateSignOutButton()
-        updateActivityIndicator()
     }
     
     private func updateUserInfoView() {
@@ -107,28 +98,6 @@ class ProfileViewController: UIViewController {
         signOutButton.setImage(UIImage(named: "sign_out_icon_tapped"), for: .selected)
         signOutButton.setImage(UIImage(named: "sign_out_icon_tapped"), for: .highlighted)
         signOutButton.addTarget(self, action: #selector(signOutButtonDidTap), for: .touchUpInside)
-    }
-    
-    private func updateActivityIndicator() {
-        view.addSubview(backView)
-        backView.snp.makeConstraints { make in
-            make.centerX.equalTo(view)
-            make.centerY.equalTo(view)
-            make.width.equalTo(view.bounds.width * 0.25)
-            make.height.equalTo(view.bounds.width * 0.25)
-        }
-        backView.isHidden = true
-        backView.layer.cornerRadius = 10
-        backView.backgroundColor = UIColor(hex: "#5896f2")
-        backView.layer.opacity = 0.8
-        
-        view.addSubview(activityIndicator)
-        activityIndicator.snp.makeConstraints { make in
-            make.centerX.equalTo(view)
-            make.centerY.equalTo(view)
-            make.width.equalTo(view.bounds.width * 0.15)
-            make.height.equalTo(view.bounds.width * 0.15)
-        }
     }
 }
 
@@ -209,15 +178,11 @@ extension ProfileViewController: UIImagePickerControllerDelegate, UINavigationCo
         guard let selectedImage = info[.editedImage] as? UIImage else { return }
         guard let imageData = selectedImage.pngData() else { return }
         
-        activityIndicator.startAnimating()
-        backView.isHidden = false
-        view.isUserInteractionEnabled = false
+        startActivityIndicator()
         
         profileViewModel.uploadImage(imageData: imageData.base64EncodedString()) { [weak self] result in
             DispatchQueue.main.async {
-                self?.activityIndicator.stopAnimating()
-                self?.backView.isHidden = true
-                self?.view.isUserInteractionEnabled = true
+                self?.stopActivityIndicator()
             }
             if result { self?.profileImageView.image = selectedImage }
         }

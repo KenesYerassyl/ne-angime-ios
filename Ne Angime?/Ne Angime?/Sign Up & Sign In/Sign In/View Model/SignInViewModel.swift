@@ -43,7 +43,7 @@ class SignInViewModel {
                     UserDefaults.standard.set(lastname, forKey: "lastname")
                     UserDefaults.standard.set(email, forKey: "email")
                     UserDefaults.standard.set(cookieValue, forKey: "token")
-                    if let avatar = userData["avatar"] {
+                    if let avatar = userData["avatar"] as? String {
                         UserDefaults.standard.set(avatar, forKey: "avatar")
                     }
                     DispatchQueue.main.async {

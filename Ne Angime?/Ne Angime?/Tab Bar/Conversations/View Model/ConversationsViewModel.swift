@@ -18,6 +18,7 @@ class ConversationsViewModel {
     init() {
         NotificationCenter.default.addObserver(self, selector: #selector(newConversationCreated), name: .newConversation, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(newMessageToHandle), name: .newMessage, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(setMessagesToRead), name: .leavingConversation, object: nil)
     }
     
     deinit {
@@ -39,28 +40,26 @@ class ConversationsViewModel {
         return lastMessage
     }
     
+    func getNumberOfUnreadMessages(at index: Int) -> Int {
+        guard let username = UserDefaults.standard.string(forKey: "username") else { return 48 }
+        var counter = 0
+        for message in conversations[index].messages {
+            if !message.isRead && message.senderUsername == username { counter += 1 }
+        }
+        return counter
+    }
+    
     func getFullNameOfRecipient(at index: Int, _ completion: @escaping(String) -> Void) {
         let group = DispatchGroup()
         var fullName = "undefined undefined"
-        if CoreDataManager.shared.doesConversationExist(conversations[index].conversationID) {
-            group.enter()
-            CoreDataManager.shared.getConversation(conversationID: conversations[index].conversationID) { (conversationCoreData, error) in
-                if let conversationCoreData = conversationCoreData,
-                   let firstName = conversationCoreData.firstNameOfRecipient,
-                   let lastName = conversationCoreData.lastNameOfRecipient {
-                    fullName = "\(firstName) \(lastName)"
-                    group.leave()
-                } else if let error = error {
-                    print("Error in fetcing conversation for getting fullname: \(error)")
-                }
+        group.enter()
+        CoreDataManager.shared.getConversation(conversationID: conversations[index].conversationID) { (conversationCoreData) in
+            if let conversationCoreData = conversationCoreData,
+               let firstName = conversationCoreData.firstNameOfRecipient,
+               let lastName = conversationCoreData.lastNameOfRecipient {
+                fullName = "\(firstName) \(lastName)"
             }
-        } else {
-            group.enter()
-            UserManager.shared.getUser(username: UserManager.shared.getOtherUsername(from: conversations[index].conversationID)) { user in
-                guard let user = user else { return }
-                fullName = "\(user.firstname) \(user.lastname)"
-                group.leave()
-            }
+            group.leave()
         }
         group.notify(queue: .main) {
             completion(fullName)
@@ -68,45 +67,58 @@ class ConversationsViewModel {
     }
     
     func fetchAllConversations() {
-        CoreDataManager.shared.getAllConversations { [weak self] (results, error) in
-            if let results = results {
-                self?.conversations.removeAll()
-                for conversationCoreData in results {
-                    var conversationToAppend = ConversationManager.shared.convertToConversation(from: conversationCoreData)
-                    conversationToAppend.messages.sort { (message1, message2) -> Bool in
-                        return message1.createdAt < message2.createdAt
-                    }
-                    self?.conversations.append(conversationToAppend)
+        CoreDataManager.shared.getAllConversations { [weak self] results in
+            guard let results = results else { return }
+            self?.conversations.removeAll()
+            for conversationCoreData in results {
+                var conversationToAppend = conversationCoreData.convertToConversation()
+                conversationToAppend.messages.sort { (message1, message2) -> Bool in
+                    return message1.createdAt < message2.createdAt
                 }
-                DispatchQueue.main.async {
-                    self?.delegate?.updateCollectionView()
-                }
-                ConversationManager.shared.getAllConversations { [weak self] conversations in
-                    guard let conversationsFromDB = conversations else { return }
-                    if conversationsFromDB.count != self?.conversations.count {
-                        self?.conversations = conversationsFromDB
-                        CoreDataManager.shared.updateConversations(conversations: conversationsFromDB)
-                        DispatchQueue.main.async {
-                            self?.delegate?.updateCollectionView()
-                        }
-                    } else {
-                        var index = 0
-                        while index < (self?.conversations.count ?? 0) {
-                            if self?.conversations[index].messages.count != conversationsFromDB[index].messages.count {
-                                self?.conversations = conversationsFromDB
-                                CoreDataManager.shared.updateConversations(conversations: conversationsFromDB)
-                                DispatchQueue.main.async {
-                                    self?.delegate?.updateCollectionView()
-                                }
-                                break
-                            }
-                            index += 1
+                self?.conversations.append(conversationToAppend)
+            }
+            DispatchQueue.main.async {
+                self?.delegate?.updateCollectionView()
+            }
+        }
+        ConversationManager.shared.getAllConversations { [weak self] conversations in
+            guard let conversationsFromDB = conversations, let self = self else { return }
+            let group = DispatchGroup()
+            var shouldGetConversationFromDB = false
+            if conversationsFromDB.count != self.conversations.count {
+                shouldGetConversationFromDB = true
+                for conversation in conversationsFromDB {
+                    if !ConversationManager.shared.doesConversationExist(conversation, in: self.conversations) {
+                        group.enter()
+                        CoreDataManager.shared.addConversation(conversation: conversation) { completed in
+                            if completed { group.leave() }
                         }
                     }
                 }
-                
-            } else if let error = error {
-                print("(Conversations VM) Error in fetching all conversations: \(error)")
+            }
+            for i in stride(from: 0, to: self.conversations.count, by: 1) {
+                for j in stride(from: 0, to: conversationsFromDB.count, by: 1) {
+                    if self.conversations[i] == conversationsFromDB[j] &&
+                        self.conversations[i].messages.count != conversationsFromDB[j].messages.count {
+                        shouldGetConversationFromDB = true
+                        group.enter()
+                        CoreDataManager.shared.addMessages(
+                            to: conversationsFromDB[j].conversationID,
+                            from: conversationsFromDB[j].messages,
+                            startingIndex: self.conversations.count
+                        ) { completed in
+                            if completed { group.leave() }
+                        }
+                    }
+                }
+            }
+            group.notify(queue: .main) {
+                if shouldGetConversationFromDB {
+                    self.conversations = conversationsFromDB
+                    DispatchQueue.main.async {
+                        self.delegate?.updateCollectionView()
+                    }
+                }
             }
         }
     }
@@ -114,14 +126,11 @@ class ConversationsViewModel {
     @objc func newConversationCreated(notification: Notification) {
         guard let userInfo = notification.userInfo,
               let conversationID = userInfo["conversationID"] as? String else { return }
-        CoreDataManager.shared.getConversation(conversationID: conversationID) { (conversation, error) in
-            if let conversation = conversation {
-                self.conversations.append(ConversationManager.shared.convertToConversation(from: conversation))
-                DispatchQueue.main.async {
-                    self.delegate?.updateCollectionView()
-                }
-            } else if let error = error {
-                print("Error in getting convo by ID: \(error)")
+        CoreDataManager.shared.getConversation(conversationID: conversationID) { (conversation) in
+            guard let conversation = conversation else { return }
+            self.conversations.append(conversation.convertToConversation())
+            DispatchQueue.main.async {
+                self.delegate?.updateCollectionView()
             }
         }
     }
@@ -139,6 +148,21 @@ class ConversationsViewModel {
                 break
             }
         }
-        
+    }
+    
+    @objc func setMessagesToRead(notification: Notification) {
+        guard let userInfo = notification.userInfo, let conversationID = userInfo["conversationID"] as? String else { return }
+        for index in stride(from: 0, to: conversations.count, by: 1) {
+            if conversations[index].conversationID == conversationID {
+                for jndex in 0...conversations[index].messages.count - 1 {
+                    conversations[index].messages[jndex].isRead = true
+                }
+                CoreDataManager.shared.setMessagesToRead(conversationID: conversationID)
+                DispatchQueue.main.async {
+                    self.delegate?.updateCollectionView()
+                }
+                break
+            }
+        }
     }
 }

@@ -8,7 +8,7 @@
 import UIKit
 import NVActivityIndicatorView
 
-class SignInViewController: UIViewController {
+class SignInViewController: ViewController {
     
     private let signInViewModel = SignInViewModel()
     private let spacing = 24.0
@@ -18,14 +18,6 @@ class SignInViewController: UIViewController {
     private let passwordTextField = UITextField()
     private let signInButton = UIButton()
     private let signUpLabel = UILabel()
-    private let activityIndicator: NVActivityIndicatorView = {
-        var temp = NVActivityIndicatorView(frame: .zero,
-                                           type: .circleStrokeSpin,
-                                           color: .blue,
-                                           padding: nil)
-        return temp
-    }()
-    private let backView = UIView()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -38,7 +30,6 @@ class SignInViewController: UIViewController {
         updatePasswordTextField()
         updateSignInButton()
         updateSignUpLabel()
-        updateActivityIndicator()
         
         NotificationCenter.default.addObserver(
             self,
@@ -156,36 +147,11 @@ class SignInViewController: UIViewController {
         let tap = UITapGestureRecognizer(target: self, action: #selector(didTapSignUpLabel))
         signUpLabel.addGestureRecognizer(tap)
     }
-    
-    private func updateActivityIndicator() {
-        view.addSubview(backView)
-        backView.snp.makeConstraints { make in
-            make.centerX.equalTo(view)
-            make.centerY.equalTo(view)
-            make.width.equalTo(view.bounds.width * 0.25)
-            make.height.equalTo(view.bounds.width * 0.25)
-        }
-        backView.isHidden = true
-        backView.layer.cornerRadius = 10
-        backView.backgroundColor = UIColor(hex: "#5896f2")
-        backView.layer.opacity = 0.8
-        
-        view.addSubview(activityIndicator)
-        activityIndicator.snp.makeConstraints { make in
-            make.centerX.equalTo(view)
-            make.centerY.equalTo(view)
-            make.width.equalTo(view.bounds.width * 0.15)
-            make.height.equalTo(view.bounds.width * 0.15)
-        }
-    }
-
 }
 
 extension SignInViewController {
     @objc private func didTapSignInButton() {
-        activityIndicator.startAnimating()
-        backView.isHidden = false
-        view.isUserInteractionEnabled = false
+        startActivityIndicator()
         guard let username = userNameTextField.text?.trimmingCharacters(in: .whitespacesAndNewlines),
               let password = passwordTextField.text?.trimmingCharacters(in: .whitespacesAndNewlines)
         else {
@@ -221,9 +187,7 @@ extension SignInViewController {
 extension SignInViewController: SignInViewModelDelegate {
 
     func userMayInteract() {
-        view.isUserInteractionEnabled = true
-        activityIndicator.stopAnimating()
-        backView.isHidden = true
+        stopActivityIndicator()
     }
     
     func showErrorAlert(title: String, message: String) {

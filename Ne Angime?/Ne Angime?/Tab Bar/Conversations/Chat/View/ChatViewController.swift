@@ -33,17 +33,12 @@ class ChatViewController: MessagesViewController {
         messageInputBar.delegate = self
         chatViewModel.delegate = self
         updateInputBar()
+        addBackButton(withNormalColor: .normalDark, didTapBackButton: #selector(didTapBackButton))
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        navigationController?.setNavigationBarHidden(false, animated: true)
         chatViewModel.fetchConversation()
-    }
-    
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewDidDisappear(animated)
-        navigationController?.setNavigationBarHidden(true, animated: true)
     }
     
     private func updateInputBar() {
@@ -51,17 +46,19 @@ class ChatViewController: MessagesViewController {
         messageInputBar.inputTextView.textContainerInset.bottom = view.bounds.height * 0.01
         messageInputBar.inputTextView.textContainerInset.top = view.bounds.height * 0.01
         messageInputBar.inputTextView.textContainerInset.left = view.bounds.width * 0.05
-        
-        messageInputBar.backgroundView.layer.cornerRadius = 25
-        messageInputBar.backgroundView.bottomAnchor.constraint(
-            equalTo: messageInputBar.contentView.bottomAnchor,
-            constant: view.bounds.height * 0.01
-        ).isActive = true
+
         messageInputBar.inputTextView.placeholder = "Write your message here..."
         messageInputBar.separatorLine.isHidden = true
         
         messageInputBar.sendButton.setImage(UIImage(named: "send_button_normal"), for: .normal)
         messageInputBar.sendButton.setTitle(nil, for: .normal)
+    }
+}
+
+extension ChatViewController {
+    @objc private func didTapBackButton() {
+        NotificationCenter.default.post(name: .leavingConversation, object: nil, userInfo: ["conversationID" : chatViewModel.conversationID])
+        navigationController?.popViewController(animated: true)
     }
 }
 
@@ -110,9 +107,8 @@ extension ChatViewController: InputBarAccessoryViewDelegate, MessagesDisplayDele
 }
 
 extension ChatViewController: ChatViewModelDelegate {
-    
     func updateCollectionView() {
         messagesCollectionView.reloadData()
-        messagesCollectionView.scrollToLastItem()
+        messagesCollectionView.scrollToLastItem(at: .bottom, animated: false)
     }
 }

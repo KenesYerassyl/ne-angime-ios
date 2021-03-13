@@ -36,22 +36,10 @@ class ConversationManager {
         }
     }
     
-    func convertToConversation(from conversationCoreData: ConversationCoreData) -> Conversation {
-        var conversation = Conversation(
-            conversationID: conversationCoreData.conversationID ?? "undefined",
-            messages: []
-        )
-        guard let messages = conversationCoreData.messages as? Set<MessageCoreData> else { return conversation }
-        for messageCoreData in messages {
-            let message = Message(
-                createdAt: messageCoreData.createdAt,
-                message: messageCoreData.message ?? "undefined",
-                messageID: messageCoreData.messageID ?? "undefined",
-                recipientUsername: messageCoreData.recipientUsername ?? "undefined",
-                senderUsername: messageCoreData.senderUsername ?? "undefined"
-            )
-            conversation.messages.append(message)
+    func doesConversationExist(_ targetConversation: Conversation, in conversations: [Conversation]) -> Bool {
+        for conversation in conversations {
+            if conversation.conversationID == targetConversation.conversationID { return true }
         }
-        return conversation
+        return false
     }
 }

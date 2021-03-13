@@ -27,37 +27,39 @@ class MessageHandler {
         message.senderUsername = messageWebSocket.senderUsername
         
         if conversationID != "undefined" {
-            CoreDataManager.shared.getConversation(conversationID: conversationID) { (conversation, error) in
-                if let conversation = conversation {
-                    conversation.addToMessages(message)
-                    CoreDataManager.shared.saveContext()
-                    NotificationCenter.default.post(
-                        name: .newMessage,
-                        object: nil,
-                        userInfo: [
-                            "conversationID" : conversationID,
-                            "messageWebSocket" : messageWebSocket
-                        ]
-                    )
-                } else if let error = error {
-                    print("Error occured in getting conversation: \(error)")
-                }
+            CoreDataManager.shared.getConversation(conversationID: conversationID) { (conversation) in
+                guard let conversation = conversation else { return }
+                conversation.addToMessages(message)
+                CoreDataManager.shared.saveContext()
+                NotificationCenter.default.post(
+                    name: .newMessage,
+                    object: nil,
+                    userInfo: [
+                        "conversationID" : conversationID,
+                        "messageWebSocket" : messageWebSocket
+                    ]
+                )
             }
         } else {
             let conversation = ConversationCoreData(entity: ConversationCoreData.entity(), insertInto: CoreDataManager.shared.context)
-            UserManager.shared.getUser(username: messageWebSocket.recipientUsername) { user in
+            let group = DispatchGroup()
+            group.enter()
+            UserManager.shared.getUser(username: messageWebSocket.senderUsername) { user in
                 guard let user = user else { return }
                 conversation.firstNameOfRecipient = user.firstname
                 conversation.lastNameOfRecipient = user.lastname
+                group.leave()
             }
-            conversation.conversationID = "\(messageWebSocket.senderUsername)&&\(messageWebSocket.recipientUsername)"
-            conversation.addToMessages(message)
-            CoreDataManager.shared.saveContext()
-            NotificationCenter.default.post(
-                name: .newConversation,
-                object: nil,
-                userInfo: ["conversationID" : "\(messageWebSocket.senderUsername)&&\(messageWebSocket.recipientUsername)"]
-            )
+            group.notify(queue: .main) {
+                conversation.conversationID = "\(messageWebSocket.senderUsername)&&\(messageWebSocket.recipientUsername)"
+                conversation.addToMessages(message)
+                CoreDataManager.shared.saveContext()
+                NotificationCenter.default.post(
+                    name: .newConversation,
+                    object: nil,
+                    userInfo: ["conversationID" : "\(messageWebSocket.senderUsername)&&\(messageWebSocket.recipientUsername)"]
+                )
+            }
         }
     }
 }

@@ -2,18 +2,22 @@
 //  UIViewController+Extension.swift
 //  Ne Angime?
 //
-//  Created by Kenes Yerassyl on 3/8/21.
+//  Created by Kenes Yerassyl on 3/14/21.
 //
 
 import UIKit
 
+enum BackButtonColor: String {
+    case normalDark = "back_icon_normal1"
+    case normalLight = "back_icon_normal2"
+}
+
 extension UIViewController {
-    
-    func addBackButton(didTapBackButton: Selector) {
+    func addBackButton(withNormalColor: BackButtonColor, didTapBackButton: Selector) {
         let backButton = UIButton()
         view.addSubview(backButton)
-        let width = UIImage(named: "back_icon_normal")!.size.width
-        let height = UIImage(named: "back_icon_normal")!.size.height
+        let width = UIImage(named: withNormalColor.rawValue)!.size.width
+        let height = UIImage(named: withNormalColor.rawValue)!.size.height
         backButton.snp.makeConstraints { make in
             make.width.equalTo(width * 2)
             make.height.equalTo(height * 2)
@@ -24,10 +28,9 @@ extension UIViewController {
             make.width.equalTo(width * 2)
             make.height.equalTo(height * 2)
         }
-        backButton.setImage(UIImage(named: "back_icon_normal"), for: .normal)
+        backButton.setImage(UIImage(named: withNormalColor.rawValue), for: .normal)
         backButton.setImage(UIImage(named: "back_icon_tapped"), for: .selected)
         backButton.setImage(UIImage(named: "back_icon_tapped"), for: .highlighted)
         backButton.addTarget(self, action: didTapBackButton, for: .touchUpInside)
     }
-    
 }

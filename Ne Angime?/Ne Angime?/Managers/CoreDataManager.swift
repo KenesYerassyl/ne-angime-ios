@@ -60,7 +60,7 @@ class CoreDataManager {
         return results.count > 0
     }
     
-    func getConversation(conversationID: String, _ completion: @escaping(ConversationCoreData?, Error?) -> Void) {
+    func getConversation(conversationID: String, _ completion: @escaping(ConversationCoreData?) -> Void) {
         let request = ConversationCoreData.fetchRequest() as NSFetchRequest<ConversationCoreData>
         request.predicate = NSPredicate(format: "conversationID == %@", conversationID)
         do {
@@ -72,15 +72,18 @@ class CoreDataManager {
                     break
                 }
             }
-            guard let conversation = resultConversation else { return }
-            completion(conversation, nil)
+            guard let conversation = resultConversation else {
+                completion(nil)
+                return
+            }
+            completion(conversation)
         } catch {
             print("Error in getting conversation by ID error: \(error)")
-            completion(nil, error)
+            completion(nil)
         }
     }
     
-    func getCachedImage(imageID: String, _ completion: @escaping(CachedImage?, Error?) -> Void) {
+    func getCachedImage(imageID: String, _ completion: @escaping(CachedImage?) -> Void) {
         let request = CachedImage.fetchRequest() as NSFetchRequest<CachedImage>
         request.predicate = NSPredicate(format: "imageID == %@", imageID)
         do {
@@ -92,22 +95,25 @@ class CoreDataManager {
                     break
                 }
             }
-            guard let cachedImage = resultCachedImage else { return }
-            completion(cachedImage, nil)
+            guard let cachedImage = resultCachedImage else {
+                completion(nil)
+                return
+            }
+            completion(cachedImage)
         } catch {
-            print("Error in getting conversation by ID error: \(error)")
-            completion(nil, error)
+            print("Error in getting cached image by ID error: \(error)")
+            completion(nil)
         }
     }
     
-    func getAllConversations(_ completion: @escaping([ConversationCoreData]?, Error?) -> Void) {
+    func getAllConversations(_ completion: @escaping([ConversationCoreData]?) -> Void) {
         let request = ConversationCoreData.fetchRequest() as NSFetchRequest<ConversationCoreData>
         do {
             let results = try context.fetch(request) as [ConversationCoreData]
-            completion(results, nil)
+            completion(results)
         } catch {
             print("Error in getting all conversations: \(error)")
-            completion(nil, error)
+            completion(nil)
         }
     }
     
@@ -146,31 +152,63 @@ class CoreDataManager {
         }
     }
     
-    func updateConversations(conversations: [Conversation]) {
-        deleteAllData()
-        let group = DispatchGroup()
-        for conversation in conversations {
-            let conversationCoreData = ConversationCoreData(entity: ConversationCoreData.entity(), insertInto: context)
-            group.enter()
-            UserManager.shared.getUser(username: UserManager.shared.getOtherUsername(from: conversation.conversationID)) { user in
-                guard let user = user else { return }
-                conversationCoreData.firstNameOfRecipient = user.firstname
-                conversationCoreData.lastNameOfRecipient = user.lastname
-                group.leave()
-            }
-            group.notify(queue: .main) {
-                conversationCoreData.conversationID = conversation.conversationID
-                for message in conversation.messages {
-                    let messageCoreData = MessageCoreData(entity: MessageCoreData.entity(), insertInto: self.context)
-                    messageCoreData.createdAt = message.createdAt
-                    messageCoreData.message = message.message
-                    messageCoreData.messageID = message.messageID
-                    messageCoreData.recipientUsername = message.recipientUsername
-                    messageCoreData.senderUsername = message.senderUsername
-                    conversationCoreData.addToMessages(messageCoreData)
+    func setMessagesToRead(conversationID: String) {
+        let request = ConversationCoreData.fetchRequest() as NSFetchRequest<ConversationCoreData>
+        request.predicate = NSPredicate(format: "conversationID == %@", conversationID)
+        do {
+            let results = try context.fetch(request) as [ConversationCoreData]
+            var resultConversation: ConversationCoreData?
+            for conversation in results {
+                if conversation.conversationID == conversationID {
+                    resultConversation = conversation
+                    break
                 }
-                self.saveContext()
             }
+            guard let conversation = resultConversation,
+                  let messages = conversation.messages?.allObjects as? [MessageCoreData] else { return }
+            for index in 0...messages.count - 1 {
+                messages[index].isRead = true
+            }
+            saveContext()
+        } catch {
+            print("Error in getting conversation by ID error: \(error)")
+        }
+    }
+    
+    func addConversation(conversation: Conversation, completion: @escaping(Bool) -> Void) {
+        let coreDataConversation = ConversationCoreData(entity: ConversationCoreData.entity(), insertInto: context)
+        coreDataConversation.conversationID = conversation.conversationID
+        let group = DispatchGroup()
+        group.enter()
+        UserManager.shared.getUser(username: UserManager.shared.getOtherUsername(from: conversation.conversationID)) { user in
+            coreDataConversation.firstNameOfRecipient = user?.firstname
+            coreDataConversation.lastNameOfRecipient = user?.lastname
+            group.leave()
+        }
+        group.notify(queue: .main) {
+            for message in conversation.messages {
+                coreDataConversation.addToMessages(message.convertToMessageCoreData())
+            }
+            self.saveContext()
+            completion(true)
+        }
+    }
+    
+    func addMessages(to conversationID: String, from messages: [Message], startingIndex: Int, completion: @escaping(Bool) -> Void) {
+        let request = ConversationCoreData.fetchRequest() as NSFetchRequest<ConversationCoreData>
+        request.predicate = NSPredicate(format: "conversationID == %@", conversationID)
+        do {
+            let results = try context.fetch(request) as [ConversationCoreData]
+            if results.first != nil && results.first!.conversationID == conversationID {
+                for index in startingIndex...messages.count - 1 {
+                    results.first!.addToMessages(messages[index].convertToMessageCoreData())
+                }
+                saveContext()
+                completion(true)
+            }
+        } catch {
+            completion(false)
+            print("Error in getting conversation by ID error: \(error)")
         }
     }
 }

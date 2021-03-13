@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import CoreData
 
 struct Message: Codable {
     var createdAt: Double
@@ -13,6 +14,7 @@ struct Message: Codable {
     var messageID: String
     var recipientUsername: String
     var senderUsername: String
+    var isRead: Bool = false
     
     enum CodingKeys: String, CodingKey {
         case createdAt = "created_at"
@@ -20,5 +22,16 @@ struct Message: Codable {
         case messageID = "message_id"
         case recipientUsername = "recipient_username"
         case senderUsername = "sender_username"
+    }
+    
+    func convertToMessageCoreData() -> MessageCoreData{
+        let messageCoreData = MessageCoreData(entity: MessageCoreData.entity(), insertInto: CoreDataManager.shared.context)
+        messageCoreData.createdAt = self.createdAt
+        messageCoreData.isRead = self.isRead
+        messageCoreData.message = self.message
+        messageCoreData.messageID = self.messageID
+        messageCoreData.recipientUsername = self.recipientUsername
+        messageCoreData.senderUsername = self.senderUsername
+        return messageCoreData
     }
 }

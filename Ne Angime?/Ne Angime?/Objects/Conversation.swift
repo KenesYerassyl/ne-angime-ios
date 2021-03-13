@@ -15,4 +15,8 @@ struct Conversation: Codable {
         case messages
         case conversationID = "conversation_id"
     }
+    
+    static func == (left: Conversation, right: Conversation) -> Bool {
+        return (left.conversationID == right.conversationID)
+    }
 }

@@ -8,7 +8,7 @@
 import UIKit
 import NVActivityIndicatorView
 
-class SignUpViewController1: UIViewController {
+class SignUpViewController1: ViewController {
     
     private let signUpViewModel1 = SignUpViewModel1()
     private let spacing = 24.0
@@ -18,14 +18,7 @@ class SignUpViewController1: UIViewController {
     private var lastNameTextField = UITextField()
     private var userNameTextField = UITextField()
     private var nextButton = UIButton()
-    private let activityIndicator: NVActivityIndicatorView = {
-        var temp = NVActivityIndicatorView(frame: .zero,
-                                           type: .circleStrokeSpin,
-                                           color: .blue,
-                                           padding: nil)
-        return temp
-    }()
-    private let backView = UIView()
+
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .clear
@@ -35,8 +28,7 @@ class SignUpViewController1: UIViewController {
         updateLastNameTextField()
         updateUserNameTextField()
         updateNextButton()
-        updateActivityIndicator()
-        addBackButton(didTapBackButton: #selector(didTapBackButton))
+        addBackButton(withNormalColor: .normalLight, didTapBackButton: #selector(didTapBackButton))
         
         signUpViewModel1.delegate = self
         
@@ -149,35 +141,11 @@ class SignUpViewController1: UIViewController {
         nextButton.titleLabel?.font = UIFont(name: "Avenir Heavy", size: 20)
         nextButton.addTarget(self, action: #selector(didTapNextButton), for: .touchUpInside)
     }
-    
-    private func updateActivityIndicator() {
-        view.addSubview(backView)
-        backView.snp.makeConstraints { make in
-            make.centerX.equalTo(view)
-            make.centerY.equalTo(view)
-            make.width.equalTo(view.bounds.width * 0.25)
-            make.height.equalTo(view.bounds.width * 0.25)
-        }
-        backView.isHidden = true
-        backView.layer.cornerRadius = 10
-        backView.backgroundColor = UIColor(hex: "#5896f2")
-        backView.layer.opacity = 0.8
-        
-        view.addSubview(activityIndicator)
-        activityIndicator.snp.makeConstraints { make in
-            make.centerX.equalTo(view)
-            make.centerY.equalTo(view)
-            make.width.equalTo(view.bounds.width * 0.15)
-            make.height.equalTo(view.bounds.width * 0.15)
-        }
-    }
 }
 
 extension SignUpViewController1 {
     @objc private func didTapNextButton() {
-        activityIndicator.startAnimating()
-        backView.isHidden = false
-        view.isUserInteractionEnabled = false
+        startActivityIndicator()
         guard let firstName = firstNameTextField.text?.trimmingCharacters(in: .whitespacesAndNewlines),
               let lastName = lastNameTextField.text?.trimmingCharacters(in: .whitespacesAndNewlines),
               let userName = userNameTextField.text?.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -212,9 +180,7 @@ extension SignUpViewController1 {
 
 extension SignUpViewController1: SignUpViewModelDelegate1 {
     func userMayInteract() {
-        activityIndicator.stopAnimating()
-        backView.isHidden = true
-        view.isUserInteractionEnabled = true
+        stopActivityIndicator()
     }
     
     func goToNextStage(username: String, firstname: String, lastname: String) {
