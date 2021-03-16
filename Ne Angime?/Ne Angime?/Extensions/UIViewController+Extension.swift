@@ -8,8 +8,8 @@
 import UIKit
 
 enum BackButtonColor: String {
-    case normalDark = "back_icon_normal1"
-    case normalLight = "back_icon_normal2"
+    case normalDark = "back_icon_dark"
+    case normalLight = "back_icon_light"
 }
 
 extension UIViewController {

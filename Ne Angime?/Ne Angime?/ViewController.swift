@@ -18,12 +18,7 @@ class ViewController: UIViewController {
     }()
     private let backView = UIView()
     
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        updateActivityIndicator()
-    }
-    
-    private func updateActivityIndicator() {
+    func updateActivityIndicator(_ viewController: ViewController) {
         view.addSubview(backView)
         backView.snp.makeConstraints { make in
             make.centerX.equalTo(view)

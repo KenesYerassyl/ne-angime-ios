@@ -12,12 +12,14 @@ import InputBarAccessoryView
 class ChatViewController: MessagesViewController {
     
     private var chatViewModel: ChatViewModel
-    var currentUserImage: UIImage?
-    var otherUserImage: UIImage?
+    var currentUserAvatar: URL?
+    var otherUserAvatar: URL?
     private var customInputBarView = UIView()
     
-    init(conversationID: String) {
+    init(conversationID: String, _ currentUserAvatar: URL?, _ otherUserAvatar: URL?) {
         self.chatViewModel = ChatViewModel(conversationID: conversationID)
+        self.currentUserAvatar = currentUserAvatar
+        self.otherUserAvatar = otherUserAvatar
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -32,8 +34,8 @@ class ChatViewController: MessagesViewController {
         messagesCollectionView.messagesDisplayDelegate = self
         messageInputBar.delegate = self
         chatViewModel.delegate = self
+        navigationItem.largeTitleDisplayMode = .never
         updateInputBar()
-        addBackButton(withNormalColor: .normalDark, didTapBackButton: #selector(didTapBackButton))
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -55,13 +57,6 @@ class ChatViewController: MessagesViewController {
     }
 }
 
-extension ChatViewController {
-    @objc private func didTapBackButton() {
-        NotificationCenter.default.post(name: .leavingConversation, object: nil, userInfo: ["conversationID" : chatViewModel.conversationID])
-        navigationController?.popViewController(animated: true)
-    }
-}
-
 extension ChatViewController: MessagesDataSource {
     func currentSender() -> SenderType {
         return chatViewModel.getCurrentUser()
@@ -77,9 +72,9 @@ extension ChatViewController: MessagesDataSource {
     
     func configureAvatarView(_ avatarView: AvatarView, for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) {
         if message.sender.senderId == chatViewModel.currentUser.senderId {
-            avatarView.image = currentUserImage
+            avatarView.sd_setImage(with: currentUserAvatar, placeholderImage: UIImage(named: "profile_placeholder"))
         } else {
-            avatarView.image = otherUserImage
+            avatarView.sd_setImage(with: otherUserAvatar, placeholderImage: UIImage(named: "profile_placeholder"))
         }
     }
 }

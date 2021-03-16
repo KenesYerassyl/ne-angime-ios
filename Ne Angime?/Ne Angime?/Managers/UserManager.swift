@@ -63,52 +63,6 @@ class UserManager {
         }
     }
     
-    func getImageOfUser(with username: String, avatar: String?, _ completion: @escaping(Data?) -> Void) {
-        if CoreDataManager.shared.doesCachedImageExist("profile_image_\(username)") {
-            CoreDataManager.shared.getCachedImage(imageID: "profile_image_\(username)") { cachedImage in
-                if let cachedImage = cachedImage, let data = cachedImage.imageData {
-                    completion(data)
-                } else {
-                    completion(nil)
-                }
-            }
-        } else {
-            var userAvatar = ""
-            let group = DispatchGroup()
-            if let avatar = avatar {
-                userAvatar = avatar
-            } else {
-                group.enter()
-                UserManager.shared.getUser(username: username) { (user) in
-                    guard let user = user, let avatar = user.avatar else {
-                        completion(nil)
-                        return
-                    }
-                    userAvatar = avatar
-                    group.leave()
-                }
-            }
-            group.notify(queue: .main) {
-                guard let url = URL(string: userAvatar), !userAvatar.isEmpty else {
-                    completion(nil)
-                    return
-                }
-                APIClient().request(url) { (data, response, error) in
-                    if let data = data {
-                        let cachedImage = CachedImage(entity: CachedImage.entity(), insertInto: CoreDataManager.shared.context)
-                        cachedImage.imageID = "profile_image_\(username)"
-                        cachedImage.imageData = data
-                        CoreDataManager.shared.saveContext()
-                        completion(data)
-                    } else if let error = error {
-                        completion(nil)
-                        print("Error in downloading user's image: \(error)")
-                    }
-                }
-            }
-        }
-    }
-    
     func getAllUsers(_ completion: @escaping([User]?) -> Void) {
         guard let cookie = UserDefaults.standard.string(forKey: "token") else {
             completion(nil)

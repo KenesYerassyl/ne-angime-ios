@@ -9,7 +9,6 @@ import SnapKit
 
 class ConversationsViewController: UIViewController {
     let conversationsViewModel = ConversationsViewModel()
-    private let titleLabel = UILabel()
     private lazy var collectionViewFlowLayout: UICollectionViewFlowLayout = {
         var temp = UICollectionViewFlowLayout()
         temp.minimumLineSpacing = 12
@@ -30,7 +29,6 @@ class ConversationsViewController: UIViewController {
         conversationsViewModel.delegate = self
         conversationsViewModel.fetchAllConversations()
         configureCollectionView()
-        configureTitleLabel()
     }
     
     func configureCollectionView() {
@@ -40,55 +38,26 @@ class ConversationsViewController: UIViewController {
             make.leading.equalTo(view)
             make.trailing.equalTo(view)
             make.bottom.equalTo(view)
-            make.top.equalTo(view).offset(130)
+            make.top.equalTo(view.safeAreaLayoutGuide)
         }
-    }
-    
-    func configureTitleLabel() {
-        view.addSubview(titleLabel)
-        titleLabel.font = UIFont(name: "Avenir Black", size: 35)
-        titleLabel.snp.makeConstraints { make in
-            make.centerX.equalTo(view)
-            make.width.equalTo(UIScreen.main.bounds.width*0.9)
-            make.height.equalTo(70)
-            make.bottom.equalTo(collectionView.snp.top).offset(-12)
-        }
-        titleLabel.text = "Conversations"
+        collectionView.alwaysBounceVertical = true
     }
 }
 
 extension ConversationsViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let conversationID = conversationsViewModel.getConversationID(at: indexPath.row)
-        let chatViewController = ChatViewController(conversationID: conversationID)
+        let chatViewController = ChatViewController(
+            conversationID: conversationID,
+            URL(string: UserDefaults.standard.string(forKey: "avatar") ?? ""),
+            conversationsViewModel.getUserImageURL(at: indexPath.row)
+        )
+        chatViewController.title = conversationsViewModel.getFullNameOfRecipient(at: indexPath.row)
         for index in 0...conversationsViewModel.conversations[indexPath.row].messages.count - 1 {
             conversationsViewModel.conversations[indexPath.row].messages[index].isRead = true
         }
         CoreDataManager.shared.setMessagesToRead(conversationID: conversationsViewModel.getConversationID(at: indexPath.row))
-        let group = DispatchGroup()
-        guard let currentUsername = UserDefaults.standard.string(forKey: "username") else { return }
-        let otherUsername = UserManager.shared.getOtherUsername(from: conversationsViewModel.getConversationID(at: indexPath.row))
-        group.enter()
-        UserManager.shared.getImageOfUser(with: currentUsername, avatar: nil) { data in
-            if let data = data {
-                chatViewController.currentUserImage = UIImage(data: data)
-            } else {
-                chatViewController.currentUserImage = UIImage(named: "profile_placeholder")
-            }
-            group.leave()
-        }
-        group.enter()
-        UserManager.shared.getImageOfUser(with: otherUsername, avatar: nil) { data in
-            if let data = data {
-                chatViewController.otherUserImage = UIImage(data: data)
-            } else {
-                chatViewController.otherUserImage = UIImage(named: "profile_placeholder")
-            }
-            group.leave()
-        }
-        group.notify(queue: .main) {
-            self.navigationController?.pushViewController(chatViewController, animated: true)
-        }
+        self.navigationController?.pushViewController(chatViewController, animated: true)
     }
 }
 
@@ -107,19 +76,12 @@ extension ConversationsViewController: UICollectionViewDataSource {
         
         
         cell.userMessageLabel.text = conversationsViewModel.getLastMessage(at: indexPath.row)
-        conversationsViewModel.getFullNameOfRecipient(at: indexPath.row) { name in
-            cell.userNameLabel.text = name
-        }
+        cell.userNameLabel.text = conversationsViewModel.getFullNameOfRecipient(at: indexPath.row)
         cell.newMessagesCounter = conversationsViewModel.getNumberOfUnreadMessages(at: indexPath.row)
-        let username = UserManager.shared.getOtherUsername(from: conversationsViewModel.conversations[indexPath.row].conversationID)
-        UserManager.shared.getImageOfUser(with: username, avatar: nil) { data in
-            if let data = data {
-                DispatchQueue.main.async { cell.userImageView.image = UIImage(data: data) }
-            } else {
-                DispatchQueue.main.async { cell.userImageView.image = UIImage(named: "profile_placeholder") }
-            }
-        }
-        
+        cell.userImageView.sd_setImage(
+            with: conversationsViewModel.getUserImageURL(at: indexPath.row),
+            placeholderImage: UIImage(named: "profile_placeholder")
+        )
         return cell
     }
 }
@@ -135,3 +97,4 @@ extension ConversationsViewController: ConversationsViewModelDelegate {
         collectionView.reloadData()
     }
 }
+

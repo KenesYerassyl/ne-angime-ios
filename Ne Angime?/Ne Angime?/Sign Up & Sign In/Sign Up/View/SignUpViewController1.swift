@@ -29,7 +29,7 @@ class SignUpViewController1: ViewController {
         updateUserNameTextField()
         updateNextButton()
         addBackButton(withNormalColor: .normalLight, didTapBackButton: #selector(didTapBackButton))
-        
+        updateActivityIndicator(self)
         signUpViewModel1.delegate = self
         
         NotificationCenter.default.addObserver(

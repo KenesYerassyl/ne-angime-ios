@@ -21,15 +21,16 @@ class SignInViewController: ViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        navigationController?.setNavigationBarHidden(true, animated: false)
         view.backgroundColor = UIColor(hex: "#30289f")
         signInViewModel.delegate = self
+        navigationController?.delegate = self
         updateFieldsView()
         updateWelcomeLabel()
         updateUserNameTextField()
         updatePasswordTextField()
         updateSignInButton()
         updateSignUpLabel()
+        updateActivityIndicator(self)
         
         NotificationCenter.default.addObserver(
             self,
@@ -47,9 +48,17 @@ class SignInViewController: ViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        navigationController?.setNavigationBarHidden(true, animated: false)
         if UserDefaults.standard.string(forKey: "username") != nil {
-            navigationController?.pushViewController(TabBarController(), animated: false)
+            let tabBarController = TabBarController()
+            tabBarController.navigationItem.title = "Conversations"
+            navigationController?.pushViewController(tabBarController, animated: false)
         }
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        navigationController?.setNavigationBarHidden(false, animated: false)
     }
     
     private func updateFieldsView() {
@@ -185,7 +194,7 @@ extension SignInViewController {
 }
 
 extension SignInViewController: SignInViewModelDelegate {
-
+    
     func userMayInteract() {
         stopActivityIndicator()
     }
@@ -203,6 +212,16 @@ extension SignInViewController: SignInViewModelDelegate {
     func goToMainPage() {
         userNameTextField.text = nil
         passwordTextField.text = nil
-        navigationController?.pushViewController(TabBarController(), animated: true)
+        let tabBarController = TabBarController()
+        tabBarController.navigationItem.title = "Conversations"
+        navigationController?.pushViewController(tabBarController, animated: false)
+    }
+}
+
+extension SignInViewController: UINavigationControllerDelegate {
+    //-TODO: Make back button according to the style of the app
+    func navigationController(_ navigationController: UINavigationController, willShow viewController: UIViewController, animated: Bool) {
+        let item = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
+        viewController.navigationItem.backBarButtonItem = item
     }
 }

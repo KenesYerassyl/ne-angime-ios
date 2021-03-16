@@ -34,4 +34,8 @@ class FriendsViewModel {
             }
         }
     }
+    
+    func getUserImageURL(at index: Int) -> URL? {
+        return URL(string: users[index].avatar ?? "")
+    }
 }

@@ -10,11 +10,6 @@ import NVActivityIndicatorView
 
 class FriendsViewController: ViewController {
     private let friendsViewModel = FriendsViewModel()
-    private let titleLabel: UILabel = {
-        var temp = UILabel()
-        temp.font = UIFont(name: "Avenir Black", size: 35)
-        return temp
-    }()
     private lazy var collectionViewFlowLayout: UICollectionViewFlowLayout = {
         var temp = UICollectionViewFlowLayout()
         temp.minimumLineSpacing = 12
@@ -33,18 +28,10 @@ class FriendsViewController: ViewController {
         collectionView.delegate = self
         collectionView.dataSource = self
         friendsViewModel.delegate = self
-        
         configureCollectionView()
-        configureTitleLabel()
+        updateActivityIndicator(self)
+        startActivityIndicator()
         friendsViewModel.fetchAllUsers()
-    }
-    
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        if friendsViewModel.users.isEmpty {
-            startActivityIndicator()
-            friendsViewModel.fetchAllUsers()
-        }
     }
     
     func configureCollectionView() {
@@ -54,21 +41,10 @@ class FriendsViewController: ViewController {
             make.leading.equalTo(view)
             make.trailing.equalTo(view)
             make.bottom.equalTo(view)
-            make.top.equalTo(view).offset(130)
+            make.top.equalTo(view.safeAreaLayoutGuide)
         }
+        collectionView.alwaysBounceVertical = true
     }
-    
-    func configureTitleLabel() {
-        view.addSubview(titleLabel)
-        titleLabel.snp.makeConstraints { make in
-            make.centerX.equalTo(view)
-            make.width.equalTo(UIScreen.main.bounds.width*0.9)
-            make.height.equalTo(70)
-            make.bottom.equalTo(collectionView.snp.top).offset(-12)
-        }
-        titleLabel.text = "Friends"
-    }
-
 }
 
 extension FriendsViewController: UICollectionViewDelegate {
@@ -81,7 +57,12 @@ extension FriendsViewController: UICollectionViewDelegate {
             conversationID = "\(user.username)&&\(currentUsername)"
         }
         
-        let chatViewController = ChatViewController(conversationID: conversationID)
+        let chatViewController = ChatViewController(
+            conversationID: conversationID,
+            URL(string: UserDefaults.standard.string(forKey: "avatar") ?? ""),
+            URL(string: user.avatar ?? "")
+        )
+        chatViewController.title = "\(user.firstname) \(user.lastname)"
         navigationController?.pushViewController(chatViewController, animated: true)
     }
 }
@@ -96,13 +77,10 @@ extension FriendsViewController: UICollectionViewDataSource {
         guard let cell = collectionViewCell else { return UICollectionViewCell() }
         let user = friendsViewModel.getUser(at: indexPath.row)
         cell.userNameLabel.text = "\(user.firstname) \(user.lastname)"
-        UserManager.shared.getImageOfUser(with: user.username, avatar: user.avatar) { (data) in
-            if let data = data {
-                DispatchQueue.main.async { cell.userImageView.image = UIImage(data: data) }
-            } else {
-                DispatchQueue.main.async { cell.userImageView.image = UIImage(named: "profile_placeholder") }
-            }
-        }
+        cell.userImageView.sd_setImage(
+            with: friendsViewModel.getUserImageURL(at: indexPath.row),
+            placeholderImage: UIImage(named: "profile_placeholder")
+        )
         return cell
     }
 }

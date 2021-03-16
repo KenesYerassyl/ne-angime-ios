@@ -7,6 +7,7 @@
 
 import UIKit
 import NVActivityIndicatorView
+import SDWebImage
 
 class ProfileViewController: ViewController {
     
@@ -26,6 +27,7 @@ class ProfileViewController: ViewController {
         updateProfileImageView()
         updateUserNameLabel()
         updateSignOutButton()
+        updateActivityIndicator(self)
     }
     
     private func updateUserInfoView() {
@@ -63,15 +65,9 @@ class ProfileViewController: ViewController {
         profileImageView.isUserInteractionEnabled = true
         let gesture = UITapGestureRecognizer(target: self, action: #selector(didTapProfileImageView))
         profileImageView.addGestureRecognizer(gesture)
-        profileImageView.image = UIImage(named: "profile_placeholder")
-        guard let username = UserDefaults.standard.string(forKey: "username"),
-              let avatar = UserDefaults.standard.string(forKey: "avatar") else { return }
-        UserManager.shared.getImageOfUser(with: username, avatar: avatar) { [weak self] data in
-            guard let data = data else { return }
-            DispatchQueue.main.async {
-                self?.profileImageView.image = UIImage(data: data)
-            }
-        }
+        guard let avatar = UserDefaults.standard.string(forKey: "avatar"),
+              let url = URL(string: avatar) else { return }
+        profileImageView.sd_setImage(with: url, placeholderImage: UIImage(named: "profile_placeholder"))
     }
     
     private func updateUserNameLabel() {
@@ -104,7 +100,7 @@ class ProfileViewController: ViewController {
 extension ProfileViewController {
     @objc private func signOutButtonDidTap() {
         profileViewModel.signOut()
-        navigationController?.popViewController(animated: true)
+        navigationController?.dismiss(animated: true)
     }
     
     @objc private func didTapProfileImageView() {
@@ -113,10 +109,6 @@ extension ProfileViewController {
 }
 
 extension ProfileViewController: ProfileViewModelDelegate {
-    func setProfileImage(with data: Data) {
-        guard let image = UIImage(data: data) else { return }
-        profileImageView.image = image
-    }
     
     func showErrorAlert(title: String, message: String) {
         let alert = UIAlertController(

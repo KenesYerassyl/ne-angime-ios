@@ -7,6 +7,7 @@ target 'Ne Angime?' do
 pod 'SnapKit', '~> 5.0.0'
 pod 'MessageKit'
 pod 'NVActivityIndicatorView'
+pod 'SDWebImage', '~> 5.0'
 
   # Pods for Ne Angime?
 

@@ -26,6 +26,7 @@ class ConversationsViewModel {
     }
     
     var conversations = [Conversation]()
+    var users = [User]()
     
     func getNumberOfItems() -> Int {
         return conversations.count
@@ -49,20 +50,35 @@ class ConversationsViewModel {
         return counter
     }
     
-    func getFullNameOfRecipient(at index: Int, _ completion: @escaping(String) -> Void) {
-        let group = DispatchGroup()
+    func getFullNameOfRecipient(at index: Int) -> String {
         var fullName = "undefined undefined"
-        group.enter()
-        CoreDataManager.shared.getConversation(conversationID: conversations[index].conversationID) { (conversationCoreData) in
-            if let conversationCoreData = conversationCoreData,
-               let firstName = conversationCoreData.firstNameOfRecipient,
-               let lastName = conversationCoreData.lastNameOfRecipient {
-                fullName = "\(firstName) \(lastName)"
+        CoreDataManager.shared.getConversation(conversationID: conversations[index].conversationID) { conversationCoreData in
+            guard let convo = conversationCoreData,
+                  let firstName = convo.firstNameOfRecipient,
+                  let lastName = convo.lastNameOfRecipient else { return }
+            fullName = "\(firstName) \(lastName)"
+        }
+        return fullName
+    }
+    
+    func getUserImageURL(at index: Int) -> URL? {
+        if users.count - 1 < index { return nil }
+        return URL(string: users[index].avatar ?? "")
+    }
+    
+    func adjustUserToConversation() {
+        users.removeAll()
+        let group = DispatchGroup()
+        for conversation in conversations {
+            group.enter()
+            UserManager.shared.getUser(username: UserManager.shared.getOtherUsername(from: conversation.conversationID)) { [weak self] user in
+                guard let user = user else { return }
+                self?.users.append(user)
+                group.leave()
             }
-            group.leave()
         }
         group.notify(queue: .main) {
-            completion(fullName)
+            DispatchQueue.main.async { self.delegate?.updateCollectionView() }
         }
     }
     
@@ -77,9 +93,8 @@ class ConversationsViewModel {
                 }
                 self?.conversations.append(conversationToAppend)
             }
-            DispatchQueue.main.async {
-                self?.delegate?.updateCollectionView()
-            }
+            print("call for adjusting 2")
+            self?.adjustUserToConversation()
         }
         ConversationManager.shared.getAllConversations { [weak self] conversations in
             guard let conversationsFromDB = conversations, let self = self else { return }
@@ -91,7 +106,7 @@ class ConversationsViewModel {
                     if !ConversationManager.shared.doesConversationExist(conversation, in: self.conversations) {
                         group.enter()
                         CoreDataManager.shared.addConversation(conversation: conversation) { completed in
-                            if completed { group.leave() }
+                            if completed == .success { group.leave() }
                         }
                     }
                 }
@@ -107,7 +122,7 @@ class ConversationsViewModel {
                             from: conversationsFromDB[j].messages,
                             startingIndex: self.conversations.count
                         ) { completed in
-                            if completed { group.leave() }
+                            if completed == .success { group.leave() }
                         }
                     }
                 }
@@ -115,9 +130,8 @@ class ConversationsViewModel {
             group.notify(queue: .main) {
                 if shouldGetConversationFromDB {
                     self.conversations = conversationsFromDB
-                    DispatchQueue.main.async {
-                        self.delegate?.updateCollectionView()
-                    }
+                    print("call for adjusting 1")
+                    self.adjustUserToConversation()
                 }
             }
         }
