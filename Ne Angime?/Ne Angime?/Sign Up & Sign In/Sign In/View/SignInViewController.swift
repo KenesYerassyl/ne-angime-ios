@@ -158,6 +158,7 @@ class SignInViewController: ViewController {
     }
 }
 
+// Extension for logic functions
 extension SignInViewController {
     @objc private func didTapSignInButton() {
         startActivityIndicator()
@@ -193,6 +194,7 @@ extension SignInViewController {
     }
 }
 
+// View Model delegate Extension
 extension SignInViewController: SignInViewModelDelegate {
     
     func userMayInteract() {
@@ -218,10 +220,11 @@ extension SignInViewController: SignInViewModelDelegate {
     }
 }
 
+//Navigation Controller delegate extensions
 extension SignInViewController: UINavigationControllerDelegate {
-    //-TODO: Make back button according to the style of the app
     func navigationController(_ navigationController: UINavigationController, willShow viewController: UIViewController, animated: Bool) {
         let item = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
+        item.tintColor = UIColor(hex: "#30289f")
         viewController.navigationItem.backBarButtonItem = item
     }
 }

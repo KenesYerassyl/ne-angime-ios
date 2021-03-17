@@ -12,4 +12,5 @@ struct MessageMessageKit: MessageType {
     var messageId: String
     var sentDate: Date
     var kind: MessageKind
+    var createdAt: Double
 }

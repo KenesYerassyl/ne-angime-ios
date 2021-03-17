@@ -36,7 +36,7 @@ class ChatViewModel {
     
     weak var delegate: ChatViewModelDelegate?
     
-    var messages = [MessageType]()
+    var messages = [MessageMessageKit]()
     
     func getMessage(at section: Int) -> MessageType {
         return messages[section]
@@ -74,7 +74,8 @@ class ChatViewModel {
             sender: currentUser,
             messageId: messageWebSocket.messageID,
             sentDate: Date(timeIntervalSince1970: messageWebSocket.createdAt),
-            kind: .text(text)
+            kind: .text(text),
+            createdAt: messageWebSocket.createdAt
         ))
         delegate?.updateCollectionView()
     }
@@ -88,7 +89,8 @@ class ChatViewModel {
                 sender: dataWebSocket.senderUsername == otherUser.senderId ? otherUser : currentUser,
                 messageId: dataWebSocket.messageID,
                 sentDate: Date(timeIntervalSince1970: dataWebSocket.createdAt),
-                kind: .text(dataWebSocket.message)
+                kind: .text(dataWebSocket.message),
+                createdAt: dataWebSocket.createdAt
             ))
             DispatchQueue.main.async {
                 self.delegate?.updateCollectionView()
@@ -99,7 +101,7 @@ class ChatViewModel {
     func fetchConversation() {
         CoreDataManager.shared.getConversation(conversationID: conversationID) { [weak self] (conversation) in
             guard let conversation = conversation, let messagesCoreData = conversation.messages?.allObjects as? [MessageCoreData] else { return }
-            var messages = [MessageType]()
+            var messages = [MessageMessageKit]()
             for item in messagesCoreData {
                 guard let senderUsername = item.senderUsername,
                       let senderUser = senderUsername == self?.otherUser.senderId ? self?.otherUser : self?.currentUser else { return }
@@ -107,11 +109,12 @@ class ChatViewModel {
                     sender: senderUser,
                     messageId: item.messageID ?? "undefined",
                     sentDate: Date(timeIntervalSince1970: item.createdAt),
-                    kind: .text(item.message ?? "undefined")
+                    kind: .text(item.message ?? "undefined"),
+                    createdAt: item.createdAt
                 ))
             }
             messages.sort { (messageType1, messageType2) -> Bool in
-                return messageType1.sentDate < messageType2.sentDate
+                return messageType1.createdAt < messageType2.createdAt
             }
             self?.messages = messages
             DispatchQueue.main.async {

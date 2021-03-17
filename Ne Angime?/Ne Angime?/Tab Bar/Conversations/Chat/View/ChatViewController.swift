@@ -36,10 +36,6 @@ class ChatViewController: MessagesViewController {
         chatViewModel.delegate = self
         navigationItem.largeTitleDisplayMode = .never
         updateInputBar()
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
         chatViewModel.fetchConversation()
     }
     
@@ -48,7 +44,7 @@ class ChatViewController: MessagesViewController {
         messageInputBar.inputTextView.textContainerInset.bottom = view.bounds.height * 0.01
         messageInputBar.inputTextView.textContainerInset.top = view.bounds.height * 0.01
         messageInputBar.inputTextView.textContainerInset.left = view.bounds.width * 0.05
-
+        
         messageInputBar.inputTextView.placeholder = "Write your message here..."
         messageInputBar.separatorLine.isHidden = true
         
@@ -57,6 +53,7 @@ class ChatViewController: MessagesViewController {
     }
 }
 
+// Extension for messages data source
 extension ChatViewController: MessagesDataSource {
     func currentSender() -> SenderType {
         return chatViewModel.getCurrentUser()
@@ -77,8 +74,24 @@ extension ChatViewController: MessagesDataSource {
             avatarView.sd_setImage(with: otherUserAvatar, placeholderImage: UIImage(named: "profile_placeholder"))
         }
     }
+    func messageTopLabelAttributedText(for message: MessageType, at indexPath: IndexPath) -> NSAttributedString? {
+        let dateFormatter = DateFormatter()
+        dateFormatter.timeStyle = .short
+        dateFormatter.dateStyle = .short
+        dateFormatter.timeZone = .current
+        guard let font = UIFont(name: "Avenir", size: 13) else { return nil }
+        let timeLabel = NSAttributedString(
+            string: dateFormatter.string(from: message.sentDate),
+            attributes: [NSAttributedString.Key.font : font]
+        )
+        return timeLabel
+    }
+    func messageTopLabelHeight(for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> CGFloat {
+        return 17
+    }
 }
 
+// Extension for message kit custom delegates
 extension ChatViewController: InputBarAccessoryViewDelegate, MessagesDisplayDelegate, MessagesLayoutDelegate {
     func inputBar(_ inputBar: InputBarAccessoryView, didPressSendButtonWith text: String) {
         guard !text.replacingOccurrences(of: " ", with: "").isEmpty else { return }
@@ -101,6 +114,7 @@ extension ChatViewController: InputBarAccessoryViewDelegate, MessagesDisplayDele
     }
 }
 
+// Extension for view model delegate
 extension ChatViewController: ChatViewModelDelegate {
     func updateCollectionView() {
         messagesCollectionView.reloadData()

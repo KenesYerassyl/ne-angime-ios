@@ -151,6 +151,7 @@ class SignUpViewController2: ViewController {
     }
 }
 
+// Extension for logic functions
 extension SignUpViewController2 {
     @objc private func didTapSignUpButton() {
         startActivityIndicator()
@@ -189,6 +190,7 @@ extension SignUpViewController2 {
     }
 }
 
+// View Model delegate Extension
 extension SignUpViewController2: SignUpViewModelDelegate2 {
     
     func userMayInteract() {

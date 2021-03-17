@@ -44,13 +44,14 @@ class ConversationsViewController: UIViewController {
     }
 }
 
+// Extension for collection view delegate
 extension ConversationsViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let conversationID = conversationsViewModel.getConversationID(at: indexPath.row)
         let chatViewController = ChatViewController(
             conversationID: conversationID,
             URL(string: UserDefaults.standard.string(forKey: "avatar") ?? ""),
-            conversationsViewModel.getUserImageURL(at: indexPath.row)
+            conversationsViewModel.getUserImageURL(from: conversationsViewModel.getConversationID(at: indexPath.row))
         )
         chatViewController.title = conversationsViewModel.getFullNameOfRecipient(at: indexPath.row)
         for index in 0...conversationsViewModel.conversations[indexPath.row].messages.count - 1 {
@@ -61,6 +62,7 @@ extension ConversationsViewController: UICollectionViewDelegate {
     }
 }
 
+// Extension for collection view data source
 extension ConversationsViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return conversationsViewModel.getNumberOfItems()
@@ -79,19 +81,21 @@ extension ConversationsViewController: UICollectionViewDataSource {
         cell.userNameLabel.text = conversationsViewModel.getFullNameOfRecipient(at: indexPath.row)
         cell.newMessagesCounter = conversationsViewModel.getNumberOfUnreadMessages(at: indexPath.row)
         cell.userImageView.sd_setImage(
-            with: conversationsViewModel.getUserImageURL(at: indexPath.row),
+            with: conversationsViewModel.getUserImageURL(from: conversationsViewModel.getConversationID(at: indexPath.row)),
             placeholderImage: UIImage(named: "profile_placeholder")
         )
         return cell
     }
 }
 
+// Extension for collection view delegate floew layout
 extension ConversationsViewController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         return CGSize(width: UIScreen.main.bounds.width * 0.9, height: 90)
     }
 }
 
+// Extension for view model delegate
 extension ConversationsViewController: ConversationsViewModelDelegate {
     func updateCollectionView() {
         collectionView.reloadData()

@@ -97,6 +97,7 @@ class ProfileViewController: ViewController {
     }
 }
 
+// Extension for logic functions
 extension ProfileViewController {
     @objc private func signOutButtonDidTap() {
         profileViewModel.signOut()
@@ -108,8 +109,8 @@ extension ProfileViewController {
     }
 }
 
+// Extension for View Model delegate
 extension ProfileViewController: ProfileViewModelDelegate {
-    
     func showErrorAlert(title: String, message: String) {
         let alert = UIAlertController(
             title: title,
@@ -121,8 +122,8 @@ extension ProfileViewController: ProfileViewModelDelegate {
     }
 }
 
+// Extensions for image picker and navigation controller delegates
 extension ProfileViewController: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
-    
     private func profileImageViewActionSheet() {
         let actionSheet = UIAlertController(
             title: "Profile Picture",

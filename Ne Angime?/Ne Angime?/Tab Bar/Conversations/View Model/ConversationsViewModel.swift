@@ -26,7 +26,7 @@ class ConversationsViewModel {
     }
     
     var conversations = [Conversation]()
-    var users = [User]()
+    var users = [String : User]()
     
     func getNumberOfItems() -> Int {
         return conversations.count
@@ -61,19 +61,22 @@ class ConversationsViewModel {
         return fullName
     }
     
-    func getUserImageURL(at index: Int) -> URL? {
-        if users.count - 1 < index { return nil }
-        return URL(string: users[index].avatar ?? "")
+    func getUserImageURL(from conversationID: String) -> URL? {
+        guard let user = users[conversationID] else { return nil }
+        return URL(string: user.avatar ?? "")
     }
     
     func adjustUserToConversation() {
+        conversations.sort { (conversation1, conversation2) -> Bool in
+            return conversation1 > conversation2
+        }
         users.removeAll()
         let group = DispatchGroup()
         for conversation in conversations {
             group.enter()
             UserManager.shared.getUser(username: UserManager.shared.getOtherUsername(from: conversation.conversationID)) { [weak self] user in
                 guard let user = user else { return }
-                self?.users.append(user)
+                self?.users[conversation.conversationID] = user
                 group.leave()
             }
         }
@@ -93,7 +96,6 @@ class ConversationsViewModel {
                 }
                 self?.conversations.append(conversationToAppend)
             }
-            print("call for adjusting 2")
             self?.adjustUserToConversation()
         }
         ConversationManager.shared.getAllConversations { [weak self] conversations in
@@ -130,7 +132,6 @@ class ConversationsViewModel {
             group.notify(queue: .main) {
                 if shouldGetConversationFromDB {
                     self.conversations = conversationsFromDB
-                    print("call for adjusting 1")
                     self.adjustUserToConversation()
                 }
             }

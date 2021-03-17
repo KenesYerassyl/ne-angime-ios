@@ -52,6 +52,7 @@ class TabBarController: UITabBarController {
     }
 }
 
+// TabBarController delegate extension
 extension TabBarController: UITabBarControllerDelegate {
     func tabBarController(_ tabBarController: UITabBarController, didSelect viewController: UIViewController) {
         if viewController.tabBarItem.tag == 1 || viewController.tabBarItem.tag == 2 {

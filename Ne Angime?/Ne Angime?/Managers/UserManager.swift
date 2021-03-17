@@ -9,7 +9,7 @@ import Foundation
 
 class UserManager {
     public static let shared = UserManager()
-    private init(){}
+    private init() {}
     
     func getOtherUsername(from conversationID: String) -> String {
         var firstUsername = "", secondUsername = ""

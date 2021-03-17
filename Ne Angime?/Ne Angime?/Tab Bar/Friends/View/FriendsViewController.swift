@@ -47,6 +47,7 @@ class FriendsViewController: ViewController {
     }
 }
 
+// Extension for collection view delegate
 extension FriendsViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         guard let currentUsername = UserDefaults.standard.string(forKey: "username") else { return }
@@ -67,11 +68,11 @@ extension FriendsViewController: UICollectionViewDelegate {
     }
 }
 
+// Extension for collection view data source
 extension FriendsViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return friendsViewModel.getNumberOfItems()
     }
-    
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let collectionViewCell = collectionView.dequeueReusableCell(withReuseIdentifier: FriendsCollectionViewCell.id, for: indexPath) as? FriendsCollectionViewCell
         guard let cell = collectionViewCell else { return UICollectionViewCell() }
@@ -85,12 +86,14 @@ extension FriendsViewController: UICollectionViewDataSource {
     }
 }
 
+// Extension for collection view delegate flow layout
 extension FriendsViewController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         return CGSize(width: UIScreen.main.bounds.width * 0.9, height: 90)
     }
 }
 
+// Extension for view model delegate
 extension FriendsViewController: FriendsViewModelDelegate {
     func userMayInteract() {
         stopActivityIndicator()
