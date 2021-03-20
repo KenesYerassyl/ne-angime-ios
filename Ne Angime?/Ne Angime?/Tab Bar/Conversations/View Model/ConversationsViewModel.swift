@@ -8,7 +8,7 @@
 import Foundation
 
 protocol ConversationsViewModelDelegate: class {
-    func updateCollectionView()
+    func reloadCollectionView()
 }
 
 class ConversationsViewModel {
@@ -45,7 +45,7 @@ class ConversationsViewModel {
         guard let username = UserDefaults.standard.string(forKey: "username") else { return 48 }
         var counter = 0
         for message in conversations[index].messages {
-            if !message.isRead && message.senderUsername == username { counter += 1 }
+            if !message.isSeen && message.senderUsername == username { counter += 1 }
         }
         return counter
     }
@@ -81,7 +81,7 @@ class ConversationsViewModel {
             }
         }
         group.notify(queue: .main) {
-            DispatchQueue.main.async { self.delegate?.updateCollectionView() }
+            DispatchQueue.main.async { self.delegate?.reloadCollectionView() }
         }
     }
     
@@ -145,7 +145,7 @@ class ConversationsViewModel {
             guard let conversation = conversation else { return }
             self.conversations.append(conversation.convertToConversation())
             DispatchQueue.main.async {
-                self.delegate?.updateCollectionView()
+                self.delegate?.reloadCollectionView()
             }
         }
     }
@@ -158,7 +158,7 @@ class ConversationsViewModel {
             if self.conversations[index].conversationID == conversationID {
                 self.conversations[index].messages.append(Message( createdAt: messageWebSocket.createdAt,message: messageWebSocket.message, messageID: messageWebSocket.messageID, recipientUsername: messageWebSocket.recipientUsername, senderUsername: messageWebSocket.senderUsername))
                 DispatchQueue.main.async {
-                    self.delegate?.updateCollectionView()
+                    self.delegate?.reloadCollectionView()
                 }
                 break
             }
@@ -170,11 +170,11 @@ class ConversationsViewModel {
         for index in stride(from: 0, to: conversations.count, by: 1) {
             if conversations[index].conversationID == conversationID {
                 for jndex in 0...conversations[index].messages.count - 1 {
-                    conversations[index].messages[jndex].isRead = true
+                    conversations[index].messages[jndex].isSeen = true
                 }
                 CoreDataManager.shared.setMessagesToRead(conversationID: conversationID)
                 DispatchQueue.main.async {
-                    self.delegate?.updateCollectionView()
+                    self.delegate?.reloadCollectionView()
                 }
                 break
             }

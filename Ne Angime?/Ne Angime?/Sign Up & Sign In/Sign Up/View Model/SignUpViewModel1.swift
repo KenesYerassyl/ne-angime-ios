@@ -35,14 +35,21 @@ class SignUpViewModel1 {
                             lastname: lastname
                         )
                     }
-                } else if !((200...299).contains(response.statusCode)),
-                          let json = try? JSONSerialization.jsonObject(with: data) as? [String : String],
-                          let message = json["message"] {
-                    self?.signUpError(message: message)
+                } else {
+                    if let json = try? JSONSerialization.jsonObject(with: data) as? [String : String], let message = json["message"] {
+                        self?.signUpError(message: message)
+                    } else {
+                        print("Unexpected error occured: response is not in range 200...299, also we either cannot serialize a JSON object or cannot find 'message' property inside JSON object.")
+                        self?.signUpError(message: "Unexpected error occured")
+                    }
                 }
+                
             } else if let error = error {
                 print("Error in signing up stage 1: \(error)")
                 self?.signUpError(message: error.localizedDescription)
+            } else {
+                print("Unexpected error occured: data, response, and error are all nil.")
+                self?.signUpError(message: "Unexpected error occured")
             }
         }
     }

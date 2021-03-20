@@ -169,6 +169,7 @@ extension SignUpViewController1 {
             } else if userNameTextField.isFirstResponder {
                 view.frame.origin.y = -keyboardSize.height + (view.frame.height - userNameTextField.frame.origin.y - userNameTextField.frame.height)
             }
+            view.frame.origin.y = min(view.frame.origin.y, 0)
         }
     }
     

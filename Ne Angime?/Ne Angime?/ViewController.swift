@@ -51,4 +51,8 @@ class ViewController: UIViewController {
         backView.isHidden = true
         view.isUserInteractionEnabled = true
     }
+    
+    func isActivityIndicatorActive() -> Bool {
+        return activityIndicator.isAnimating
+    }
 }

@@ -2,7 +2,7 @@
 //  MessageCoreData+CoreDataProperties.swift
 //  Ne Angime?
 //
-//  Created by Kenes Yerassyl on 3/16/21.
+//  Created by Kenes Yerassyl on 3/20/21.
 //
 //
 
@@ -17,7 +17,7 @@ extension MessageCoreData {
     }
 
     @NSManaged public var createdAt: Double
-    @NSManaged public var isRead: Bool
+    @NSManaged public var isSeen: Bool
     @NSManaged public var message: String?
     @NSManaged public var messageID: String?
     @NSManaged public var recipientUsername: String?

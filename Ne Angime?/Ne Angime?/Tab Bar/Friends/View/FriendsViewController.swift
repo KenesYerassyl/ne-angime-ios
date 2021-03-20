@@ -28,13 +28,13 @@ class FriendsViewController: ViewController {
         collectionView.delegate = self
         collectionView.dataSource = self
         friendsViewModel.delegate = self
-        configureCollectionView()
+        updateCollectionView()
         updateActivityIndicator(self)
         startActivityIndicator()
         friendsViewModel.fetchAllUsers()
     }
     
-    func configureCollectionView() {
+    func updateCollectionView() {
         view.addSubview(collectionView)
         collectionView.backgroundColor = .clear
         collectionView.snp.makeConstraints { make in
@@ -99,7 +99,7 @@ extension FriendsViewController: FriendsViewModelDelegate {
         stopActivityIndicator()
     }
     
-    func updateCollectionView() {
+    func reloadCollectionView() {
         collectionView.reloadData()
     }
 }

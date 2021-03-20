@@ -18,6 +18,8 @@ class TabBarController: UITabBarController {
         super.viewDidLoad()
         delegate = self
         tabBar.tintColor = UIColor(hex: "#30289f")
+        navigationItem.title = "Conversations"
+    
         conversationsViewController.tabBarItem = UITabBarItem(
             title: "Conversations",
             image: UIImage(named: "conversations_tab_bar_icon"),
@@ -29,6 +31,7 @@ class TabBarController: UITabBarController {
             image: UIImage(named: "friends_tab_bar_icon"),
             tag: 2
         )
+        findViewController.title = "Find"
         findViewController.tabBarItem = UITabBarItem(
             title: "Find",
             image: UIImage(named: "find_tab_bar_icon"),
@@ -47,19 +50,23 @@ class TabBarController: UITabBarController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        navigationItem.setHidesBackButton(true, animated: true)
         navigationController?.navigationBar.prefersLargeTitles = true
+        navigationItem.setHidesBackButton(true, animated: true)
+    }
+    
+    @objc private func clearButtonClicked() {
+        findViewController.clearButtonClicked()
     }
 }
 
 // TabBarController delegate extension
 extension TabBarController: UITabBarControllerDelegate {
     func tabBarController(_ tabBarController: UITabBarController, didSelect viewController: UIViewController) {
-        if viewController.tabBarItem.tag == 1 || viewController.tabBarItem.tag == 2 {
-            navigationController?.setNavigationBarHidden(false, animated: true)
-        } else {
-            navigationController?.setNavigationBarHidden(true, animated: true)
-        }
+        let tag = viewController.tabBarItem.tag
+        navigationController?.setNavigationBarHidden(tag == 4, animated: false)
+        navigationController?.navigationBar.prefersLargeTitles = tag != 4 && tag != 3
+        navigationItem.rightBarButtonItem = tag == 3 ? UIBarButtonItem(title: "Clear", style: .done, target: self, action: #selector(clearButtonClicked)) : nil
+        navigationItem.titleView = tag == 3 ? viewController.navigationItem.titleView : nil
         navigationItem.title = viewController.title
     }
 }

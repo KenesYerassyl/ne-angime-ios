@@ -8,7 +8,7 @@
 import Foundation
 
 protocol FriendsViewModelDelegate: class {
-    func updateCollectionView()
+    func reloadCollectionView()
     func userMayInteract()
 }
 
@@ -26,11 +26,14 @@ class FriendsViewModel {
     
     func fetchAllUsers() {
         UserManager.shared.getAllUsers { [weak self] (newUsers) in
-            guard let newUsers = newUsers else { return }
-            self?.users = newUsers
-            DispatchQueue.main.async {
-                self?.delegate?.userMayInteract()
-                self?.delegate?.updateCollectionView()
+            if let newUsers = newUsers {
+                self?.users = newUsers
+                DispatchQueue.main.async {
+                    self?.delegate?.userMayInteract()
+                    self?.delegate?.reloadCollectionView()
+                }
+            } else {
+                print("Unexpected error: new users fetched wrong")
             }
         }
     }

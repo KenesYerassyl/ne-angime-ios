@@ -14,7 +14,7 @@ struct Message: Codable {
     var messageID: String
     var recipientUsername: String
     var senderUsername: String
-    var isRead: Bool = false
+    var isSeen: Bool = false
     
     enum CodingKeys: String, CodingKey {
         case createdAt = "created_at"
@@ -27,7 +27,7 @@ struct Message: Codable {
     func convertToMessageCoreData() -> MessageCoreData{
         let messageCoreData = MessageCoreData(entity: MessageCoreData.entity(), insertInto: CoreDataManager.shared.context)
         messageCoreData.createdAt = self.createdAt
-        messageCoreData.isRead = self.isRead
+        messageCoreData.isSeen = self.isSeen
         messageCoreData.message = self.message
         messageCoreData.messageID = self.messageID
         messageCoreData.recipientUsername = self.recipientUsername

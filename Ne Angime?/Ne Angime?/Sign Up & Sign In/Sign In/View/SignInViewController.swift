@@ -51,14 +51,9 @@ class SignInViewController: ViewController {
         navigationController?.setNavigationBarHidden(true, animated: false)
         if UserDefaults.standard.string(forKey: "username") != nil {
             let tabBarController = TabBarController()
-            tabBarController.navigationItem.title = "Conversations"
+            navigationController?.setNavigationBarHidden(false, animated: false)
             navigationController?.pushViewController(tabBarController, animated: false)
         }
-    }
-    
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        navigationController?.setNavigationBarHidden(false, animated: false)
     }
     
     private func updateFieldsView() {
@@ -184,6 +179,7 @@ extension SignInViewController {
             } else if userNameTextField.isFirstResponder {
                 view.frame.origin.y = -keyboardSize.height + (view.frame.height - userNameTextField.frame.origin.y - userNameTextField.frame.height)
             }
+            view.frame.origin.y = min(view.frame.origin.y, 0)
         }
     }
     
@@ -215,8 +211,8 @@ extension SignInViewController: SignInViewModelDelegate {
         userNameTextField.text = nil
         passwordTextField.text = nil
         let tabBarController = TabBarController()
-        tabBarController.navigationItem.title = "Conversations"
-        navigationController?.pushViewController(tabBarController, animated: false)
+        navigationController?.setNavigationBarHidden(false, animated: true)
+        navigationController?.pushViewController(tabBarController, animated: true)
     }
 }
 

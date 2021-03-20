@@ -65,8 +65,7 @@ class ProfileViewController: ViewController {
         profileImageView.isUserInteractionEnabled = true
         let gesture = UITapGestureRecognizer(target: self, action: #selector(didTapProfileImageView))
         profileImageView.addGestureRecognizer(gesture)
-        guard let avatar = UserDefaults.standard.string(forKey: "avatar"),
-              let url = URL(string: avatar) else { return }
+        let url = URL(string: UserDefaults.standard.string(forKey: "avatar") ?? "")
         profileImageView.sd_setImage(with: url, placeholderImage: UIImage(named: "profile_placeholder"))
     }
     
@@ -101,7 +100,7 @@ class ProfileViewController: ViewController {
 extension ProfileViewController {
     @objc private func signOutButtonDidTap() {
         profileViewModel.signOut()
-        navigationController?.dismiss(animated: true)
+        navigationController?.popViewController(animated: true)
     }
     
     @objc private func didTapProfileImageView() {

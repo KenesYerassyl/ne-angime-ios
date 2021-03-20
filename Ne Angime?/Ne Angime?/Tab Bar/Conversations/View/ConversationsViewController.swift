@@ -7,7 +7,7 @@
 
 import SnapKit
 
-class ConversationsViewController: UIViewController {
+class ConversationsViewController: ViewController {
     let conversationsViewModel = ConversationsViewModel()
     private lazy var collectionViewFlowLayout: UICollectionViewFlowLayout = {
         var temp = UICollectionViewFlowLayout()
@@ -28,10 +28,10 @@ class ConversationsViewController: UIViewController {
         collectionView.dataSource = self
         conversationsViewModel.delegate = self
         conversationsViewModel.fetchAllConversations()
-        configureCollectionView()
+        updateCollectionView()
     }
     
-    func configureCollectionView() {
+    func updateCollectionView() {
         view.addSubview(collectionView)
         collectionView.backgroundColor = .clear
         collectionView.snp.makeConstraints { make in
@@ -55,7 +55,7 @@ extension ConversationsViewController: UICollectionViewDelegate {
         )
         chatViewController.title = conversationsViewModel.getFullNameOfRecipient(at: indexPath.row)
         for index in 0...conversationsViewModel.conversations[indexPath.row].messages.count - 1 {
-            conversationsViewModel.conversations[indexPath.row].messages[index].isRead = true
+            conversationsViewModel.conversations[indexPath.row].messages[index].isSeen = true
         }
         CoreDataManager.shared.setMessagesToRead(conversationID: conversationsViewModel.getConversationID(at: indexPath.row))
         self.navigationController?.pushViewController(chatViewController, animated: true)
@@ -97,7 +97,7 @@ extension ConversationsViewController: UICollectionViewDelegateFlowLayout {
 
 // Extension for view model delegate
 extension ConversationsViewController: ConversationsViewModelDelegate {
-    func updateCollectionView() {
+    func reloadCollectionView() {
         collectionView.reloadData()
     }
 }

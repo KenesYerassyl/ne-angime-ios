@@ -180,6 +180,7 @@ extension SignUpViewController2 {
             } else if passwordTextField2.isFirstResponder {
                 view.frame.origin.y = -keyboardSize.height + (view.frame.height - passwordTextField2.frame.origin.y - passwordTextField2.frame.height)
             }
+            view.frame.origin.y = min(view.frame.origin.y, 0)
         }
     }
     

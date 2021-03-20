@@ -122,7 +122,7 @@ class CoreDataManager {
             guard let conversation = resultConversation,
                   let messages = conversation.messages?.allObjects as? [MessageCoreData] else { return }
             for index in 0...messages.count - 1 {
-                messages[index].isRead = true
+                messages[index].isSeen = true
             }
             saveContext()
         } catch {

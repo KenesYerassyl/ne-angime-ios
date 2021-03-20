@@ -62,10 +62,14 @@ class ProfileViewModel {
                         completion(false)
                     }
                 } else {
+                    print("Unexpected error occured: unhandled response status code.")
                     completion(false)
                 }
             } else if let error = error {
                 print("Error in uploading a profile image: \(error)")
+                DispatchQueue.main.async { completion(false) }
+            } else {
+                print("Unexpected error occured: data, response, and error are all nil.")
                 DispatchQueue.main.async { completion(false) }
             }
         }

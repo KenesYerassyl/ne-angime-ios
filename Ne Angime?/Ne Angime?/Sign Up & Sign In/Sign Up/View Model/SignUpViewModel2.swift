@@ -68,11 +68,15 @@ class SignUpViewModel2 {
                     }
                 } else if !((200...299).contains(response.statusCode)), let message = json["message"] as? String {
                     self?.signUpError(message: message)
+                } else {
+                    print("Unexpected error occured: either status code is not in range 200...299 or JSON object has not property named 'message'.")
+                    self?.signUpError(message: "Unexpected error occured")
                 }
             } else if let error = error {
                 print("Error in signing in: \(error)")
                 self?.signUpError(message: error.localizedDescription)
             } else {
+                print("Unexpected error occured: data, response, and error are all nil.")
                 self?.signUpError(message: "Unexpected error occured")
             }
         }
