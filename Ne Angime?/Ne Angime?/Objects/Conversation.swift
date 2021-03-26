@@ -7,7 +7,8 @@
 
 import Foundation
 
-struct Conversation: Codable {
+
+struct Conversation: Codable, Equatable {
     var conversationID: String
     var messages: [Message]
     
@@ -17,7 +18,21 @@ struct Conversation: Codable {
     }
     
     static func == (left: Conversation, right: Conversation) -> Bool {
-        return (left.conversationID == right.conversationID)
+        if left.conversationID != right.conversationID { return false }
+        if left.messages.count != right.messages.count { return false }
+        for index in stride(from: 0, to: left.messages.count, by: 1) {
+            if left.messages[index] != right.messages[index] { return false }
+        }
+        return true
+    }
+    
+    static func != (left: Conversation, right: Conversation) -> Bool {
+        if left.conversationID != right.conversationID { return true }
+        if left.messages.count != right.messages.count { return true }
+        for index in stride(from: 0, to: left.messages.count, by: 1) {
+            if left.messages[index] != right.messages[index] { return true }
+        }
+        return false
     }
     
     static func < (left: Conversation, right: Conversation) -> Bool {

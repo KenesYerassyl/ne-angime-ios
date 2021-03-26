@@ -9,6 +9,7 @@ import Foundation
 
 protocol ConversationsViewModelDelegate: class {
     func reloadCollectionView()
+    func inChatViewController(with conversationID: String) -> Bool
 }
 
 class ConversationsViewModel {
@@ -18,7 +19,6 @@ class ConversationsViewModel {
     init() {
         NotificationCenter.default.addObserver(self, selector: #selector(newConversationCreated), name: .newConversation, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(newMessageToHandle), name: .newMessage, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(setMessagesToRead), name: .leavingConversation, object: nil)
     }
     
     deinit {
@@ -42,10 +42,10 @@ class ConversationsViewModel {
     }
     
     func getNumberOfUnreadMessages(at index: Int) -> Int {
-        guard let username = UserDefaults.standard.string(forKey: "username") else { return 48 }
+        guard let username = UserDefaults.standard.string(forKey: "username") else { fatalError("User is not logged in!") }
         var counter = 0
         for message in conversations[index].messages {
-            if !message.isSeen && message.senderUsername == username { counter += 1 }
+            if !message.isSeen && message.senderUsername != username { counter += 1 }
         }
         return counter
     }
@@ -115,14 +115,13 @@ class ConversationsViewModel {
             }
             for i in stride(from: 0, to: self.conversations.count, by: 1) {
                 for j in stride(from: 0, to: conversationsFromDB.count, by: 1) {
-                    if self.conversations[i] == conversationsFromDB[j] &&
-                        self.conversations[i].messages.count != conversationsFromDB[j].messages.count {
+                    if self.conversations[i].conversationID == conversationsFromDB[j].conversationID &&
+                        self.conversations[i] != conversationsFromDB[j] {
                         shouldGetConversationFromDB = true
                         group.enter()
                         CoreDataManager.shared.addMessages(
                             to: conversationsFromDB[j].conversationID,
-                            from: conversationsFromDB[j].messages,
-                            startingIndex: self.conversations.count
+                            from: conversationsFromDB[j].messages
                         ) { completed in
                             if completed == .success { group.leave() }
                         }
@@ -133,6 +132,7 @@ class ConversationsViewModel {
                 if shouldGetConversationFromDB {
                     self.conversations = conversationsFromDB
                     self.adjustUserToConversation()
+                    NotificationCenter.default.post(name: .conversationsAreLoadedFromDB, object: nil)
                 }
             }
         }
@@ -154,25 +154,23 @@ class ConversationsViewModel {
         guard let userInfo = notification.userInfo,
               let conversationID = userInfo["conversationID"] as? String,
               let messageWebSocket = userInfo["messageWebSocket"] as? MessageWebSocket else { return }
+        
+        guard let createdAt = messageWebSocket.createdAt,
+              let messageContent =  messageWebSocket.message
+        else { fatalError("Message creation time date or message content is nil") }
+        
         for index in 0...self.conversations.count - 1 {
             if self.conversations[index].conversationID == conversationID {
-                self.conversations[index].messages.append(Message( createdAt: messageWebSocket.createdAt,message: messageWebSocket.message, messageID: messageWebSocket.messageID, recipientUsername: messageWebSocket.recipientUsername, senderUsername: messageWebSocket.senderUsername))
-                DispatchQueue.main.async {
-                    self.delegate?.reloadCollectionView()
-                }
-                break
-            }
-        }
-    }
-    
-    @objc func setMessagesToRead(notification: Notification) {
-        guard let userInfo = notification.userInfo, let conversationID = userInfo["conversationID"] as? String else { return }
-        for index in stride(from: 0, to: conversations.count, by: 1) {
-            if conversations[index].conversationID == conversationID {
-                for jndex in 0...conversations[index].messages.count - 1 {
-                    conversations[index].messages[jndex].isSeen = true
-                }
-                CoreDataManager.shared.setMessagesToRead(conversationID: conversationID)
+                self.conversations[index].messages.append(
+                    Message(
+                        createdAt: createdAt,
+                        message: messageContent,
+                        messageID: messageWebSocket.messageID,
+                        recipientUsername: messageWebSocket.recipientUsername,
+                        senderUsername: messageWebSocket.senderUsername,
+                        isSeen: self.delegate?.inChatViewController(with: self.conversations[index].conversationID) ?? false
+                    )
+                )
                 DispatchQueue.main.async {
                     self.delegate?.reloadCollectionView()
                 }

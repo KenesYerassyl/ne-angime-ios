@@ -15,30 +15,14 @@ enum EventType: String, Codable {
     case getMessageStatusSeen = "get_message_status_seen"
 }
 
-struct MessageStatusWebSocket: Codable {
-    var type: EventType
-    var messageID: String
-    var conversationID: String
-    var senderUsername: String
-    var recipientUsername: String
-    
-    enum CodingKeys: String, CodingKey {
-        case type
-        case messageID = "message_id"
-        case conversationID = "conversation_id"
-        case senderUsername = "sender_username"
-        case recipientUsername = "recipient_username"
-    }
-}
-
 struct MessageWebSocket: Codable {
     var type: EventType
-    var message: String
+    var message: String?
     var messageID: String
     var conversationID: String
     var senderUsername: String
     var recipientUsername: String
-    var createdAt: Double
+    var createdAt: Double?
     
     enum CodingKeys: String, CodingKey {
         case type

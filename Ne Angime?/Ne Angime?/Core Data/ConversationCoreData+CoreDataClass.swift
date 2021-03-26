@@ -23,7 +23,8 @@ public class ConversationCoreData: NSManagedObject {
                 message: messageCoreData.message ?? "undefined",
                 messageID: messageCoreData.messageID ?? "undefined",
                 recipientUsername: messageCoreData.recipientUsername ?? "undefined",
-                senderUsername: messageCoreData.senderUsername ?? "undefined"
+                senderUsername: messageCoreData.senderUsername ?? "undefined",
+                isSeen: messageCoreData.isSeen
             )
             conversation.messages.append(message)
         }

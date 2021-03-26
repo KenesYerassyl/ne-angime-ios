@@ -29,7 +29,6 @@ extension UIViewController {
             make.height.equalTo(height * 2)
         }
         backButton.setImage(UIImage(named: withNormalColor.rawValue), for: .normal)
-        backButton.setImage(UIImage(named: "back_icon_tapped"), for: .selected)
         backButton.setImage(UIImage(named: "back_icon_tapped"), for: .highlighted)
         backButton.addTarget(self, action: didTapBackButton, for: .touchUpInside)
     }

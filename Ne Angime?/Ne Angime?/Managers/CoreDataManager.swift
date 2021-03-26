@@ -70,7 +70,7 @@ class CoreDataManager {
             completion(nil)
         }
     }
-
+    
     
     func getAllConversations(_ completion: @escaping([ConversationCoreData]?) -> Void) {
         let request = ConversationCoreData.fetchRequest() as NSFetchRequest<ConversationCoreData>
@@ -94,8 +94,8 @@ class CoreDataManager {
         } catch {
             print("Error in deleting conversations: \(error)")
         }
-
-        let fetchRequest2: NSFetchRequest<NSFetchRequestResult> = NSFetchRequest(entityName: "ConversationCoreData")
+        
+        let fetchRequest2: NSFetchRequest<NSFetchRequestResult> = NSFetchRequest(entityName: "MessageCoreData")
         let deleteRequest2 = NSBatchDeleteRequest(fetchRequest: fetchRequest2)
         do {
             try CoreDataManager.shared.context.persistentStoreCoordinator?.execute(
@@ -104,29 +104,6 @@ class CoreDataManager {
             )
         } catch {
             print("Error in deleting messages: \(error)")
-        }
-    }
-    
-    func setMessagesToRead(conversationID: String) {
-        let request = ConversationCoreData.fetchRequest() as NSFetchRequest<ConversationCoreData>
-        request.predicate = NSPredicate(format: "conversationID == %@", conversationID)
-        do {
-            let results = try context.fetch(request) as [ConversationCoreData]
-            var resultConversation: ConversationCoreData?
-            for conversation in results {
-                if conversation.conversationID == conversationID {
-                    resultConversation = conversation
-                    break
-                }
-            }
-            guard let conversation = resultConversation,
-                  let messages = conversation.messages?.allObjects as? [MessageCoreData] else { return }
-            for index in 0...messages.count - 1 {
-                messages[index].isSeen = true
-            }
-            saveContext()
-        } catch {
-            print("Error in getting conversation by ID error: \(error)")
         }
     }
     
@@ -153,18 +130,18 @@ class CoreDataManager {
         }
     }
     
-    func addMessages(to conversationID: String, from messages: [Message], startingIndex: Int, completion: @escaping(Result) -> Void) {
+    func addMessages(to conversationID: String, from messages: [Message], completion: @escaping(Result) -> Void) {
         let request = ConversationCoreData.fetchRequest() as NSFetchRequest<ConversationCoreData>
         request.predicate = NSPredicate(format: "conversationID == %@", conversationID)
         do {
             let results = try context.fetch(request) as [ConversationCoreData]
-            if results.first != nil && results.first!.conversationID == conversationID {
-                for index in startingIndex...messages.count - 1 {
-                    results.first!.addToMessages(messages[index].convertToMessageCoreData())
-                }
-                saveContext()
-                completion(.success)
+            guard results.first != nil && results.first!.conversationID == conversationID else { fatalError("This conversation does not exist, which cannot be happened!") }
+            if results.first!.messages != nil { results.first!.removeFromMessages(results.first!.messages!) }
+            for index in 0...messages.count - 1 {
+                results.first!.addToMessages(messages[index].convertToMessageCoreData())
             }
+            saveContext()
+            completion(.success)
         } catch {
             completion(.failure)
             print("Error in getting conversation by ID error: \(error)")

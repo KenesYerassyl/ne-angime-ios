@@ -7,8 +7,8 @@
 import SnapKit
 import NVActivityIndicatorView
 
-class FriendsViewController: ViewController {
-    private let friendsViewModel = FriendsViewModel()
+class UsersViewController: ViewController {
+    private let usersViewModel = UsersViewModel()
     private lazy var collectionViewFlowLayout: UICollectionViewFlowLayout = {
         var temp = UICollectionViewFlowLayout()
         temp.minimumLineSpacing = 12
@@ -17,20 +17,21 @@ class FriendsViewController: ViewController {
     }()
     private lazy var collectionView: UICollectionView = {
         var temp = UICollectionView(frame: .zero, collectionViewLayout: self.collectionViewFlowLayout)
-        temp.register(FriendsCollectionViewCell.self, forCellWithReuseIdentifier: FriendsCollectionViewCell.id)
+        temp.register(UsersCollectionViewCell.self, forCellWithReuseIdentifier: UsersCollectionViewCell.id)
         return temp
     }()
+    var completion: ((String) -> Void)?
     
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = UIColor(hex: "#f4f5fa")
         collectionView.delegate = self
         collectionView.dataSource = self
-        friendsViewModel.delegate = self
+        usersViewModel.delegate = self
         updateCollectionView()
         updateActivityIndicator(self)
         startActivityIndicator()
-        friendsViewModel.fetchAllUsers()
+        usersViewModel.fetchAllUsers()
     }
     
     func updateCollectionView() {
@@ -40,31 +41,53 @@ class FriendsViewController: ViewController {
             make.leading.equalTo(view)
             make.trailing.equalTo(view)
             make.bottom.equalTo(view)
-            make.top.equalTo(view.safeAreaLayoutGuide)
+            make.top.equalTo(view.safeAreaLayoutGuide).offset(24)
         }
         collectionView.alwaysBounceVertical = true
     }
 }
 
 // Extension for collection view delegate
-extension FriendsViewController: UICollectionViewDelegate {
+extension UsersViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        //TODO: navigate to the user's profile
+        guard let currentUsername = UserDefaults.standard.string(forKey: "username") else { return }
+        let user = usersViewModel.getUser(at: indexPath.row)
+        var isNewConversation = true
+        var conversationID = "\(currentUsername)&&\(user.username)"
+        
+        if CoreDataManager.shared.doesConversationExist("\(user.username)&&\(currentUsername)") {
+            conversationID = "\(user.username)&&\(currentUsername)"
+            isNewConversation = false
+        } else if CoreDataManager.shared.doesConversationExist("\(currentUsername)&&\(user.username)") {
+            isNewConversation = false
+        }
+        let chatViewController = ChatViewController(
+            conversationID: conversationID,
+            URL(string: UserDefaults.standard.string(forKey: "avatar") ?? "")
+        )
+        chatViewController.title = "\(user.firstname) \(user.lastname)"
+        dismiss(animated: true)
+        if isNewConversation {
+            navigationController?.pushViewController(chatViewController, animated: true)
+        } else {
+            guard let completion = completion else { return }
+            completion(conversationID)
+        }
     }
 }
 
 // Extension for collection view data source
-extension FriendsViewController: UICollectionViewDataSource {
+extension UsersViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return friendsViewModel.getNumberOfItems()
+        return usersViewModel.getNumberOfItems()
     }
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let collectionViewCell = collectionView.dequeueReusableCell(withReuseIdentifier: FriendsCollectionViewCell.id, for: indexPath) as? FriendsCollectionViewCell
+        let collectionViewCell = collectionView.dequeueReusableCell(withReuseIdentifier: UsersCollectionViewCell.id, for: indexPath) as? UsersCollectionViewCell
         guard let cell = collectionViewCell else { return UICollectionViewCell() }
-        let user = friendsViewModel.getUser(at: indexPath.row)
+        let user = usersViewModel.getUser(at: indexPath.row)
         cell.userNameLabel.text = "\(user.firstname) \(user.lastname)"
         cell.userImageView.sd_setImage(
-            with: friendsViewModel.getUserImageURL(at: indexPath.row),
+            with: usersViewModel.getUserImageURL(at: indexPath.row),
             placeholderImage: UIImage(named: "profile_placeholder")
         )
         return cell
@@ -72,14 +95,14 @@ extension FriendsViewController: UICollectionViewDataSource {
 }
 
 // Extension for collection view delegate flow layout
-extension FriendsViewController: UICollectionViewDelegateFlowLayout {
+extension UsersViewController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         return CGSize(width: UIScreen.main.bounds.width * 0.9, height: 90)
     }
 }
 
 // Extension for view model delegate
-extension FriendsViewController: FriendsViewModelDelegate {
+extension UsersViewController: UsersViewModelDelegate {
     func userMayInteract() {
         stopActivityIndicator()
     }

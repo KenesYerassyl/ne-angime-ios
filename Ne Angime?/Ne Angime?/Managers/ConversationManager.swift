@@ -30,7 +30,7 @@ class ConversationManager {
                     DispatchQueue.main.async { completion(nil) }
                 }
             } else if let error = error {
-                print("Erro in all conversations: \(error)")
+                print("Error in all conversations: \(error)")
                 DispatchQueue.main.async { completion(nil) }
             }
         }

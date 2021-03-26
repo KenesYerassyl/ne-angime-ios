@@ -90,7 +90,6 @@ class ProfileViewController: ViewController {
             make.trailing.equalTo(view).offset(-spacing)
         }
         signOutButton.setImage(UIImage(named: "sign_out_icon_normal"), for: .normal)
-        signOutButton.setImage(UIImage(named: "sign_out_icon_tapped"), for: .selected)
         signOutButton.setImage(UIImage(named: "sign_out_icon_tapped"), for: .highlighted)
         signOutButton.addTarget(self, action: #selector(signOutButtonDidTap), for: .touchUpInside)
     }

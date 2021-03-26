@@ -50,21 +50,7 @@ class FriendsViewController: ViewController {
 // Extension for collection view delegate
 extension FriendsViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        guard let currentUsername = UserDefaults.standard.string(forKey: "username") else { return }
-        let user = friendsViewModel.getUser(at: indexPath.row)
-        var conversationID = "\(currentUsername)&&\(user.username)"
-        
-        if CoreDataManager.shared.doesConversationExist("\(user.username)&&\(currentUsername)") {
-            conversationID = "\(user.username)&&\(currentUsername)"
-        }
-        
-        let chatViewController = ChatViewController(
-            conversationID: conversationID,
-            URL(string: UserDefaults.standard.string(forKey: "avatar") ?? ""),
-            URL(string: user.avatar ?? "")
-        )
-        chatViewController.title = "\(user.firstname) \(user.lastname)"
-        navigationController?.pushViewController(chatViewController, animated: true)
+        //TODO: navigate to the user's profile
     }
 }
 

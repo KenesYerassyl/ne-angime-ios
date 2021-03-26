@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import UIKit
 
 class MessageHandler {
     public static let shared = MessageHandler()
@@ -18,11 +19,14 @@ class MessageHandler {
         } else if CoreDataManager.shared.doesConversationExist("\(messageWebSocket.recipientUsername)&&\(messageWebSocket.senderUsername)") {
             conversationID = "\(messageWebSocket.recipientUsername)&&\(messageWebSocket.senderUsername)"
         }
+        guard let createdAt = messageWebSocket.createdAt,
+              let messageContent =  messageWebSocket.message
+        else { fatalError("Message creation time date or message content is nil") }
         
         let message = MessageCoreData(entity: MessageCoreData.entity(), insertInto: CoreDataManager.shared.context)
         message.messageID = messageWebSocket.messageID
-        message.message = messageWebSocket.message
-        message.createdAt = messageWebSocket.createdAt
+        message.message = messageContent
+        message.createdAt = createdAt
         message.recipientUsername = messageWebSocket.recipientUsername
         message.senderUsername = messageWebSocket.senderUsername
         

@@ -17,7 +17,7 @@ class FindViewController: ViewController {
     }()
     private lazy var collectionView: UICollectionView = {
         var temp = UICollectionView(frame: .zero, collectionViewLayout: self.collectionViewFlowLayout)
-        temp.register(FriendsCollectionViewCell.self, forCellWithReuseIdentifier: FriendsCollectionViewCell.id)
+        temp.register(FindCollectionViewCell.self, forCellWithReuseIdentifier: FindCollectionViewCell.id)
         return temp
     }()
     private let searchBar = UISearchBar()
@@ -52,7 +52,7 @@ class FindViewController: ViewController {
             make.leading.equalTo(view)
             make.trailing.equalTo(view)
             make.bottom.equalTo(view)
-            make.top.equalTo(view.safeAreaLayoutGuide)
+            make.top.equalTo(view.safeAreaLayoutGuide).offset(24)
         }
         collectionView.alwaysBounceVertical = true
     }
@@ -77,21 +77,7 @@ class FindViewController: ViewController {
 // Extension for collection view delegate
 extension FindViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        guard let currentUsername = UserDefaults.standard.string(forKey: "username") else { return }
-        let user = findViewModel.getUser(at: indexPath.row)
-        var conversationID = "\(currentUsername)&&\(user.username)"
-        
-        if CoreDataManager.shared.doesConversationExist("\(user.username)&&\(currentUsername)") {
-            conversationID = "\(user.username)&&\(currentUsername)"
-        }
-        
-        let chatViewController = ChatViewController(
-            conversationID: conversationID,
-            URL(string: UserDefaults.standard.string(forKey: "avatar") ?? ""),
-            URL(string: user.avatar ?? "")
-        )
-        chatViewController.title = "\(user.firstname) \(user.lastname)"
-        navigationController?.pushViewController(chatViewController, animated: true)
+        //TODO: navigate to the user's profile
     }
 }
 // Extension for collection view data source
@@ -100,7 +86,7 @@ extension FindViewController: UICollectionViewDataSource {
         return findViewModel.getNumberOfItems()
     }
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let collectionViewCell = collectionView.dequeueReusableCell(withReuseIdentifier: FriendsCollectionViewCell.id, for: indexPath) as? FriendsCollectionViewCell
+        let collectionViewCell = collectionView.dequeueReusableCell(withReuseIdentifier: FindCollectionViewCell.id, for: indexPath) as? FindCollectionViewCell
         guard let cell = collectionViewCell else { return UICollectionViewCell() }
         let user = findViewModel.getUser(at: indexPath.row)
         cell.userNameLabel.text = "\(user.firstname) \(user.lastname)"

@@ -20,7 +20,7 @@ class WebSocket: NSObject{
         webSocketTask = urlSession?.webSocketTask(with: url)
     }
     
-    public func resetTask() {
+    func resetTask() {
         urlSession = nil
         webSocketTask = nil
         
@@ -65,6 +65,30 @@ class WebSocket: NSObject{
         })
     }
     
+    func sendMessageStatus(message: Message, conversationID: String, completion: @escaping(Result) -> Void) {
+        let messageStatusWebSocket = MessageWebSocket(
+            type: .setMessageStatusSeen,
+            messageID: message.messageID,
+            conversationID: conversationID,
+            senderUsername: message.senderUsername,
+            recipientUsername: message.recipientUsername
+        )
+        do {
+            let data = try JSONEncoder().encode(messageStatusWebSocket)
+            WebSocket.shared.webSocketTask?.send(.data(data), completionHandler: { error in
+                if let error = error {
+                    print("Error in sending data: \(error)")
+                    completion(.failure)
+                } else {
+                    completion(.success)
+                }
+            })
+        } catch {
+            completion(.failure)
+            print("Error in encoding message status change: \(error)")
+        }
+    }
+    
     private func distributeData(data: Data) {
         do {
             let messageWebSocket = try JSONDecoder().decode(MessageWebSocket.self, from: data)
@@ -72,19 +96,24 @@ class WebSocket: NSObject{
             case .receiveMessage:
                 MessageHandler.shared.handleMessage(messageWebSocket: messageWebSocket)
             case .sendMessage:
-                print("This will not happen 3")
+                print("Error: an app cannot receive such type of message. It only sends it")
+            case .getMessageStatusSeen:
+                //TODO: this message was seen
+                print("A user receives this type message when his message was seen by a recipient")
+            case .setMessageStatusSeen:
+                print("Error: an app cannot receive such type of message. It only sends it")
             }
         } catch {
             print("Error in distributing data: \(error)")
         }
     }
     
-    public func connect() {
+    func connect() {
         print("trying to connect...")
         webSocketTask?.resume()
     }
     
-    public func disconnect() {
+    func disconnect() {
         let reason = "disconnecting".data(using: .utf8)
         webSocketTask?.cancel(with: .goingAway, reason: reason)
     }

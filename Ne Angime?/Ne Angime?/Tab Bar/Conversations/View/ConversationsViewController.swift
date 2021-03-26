@@ -20,6 +20,7 @@ class ConversationsViewController: ViewController {
         temp.register(ConversationsCollectionViewCell.self, forCellWithReuseIdentifier: ConversationsCollectionViewCell.id)
         return temp
     }()
+    private let newConversationButton = UIButton()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -29,6 +30,7 @@ class ConversationsViewController: ViewController {
         conversationsViewModel.delegate = self
         conversationsViewModel.fetchAllConversations()
         updateCollectionView()
+        updateNewConversationButton()
     }
     
     func updateCollectionView() {
@@ -42,23 +44,83 @@ class ConversationsViewController: ViewController {
         }
         collectionView.alwaysBounceVertical = true
     }
+    
+    func updateNewConversationButton() {
+        view.addSubview(newConversationButton)
+        newConversationButton.snp.makeConstraints { make in
+            guard let myTabBarController = self.tabBarController else { return }
+            make.width.equalTo(60)
+            make.height.equalTo(60)
+            make.bottom.equalTo(view).offset(-12 - myTabBarController.tabBar.bounds.height * 2)
+            make.trailing.equalTo(view).offset(-24)
+        }
+        newConversationButton.titleLabel?.textAlignment = .center
+        newConversationButton.layer.cornerRadius = 30
+        newConversationButton.backgroundColor = UIColor(hex: "#30289f")
+        newConversationButton.titleLabel?.font = UIFont(name: "Avenir", size: 24)
+        newConversationButton.setTitle("+", for: .normal)
+        newConversationButton.setTitleColor(.white, for: .normal)
+        newConversationButton.setTitle("+", for: .highlighted)
+        newConversationButton.setTitleColor(UIColor(hex: "#aba7f3"), for: .highlighted)
+        newConversationButton.addTarget(self, action: #selector(newConversationButtonClicked), for: .touchUpInside)
+    }
 }
-
+// Extension for logics functions
+extension ConversationsViewController {
+    @objc private func newConversationButtonClicked() {
+        let usersViewController = UsersViewController()
+        usersViewController.completion = { [weak self] conversationID in
+            guard let self = self else { return }
+            for row in stride(from: 0, to: self.conversationsViewModel.getNumberOfItems(), by: 1) {
+                if self.conversationsViewModel.getConversationID(at: row) == conversationID {
+                    let indexPath = IndexPath(row: row, section: 0)
+                    DispatchQueue.main.async {
+                        self.collectionView(self.collectionView, didSelectItemAt: indexPath)
+                    }
+                    break
+                }
+            }
+        }
+        present(usersViewController, animated: true)
+    }
+}
 // Extension for collection view delegate
 extension ConversationsViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let conversationID = conversationsViewModel.getConversationID(at: indexPath.row)
         let chatViewController = ChatViewController(
             conversationID: conversationID,
-            URL(string: UserDefaults.standard.string(forKey: "avatar") ?? ""),
-            conversationsViewModel.getUserImageURL(from: conversationsViewModel.getConversationID(at: indexPath.row))
+            URL(string: UserDefaults.standard.string(forKey: "avatar") ?? "")
         )
         chatViewController.title = conversationsViewModel.getFullNameOfRecipient(at: indexPath.row)
+        let group = DispatchGroup()
+        var completed = true
         for index in 0...conversationsViewModel.conversations[indexPath.row].messages.count - 1 {
-            conversationsViewModel.conversations[indexPath.row].messages[index].isSeen = true
+            if !conversationsViewModel.conversations[indexPath.row].messages[index].isSeen {
+                group.enter()
+                WebSocket.shared.sendMessageStatus(
+                    message: conversationsViewModel.conversations[indexPath.row].messages[index],
+                    conversationID: conversationID)
+                { [weak self] result in
+                    if result == .success, let self = self {
+                        self.conversationsViewModel.conversations[indexPath.row].messages[index].isSeen = true
+                    } else {
+                        completed = false
+                    }
+                    group.leave()
+                }
+            }
         }
-        CoreDataManager.shared.setMessagesToRead(conversationID: conversationsViewModel.getConversationID(at: indexPath.row))
+        group.notify(queue: .main) {
+            if completed {
+                CoreDataManager.shared.addMessages(
+                    to: conversationID,
+                    from: self.conversationsViewModel.conversations[indexPath.row].messages
+                ) { _ in }
+            }
+        }
         self.navigationController?.pushViewController(chatViewController, animated: true)
+        reloadCollectionView()
     }
 }
 
@@ -88,7 +150,7 @@ extension ConversationsViewController: UICollectionViewDataSource {
     }
 }
 
-// Extension for collection view delegate floew layout
+// Extension for collection view delegate flow layout
 extension ConversationsViewController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         return CGSize(width: UIScreen.main.bounds.width * 0.9, height: 90)
@@ -99,6 +161,20 @@ extension ConversationsViewController: UICollectionViewDelegateFlowLayout {
 extension ConversationsViewController: ConversationsViewModelDelegate {
     func reloadCollectionView() {
         collectionView.reloadData()
+    }
+    
+    func inChatViewController(with conversationID: String) -> Bool {
+        var validation = false
+        DispatchQueue.main.async {
+            if self.navigationController?.topViewController?.view.tag == 88,
+               let chatViewController = self.navigationController?.topViewController as? ChatViewController,
+               chatViewController.chatViewModel.conversationID == conversationID {
+                validation = true
+            } else {
+                validation = false
+            }
+        }
+        return validation
     }
 }
 

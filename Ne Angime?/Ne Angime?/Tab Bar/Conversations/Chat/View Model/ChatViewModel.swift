@@ -22,19 +22,19 @@ class ChatViewModel {
             return Sender.undefined
         }
     }()
+    weak var delegate: ChatViewModelDelegate?
     
     init(conversationID: String) {
         self.conversationID = conversationID
         let otherUsername = UserManager.shared.getOtherUsername(from: conversationID)
         self.otherUser = Sender(senderId: otherUsername, displayName: "Ne Angime?")
         NotificationCenter.default.addObserver(self, selector: #selector(newMessageToHandle), name: .newMessage, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(fetchConversation), name: .conversationsAreLoadedFromDB, object: nil)
     }
     
     deinit {
         NotificationCenter.default.removeObserver(self)
     }
-    
-    weak var delegate: ChatViewModelDelegate?
     
     var messages = [MessageMessageKit]()
     
@@ -70,12 +70,12 @@ class ChatViewModel {
         } catch {
             print("Error in encoding message: \(error)")
         }
+        guard let createdAt = messageWebSocket.createdAt else { fatalError("Message creation time date or message content is nil") }
         messages.append(MessageMessageKit(
             sender: currentUser,
             messageId: messageWebSocket.messageID,
-            sentDate: Date(timeIntervalSince1970: messageWebSocket.createdAt),
-            kind: .text(text),
-            createdAt: messageWebSocket.createdAt
+            sentDate: Date(timeIntervalSince1970: createdAt),
+            kind: .text(text)
         ))
         delegate?.updateCollectionView()
     }
@@ -83,14 +83,18 @@ class ChatViewModel {
     @objc private func newMessageToHandle(notification: Notification) {
         guard let userInfo = notification.userInfo,
               let conversationID = userInfo["conversationID"] as? String,
-              let dataWebSocket = userInfo["messageWebSocket"] as? MessageWebSocket else { return }
-        if conversationID == self.conversationID && dataWebSocket.type == .receiveMessage {
+              let messageWebSocket = userInfo["messageWebSocket"] as? MessageWebSocket else { return }
+        
+        guard let createdAt = messageWebSocket.createdAt,
+              let messageContent =  messageWebSocket.message
+        else { fatalError("Message creation time date or message content is nil") }
+        
+        if conversationID == self.conversationID && messageWebSocket.type == .receiveMessage {
             messages.append(MessageMessageKit(
-                sender: dataWebSocket.senderUsername == otherUser.senderId ? otherUser : currentUser,
-                messageId: dataWebSocket.messageID,
-                sentDate: Date(timeIntervalSince1970: dataWebSocket.createdAt),
-                kind: .text(dataWebSocket.message),
-                createdAt: dataWebSocket.createdAt
+                sender: otherUser,
+                messageId: messageWebSocket.messageID,
+                sentDate: Date(timeIntervalSince1970: createdAt),
+                kind: .text(messageContent)
             ))
             DispatchQueue.main.async {
                 self.delegate?.updateCollectionView()
@@ -98,7 +102,7 @@ class ChatViewModel {
         }
     }
     
-    func fetchConversation() {
+    @objc func fetchConversation() {
         CoreDataManager.shared.getConversation(conversationID: conversationID) { [weak self] (conversation) in
             guard let conversation = conversation, let messagesCoreData = conversation.messages?.allObjects as? [MessageCoreData] else { return }
             var messages = [MessageMessageKit]()
@@ -109,16 +113,15 @@ class ChatViewModel {
                     sender: senderUser,
                     messageId: item.messageID ?? "undefined",
                     sentDate: Date(timeIntervalSince1970: item.createdAt),
-                    kind: .text(item.message ?? "undefined"),
-                    createdAt: item.createdAt
+                    kind: .text(item.message ?? "undefined")
                 ))
             }
             messages.sort { (messageType1, messageType2) -> Bool in
-                return messageType1.createdAt < messageType2.createdAt
+                return messageType1.sentDate < messageType2.sentDate
             }
-            self?.messages = messages
-            DispatchQueue.main.async {
-                self?.delegate?.updateCollectionView()
+            if self?.messages != messages {
+                self?.messages = messages
+                DispatchQueue.main.async { self?.delegate?.updateCollectionView() }
             }
         }
     }

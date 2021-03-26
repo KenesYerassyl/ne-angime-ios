@@ -11,16 +11,16 @@ import InputBarAccessoryView
 
 class ChatViewController: MessagesViewController {
     
-    private var chatViewModel: ChatViewModel
+    var chatViewModel: ChatViewModel
     var currentUserAvatar: URL?
     var otherUserAvatar: URL?
     private var customInputBarView = UIView()
     
-    init(conversationID: String, _ currentUserAvatar: URL?, _ otherUserAvatar: URL?) {
+    init(conversationID: String, _ currentUserAvatar: URL?) {
         self.chatViewModel = ChatViewModel(conversationID: conversationID)
         self.currentUserAvatar = currentUserAvatar
-        self.otherUserAvatar = otherUserAvatar
         super.init(nibName: nil, bundle: nil)
+        view.tag = 88
     }
     
     required init?(coder: NSCoder) {
@@ -29,6 +29,8 @@ class ChatViewController: MessagesViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        scrollsToLastItemOnKeyboardBeginsEditing = true
+        maintainPositionOnKeyboardFrameChanged = true
         messagesCollectionView.messagesDataSource = self
         messagesCollectionView.messagesLayoutDelegate = self
         messagesCollectionView.messagesDisplayDelegate = self
@@ -36,6 +38,11 @@ class ChatViewController: MessagesViewController {
         chatViewModel.delegate = self
         navigationItem.largeTitleDisplayMode = .never
         updateInputBar()
+        UserManager.shared.getUser(username: chatViewModel.otherUser.senderId) { [weak self] user in
+            guard let user = user else { return }
+            self?.otherUserAvatar = URL(string: user.avatar ?? "")
+            DispatchQueue.main.async { self?.messagesCollectionView.reloadData() }
+        }
         chatViewModel.fetchConversation()
     }
     
@@ -96,7 +103,7 @@ extension ChatViewController: InputBarAccessoryViewDelegate, MessagesDisplayDele
     func inputBar(_ inputBar: InputBarAccessoryView, didPressSendButtonWith text: String) {
         guard !text.replacingOccurrences(of: " ", with: "").isEmpty else { return }
         messageInputBar.inputTextView.text = nil
-        chatViewModel.didTapSendButton(text)
+        chatViewModel.didTapSendButton(text.trimmingCharacters(in: .whitespacesAndNewlines))
     }
     func backgroundColor(for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> UIColor {
         if message.sender as? Sender == chatViewModel.currentUser {
@@ -118,6 +125,6 @@ extension ChatViewController: InputBarAccessoryViewDelegate, MessagesDisplayDele
 extension ChatViewController: ChatViewModelDelegate {
     func updateCollectionView() {
         messagesCollectionView.reloadData()
-        messagesCollectionView.scrollToLastItem(at: .bottom, animated: false)
+        messagesCollectionView.scrollToLastItem()
     }
 }
