@@ -2,7 +2,7 @@
 //  MessageCoreData+CoreDataProperties.swift
 //  Ne Angime?
 //
-//  Created by Kenes Yerassyl on 3/20/21.
+//  Created by Kenes Yerassyl on 3/24/21.
 //
 //
 

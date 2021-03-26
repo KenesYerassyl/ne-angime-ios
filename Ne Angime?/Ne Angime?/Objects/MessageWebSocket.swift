@@ -11,6 +11,24 @@ import Foundation
 enum EventType: String, Codable {
     case sendMessage = "send_message"
     case receiveMessage = "receive_message"
+    case setMessageStatusSeen = "set_message_status_seen"
+    case getMessageStatusSeen = "get_message_status_seen"
+}
+
+struct MessageStatusWebSocket: Codable {
+    var type: EventType
+    var messageID: String
+    var conversationID: String
+    var senderUsername: String
+    var recipientUsername: String
+    
+    enum CodingKeys: String, CodingKey {
+        case type
+        case messageID = "message_id"
+        case conversationID = "conversation_id"
+        case senderUsername = "sender_username"
+        case recipientUsername = "recipient_username"
+    }
 }
 
 struct MessageWebSocket: Codable {
