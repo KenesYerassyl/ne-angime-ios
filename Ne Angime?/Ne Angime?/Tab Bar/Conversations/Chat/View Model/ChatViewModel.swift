@@ -38,7 +38,7 @@ class ChatViewModel {
     
     var messages = [MessageMessageKit]()
     
-    func getMessage(at section: Int) -> MessageType {
+    func getMessage(at section: Int) -> MessageMessageKit {
         return messages[section]
     }
     
@@ -75,7 +75,8 @@ class ChatViewModel {
             sender: currentUser,
             messageId: messageWebSocket.messageID,
             sentDate: Date(timeIntervalSince1970: createdAt),
-            kind: .text(text)
+            kind: .text(text),
+            isSeen: false
         ))
         delegate?.updateCollectionView()
     }
@@ -94,7 +95,8 @@ class ChatViewModel {
                 sender: otherUser,
                 messageId: messageWebSocket.messageID,
                 sentDate: Date(timeIntervalSince1970: createdAt),
-                kind: .text(messageContent)
+                kind: .text(messageContent),
+                isSeen: false
             ))
             DispatchQueue.main.async {
                 self.delegate?.updateCollectionView()
@@ -113,7 +115,8 @@ class ChatViewModel {
                     sender: senderUser,
                     messageId: item.messageID ?? "undefined",
                     sentDate: Date(timeIntervalSince1970: item.createdAt),
-                    kind: .text(item.message ?? "undefined")
+                    kind: .text(item.message ?? "undefined"),
+                    isSeen: item.isSeen
                 ))
             }
             messages.sort { (messageType1, messageType2) -> Bool in

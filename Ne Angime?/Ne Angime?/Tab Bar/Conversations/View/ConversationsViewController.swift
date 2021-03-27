@@ -22,6 +22,19 @@ class ConversationsViewController: ViewController {
     }()
     private let newConversationButton = UIButton()
     
+    init() {
+        super.init(nibName: nil, bundle: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(createTemporaryConversation), name: .temporaryConversationCreated, object: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = UIColor(hex: "#f4f5fa")
@@ -31,6 +44,11 @@ class ConversationsViewController: ViewController {
         conversationsViewModel.fetchAllConversations()
         updateCollectionView()
         updateNewConversationButton()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        reloadCollectionView()
     }
     
     func updateCollectionView() {
@@ -83,44 +101,51 @@ extension ConversationsViewController {
         }
         present(usersViewController, animated: true)
     }
+    
+    @objc private func createTemporaryConversation(notification: Notification) {
+        guard let userInfo = notification.userInfo,
+              let conversationID = userInfo["conversationID"] as? String,
+              let title = userInfo["title"] as? String else { return }
+        pushChatViewController(conversationID: conversationID, title: title)
+    }
+    
+    private func pushChatViewController(conversationID: String, title: String) {
+        let chatViewController = ChatViewController(conversationID: conversationID)
+        chatViewController.title = title
+        
+        chatViewController.completion = { [weak self] conversationIDToBeChanged, index in
+            guard let self = self else { return }
+            for jndex in stride(from: 0, to: self.conversationsViewModel.conversations.count, by: 1) {
+                if self.conversationsViewModel.conversations[jndex].conversationID == conversationIDToBeChanged {
+                    self.conversationsViewModel.conversations[jndex].messages.sort { (message1, message2) -> Bool in
+                        return message1.createdAt < message2.createdAt
+                    }
+                    WebSocket.shared.sendMessageStatus(
+                        message: self.conversationsViewModel.conversations[jndex].messages[index],
+                        conversationID: conversationIDToBeChanged)
+                    { [weak self] result in
+                        guard result == .success, let self = self else { return }
+                        self.conversationsViewModel.conversations[jndex].messages[index].isSeen = true
+                        CoreDataManager.shared.setMessageStatusSeen(
+                            from: conversationIDToBeChanged,
+                            message: self.conversationsViewModel.conversations[jndex].messages[index]
+                        )
+                    }
+                    break
+                }
+            }
+        }
+        
+        self.navigationController?.pushViewController(chatViewController, animated: true)
+    }
 }
 // Extension for collection view delegate
 extension ConversationsViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let conversationID = conversationsViewModel.getConversationID(at: indexPath.row)
-        let chatViewController = ChatViewController(
-            conversationID: conversationID,
-            URL(string: UserDefaults.standard.string(forKey: "avatar") ?? "")
+        pushChatViewController(
+            conversationID: conversationsViewModel.getConversationID(at: indexPath.row),
+            title: conversationsViewModel.getFullNameOfRecipient(at: indexPath.row)
         )
-        chatViewController.title = conversationsViewModel.getFullNameOfRecipient(at: indexPath.row)
-        let group = DispatchGroup()
-        var completed = true
-        for index in 0...conversationsViewModel.conversations[indexPath.row].messages.count - 1 {
-            if !conversationsViewModel.conversations[indexPath.row].messages[index].isSeen {
-                group.enter()
-                WebSocket.shared.sendMessageStatus(
-                    message: conversationsViewModel.conversations[indexPath.row].messages[index],
-                    conversationID: conversationID)
-                { [weak self] result in
-                    if result == .success, let self = self {
-                        self.conversationsViewModel.conversations[indexPath.row].messages[index].isSeen = true
-                    } else {
-                        completed = false
-                    }
-                    group.leave()
-                }
-            }
-        }
-        group.notify(queue: .main) {
-            if completed {
-                CoreDataManager.shared.addMessages(
-                    to: conversationID,
-                    from: self.conversationsViewModel.conversations[indexPath.row].messages
-                ) { _ in }
-            }
-        }
-        self.navigationController?.pushViewController(chatViewController, animated: true)
-        reloadCollectionView()
     }
 }
 

@@ -14,11 +14,12 @@ class ChatViewController: MessagesViewController {
     var chatViewModel: ChatViewModel
     var currentUserAvatar: URL?
     var otherUserAvatar: URL?
+    var completion: ((_ conversationID: String, _ index: Int) -> Void)?
     private var customInputBarView = UIView()
     
-    init(conversationID: String, _ currentUserAvatar: URL?) {
+    init(conversationID: String) {
         self.chatViewModel = ChatViewModel(conversationID: conversationID)
-        self.currentUserAvatar = currentUserAvatar
+        self.currentUserAvatar = URL(string: UserDefaults.standard.string(forKey: "avatar") ?? "")
         super.init(nibName: nil, bundle: nil)
         view.tag = 88
     }
@@ -58,6 +59,10 @@ class ChatViewController: MessagesViewController {
         messageInputBar.sendButton.setImage(UIImage(named: "send_button_normal"), for: .normal)
         messageInputBar.sendButton.setTitle(nil, for: .normal)
     }
+    override func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+        guard !chatViewModel.getMessage(at: indexPath.section).isSeen else { return }
+        completion?(chatViewModel.conversationID, indexPath.section)
+    }
 }
 
 // Extension for messages data source
@@ -65,7 +70,6 @@ extension ChatViewController: MessagesDataSource {
     func currentSender() -> SenderType {
         return chatViewModel.getCurrentUser()
     }
-    
     func messageForItem(at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> MessageType {
         return chatViewModel.getMessage(at: indexPath.section)
     }

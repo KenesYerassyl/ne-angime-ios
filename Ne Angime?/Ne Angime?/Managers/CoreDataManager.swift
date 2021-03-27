@@ -130,6 +130,31 @@ class CoreDataManager {
         }
     }
     
+    func setMessageStatusSeen(from conversationID: String, message: Message) {
+        let request = ConversationCoreData.fetchRequest() as NSFetchRequest<ConversationCoreData>
+        request.predicate = NSPredicate(format: "conversationID == %@", conversationID)
+        do {
+            let results = try context.fetch(request) as [ConversationCoreData]
+            guard results.first != nil,
+                  results.first!.conversationID == conversationID,
+                  let messages = results.first!.messages?.allObjects as? [MessageCoreData]
+            else { fatalError("This conversation does not exist, which cannot be happened!") }
+            
+            for index in stride(from: 0, to: messages.count, by: 1) {
+                if messages[index].messageID == message.messageID,
+                   messages[index].createdAt == message.createdAt,
+                   messages[index].message == message.message {
+                    results.first!.removeFromMessages(messages[index])
+                    results.first!.addToMessages(message.convertToMessageCoreData())
+                    break
+                }
+            }
+            DispatchQueue.main.async { self.saveContext() }
+        } catch {
+            print("Error in getting conversation by ID error: \(error)")
+        }
+    }
+    
     func addMessages(to conversationID: String, from messages: [Message], completion: @escaping(Result) -> Void) {
         let request = ConversationCoreData.fetchRequest() as NSFetchRequest<ConversationCoreData>
         request.predicate = NSPredicate(format: "conversationID == %@", conversationID)

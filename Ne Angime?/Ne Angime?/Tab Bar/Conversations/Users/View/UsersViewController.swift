@@ -61,17 +61,15 @@ extension UsersViewController: UICollectionViewDelegate {
         } else if CoreDataManager.shared.doesConversationExist("\(currentUsername)&&\(user.username)") {
             isNewConversation = false
         }
-        let chatViewController = ChatViewController(
-            conversationID: conversationID,
-            URL(string: UserDefaults.standard.string(forKey: "avatar") ?? "")
-        )
-        chatViewController.title = "\(user.firstname) \(user.lastname)"
         dismiss(animated: true)
         if isNewConversation {
-            navigationController?.pushViewController(chatViewController, animated: true)
+            NotificationCenter.default.post(
+                name: .temporaryConversationCreated,
+                object: nil,
+                userInfo: ["conversationID" : conversationID, "title" : "\(user.firstname) \(user.lastname)"]
+            )
         } else {
-            guard let completion = completion else { return }
-            completion(conversationID)
+            completion?(conversationID)
         }
     }
 }
