@@ -54,11 +54,11 @@ extension UsersViewController: UICollectionViewDelegate {
         let user = usersViewModel.getUser(at: indexPath.row)
         var isNewConversation = true
         var conversationID = "\(currentUsername)&&\(user.username)"
-        
-        if CoreDataManager.shared.doesConversationExist("\(user.username)&&\(currentUsername)") {
+        let realm = RealmManager()
+        if realm.doesConversationExist(conversationID: "\(user.username)&&\(currentUsername)") {
             conversationID = "\(user.username)&&\(currentUsername)"
             isNewConversation = false
-        } else if CoreDataManager.shared.doesConversationExist("\(currentUsername)&&\(user.username)") {
+        } else if realm.doesConversationExist(conversationID: "\(currentUsername)&&\(user.username)") {
             isNewConversation = false
         }
         dismiss(animated: true)

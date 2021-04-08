@@ -14,7 +14,7 @@ class ChatViewController: MessagesViewController {
     var chatViewModel: ChatViewModel
     var currentUserAvatar: URL?
     var otherUserAvatar: URL?
-    var completion: ((_ conversationID: String, _ index: Int) -> Void)?
+    var completion: ((_ conversationID: String, _ messageID: String) -> Void)?
     private var customInputBarView = UIView()
     
     init(conversationID: String) {
@@ -60,8 +60,9 @@ class ChatViewController: MessagesViewController {
         messageInputBar.sendButton.setTitle(nil, for: .normal)
     }
     override func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-        guard !chatViewModel.getMessage(at: indexPath.section).isSeen else { return }
-        completion?(chatViewModel.conversationID, indexPath.section)
+        let message = chatViewModel.getMessage(at: indexPath.section)
+        guard !message.isSeen && message.sender.senderId != chatViewModel.currentUser.senderId else { return }
+        completion?(chatViewModel.conversationID, message.messageId)
     }
 }
 

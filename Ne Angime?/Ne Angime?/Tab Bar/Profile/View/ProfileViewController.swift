@@ -174,8 +174,8 @@ extension ProfileViewController: UIImagePickerControllerDelegate, UINavigationCo
         profileViewModel.uploadImage(imageData: imageData.base64EncodedString()) { [weak self] result in
             DispatchQueue.main.async {
                 self?.stopActivityIndicator()
+                if result { self?.profileImageView.image = selectedImage }
             }
-            if result { self?.profileImageView.image = selectedImage }
         }
     }
     func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {

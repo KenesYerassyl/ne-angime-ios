@@ -48,17 +48,17 @@ class UserManager {
                 do {
                     let userDict = try JSONDecoder().decode([String : User].self, from: data)
                     guard let user = userDict["user"] else {
-                        DispatchQueue.main.async { completion(nil) }
+                        completion(nil)
                         return
                     }
-                    DispatchQueue.main.async { completion(user) }
+                    completion(user)
                 } catch {
                     print("Error in decoding a user: \(error)")
-                    DispatchQueue.main.async { completion(nil) }
+                    completion(nil)
                 }
             } else if let error = error {
                 print("Error in fetching a user: \(error)")
-                DispatchQueue.main.async { completion(nil) }
+                completion(nil)
             }
         }
     }
@@ -76,17 +76,17 @@ class UserManager {
                 do {
                     let userArray = try JSONDecoder().decode([String : [User]].self, from: data)
                     if let newUsers = userArray["users"] {
-                        DispatchQueue.main.async { completion(newUsers) }
+                        completion(newUsers)
                     } else {
-                        DispatchQueue.main.async { completion(nil) }
+                        completion(nil)
                     }
                 } catch {
                     print("Error in decoding [User] data: \(error)")
-                    DispatchQueue.main.async { completion(nil) }
+                    completion(nil)
                 }
             } else if let error = error {
                 print("Error in getting all users: \(error)")
-                DispatchQueue.main.async { completion(nil) }
+                completion(nil)
             }
         }
     }

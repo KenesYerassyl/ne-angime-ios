@@ -24,14 +24,14 @@ class ConversationManager {
                 do {
                     let decoder = JSONDecoder()
                     let conversations = try decoder.decode([Conversation].self, from: data)
-                    DispatchQueue.main.async { completion(conversations) }
+                    completion(conversations)
                 } catch {
                     print("Error in decoding [Conversation] data: \(error)")
-                    DispatchQueue.main.async { completion(nil) }
+                    completion(nil)
                 }
             } else if let error = error {
                 print("Error in all conversations: \(error)")
-                DispatchQueue.main.async { completion(nil) }
+                completion(nil)
             }
         }
     }

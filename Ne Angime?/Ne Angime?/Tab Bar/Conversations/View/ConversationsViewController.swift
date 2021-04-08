@@ -113,23 +113,25 @@ extension ConversationsViewController {
         let chatViewController = ChatViewController(conversationID: conversationID)
         chatViewController.title = title
         
-        chatViewController.completion = { [weak self] conversationIDToBeChanged, index in
+        chatViewController.completion = { [weak self] conversationIDToBeChanged, messageID in
             guard let self = self else { return }
             for jndex in stride(from: 0, to: self.conversationsViewModel.conversations.count, by: 1) {
-                if self.conversationsViewModel.conversations[jndex].conversationID == conversationIDToBeChanged {
-                    self.conversationsViewModel.conversations[jndex].messages.sort { (message1, message2) -> Bool in
-                        return message1.createdAt < message2.createdAt
-                    }
+                if self.conversationsViewModel.conversations[jndex].conversationID == conversationIDToBeChanged,
+                   let messageToBeUpdated = self.conversationsViewModel.conversations[jndex].getMessage(by: messageID) {
                     WebSocket.shared.sendMessageStatus(
-                        message: self.conversationsViewModel.conversations[jndex].messages[index],
+                        message: messageToBeUpdated,
                         conversationID: conversationIDToBeChanged)
                     { [weak self] result in
                         guard result == .success, let self = self else { return }
-                        self.conversationsViewModel.conversations[jndex].messages[index].isSeen = true
-                        CoreDataManager.shared.setMessageStatusSeen(
-                            from: conversationIDToBeChanged,
-                            message: self.conversationsViewModel.conversations[jndex].messages[index]
-                        )
+                        self.conversationsViewModel.conversations[jndex].setMessageStatusSeen(with: messageID)
+                        autoreleasepool {
+                            let realm = RealmManager()
+                            realm.database.refresh()
+                            realm.setMessageStatusSeen(
+                                from: conversationIDToBeChanged,
+                                message: messageToBeUpdated
+                            )
+                        }
                     }
                     break
                 }

@@ -25,15 +25,16 @@ struct Message: Codable, Equatable {
         case isSeen = "is_seen"
     }
     
-    func convertToMessageCoreData() -> MessageCoreData{
-        let messageCoreData = MessageCoreData(entity: MessageCoreData.entity(), insertInto: CoreDataManager.shared.context)
-        messageCoreData.createdAt = self.createdAt
-        messageCoreData.isSeen = self.isSeen
-        messageCoreData.message = self.message
-        messageCoreData.messageID = self.messageID
-        messageCoreData.recipientUsername = self.recipientUsername
-        messageCoreData.senderUsername = self.senderUsername
-        return messageCoreData
+    func toMessageRealm() -> MessageRealm {
+        let messageRealm = MessageRealm(
+            createdAt: self.createdAt,
+            message: self.message,
+            messageID: self.messageID,
+            recipientUsername: self.recipientUsername,
+            senderUsername: self.senderUsername,
+            isSeen: self.isSeen
+        )
+        return messageRealm
     }
     
     static func == (left: Message, right: Message) -> Bool {

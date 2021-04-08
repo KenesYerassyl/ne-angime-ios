@@ -1,6 +1,0 @@
-framework module Pods_Ne_Angime_Tests {
-  umbrella header "Pods-Ne Angime?Tests-umbrella.h"
-
-  export *
-  module * { export * }
-}

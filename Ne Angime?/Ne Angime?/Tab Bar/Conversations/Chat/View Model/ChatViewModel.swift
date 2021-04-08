@@ -105,27 +105,24 @@ class ChatViewModel {
     }
     
     @objc func fetchConversation() {
-        CoreDataManager.shared.getConversation(conversationID: conversationID) { [weak self] (conversation) in
-            guard let conversation = conversation, let messagesCoreData = conversation.messages?.allObjects as? [MessageCoreData] else { return }
-            var messages = [MessageMessageKit]()
-            for item in messagesCoreData {
-                guard let senderUsername = item.senderUsername,
-                      let senderUser = senderUsername == self?.otherUser.senderId ? self?.otherUser : self?.currentUser else { return }
-                messages.append(MessageMessageKit(
-                    sender: senderUser,
-                    messageId: item.messageID ?? "undefined",
-                    sentDate: Date(timeIntervalSince1970: item.createdAt),
-                    kind: .text(item.message ?? "undefined"),
-                    isSeen: item.isSeen
-                ))
-            }
-            messages.sort { (messageType1, messageType2) -> Bool in
-                return messageType1.sentDate < messageType2.sentDate
-            }
-            if self?.messages != messages {
-                self?.messages = messages
-                DispatchQueue.main.async { self?.delegate?.updateCollectionView() }
-            }
+        guard let messagesRealm = RealmManager().getConversation(conversationID: conversationID)?.messages else { return }
+        var messages = [MessageMessageKit]()
+        for message in messagesRealm {
+            let senderUser = message.senderUsername == otherUser.senderId ? otherUser : currentUser
+            messages.append(MessageMessageKit(
+                sender: senderUser,
+                messageId: message.messageID,
+                sentDate: Date(timeIntervalSince1970: message.createdAt),
+                kind: .text(message.message),
+                isSeen: message.isSeen
+            ))
+        }
+        messages.sort { (messageType1, messageType2) -> Bool in
+            return messageType1.sentDate < messageType2.sentDate
+        }
+        if self.messages != messages {
+            self.messages = messages
+            delegate?.updateCollectionView()
         }
     }
 }

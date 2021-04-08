@@ -47,12 +47,10 @@ class FindViewModel {
             self.users.sort { (user1, user2) -> Bool in
                 return "\(user1.firstname) \(user1.lastname)" < "\(user2.firstname) \(user2.lastname)"
             }
-            DispatchQueue.main.async {
-                self.delegate?.userMayInteract()
-                self.delegate?.reloadCollectionView()
-                if self.users.isEmpty {
-                    self.delegate?.noResultsFound()
-                }
+            self.delegate?.userMayInteract()
+            self.delegate?.reloadCollectionView()
+            if self.users.isEmpty {
+                self.delegate?.noResultsFound()
             }
         }
     }

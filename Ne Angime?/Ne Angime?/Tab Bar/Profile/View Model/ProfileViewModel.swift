@@ -23,7 +23,7 @@ class ProfileViewModel {
         UserDefaults.standard.removeObject(forKey: "token")
         UserDefaults.standard.removeObject(forKey: "avatar")
         WebSocket.shared.disconnect()
-        CoreDataManager.shared.deleteAllData()
+        RealmManager().deleteAll()
     }
     
     func getUserFullName() -> (String, String) {
@@ -51,26 +51,26 @@ class ProfileViewModel {
                         guard let json = try JSONSerialization.jsonObject(with: data) as? [String : Any],
                               let url = json["url"] as? String else { return }
                         UserDefaults.standard.set(url, forKey: "avatar")
-                        DispatchQueue.main.async { completion(true) }
+                        completion(true)
                     } catch {
                         print("Error in decoding data from uploading profile image: \(error)")
-                        DispatchQueue.main.async { completion(false) }
+                        completion(false)
                     }
                 } else if response.statusCode == 413 {
                     DispatchQueue.main.async {
                         self.delegate?.showErrorAlert(title: "Something went wrong", message: "The size of an image should be less than 10 Mb. This image is too heavy, please choose another one.")
-                        completion(false)
                     }
+                    completion(false)
                 } else {
                     print("Unexpected error occured: unhandled response status code.")
                     completion(false)
                 }
             } else if let error = error {
                 print("Error in uploading a profile image: \(error)")
-                DispatchQueue.main.async { completion(false) }
+                completion(false)
             } else {
                 print("Unexpected error occured: data, response, and error are all nil.")
-                DispatchQueue.main.async { completion(false) }
+                completion(false)
             }
         }
     }

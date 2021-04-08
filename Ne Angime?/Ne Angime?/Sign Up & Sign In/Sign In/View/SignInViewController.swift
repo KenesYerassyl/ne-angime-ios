@@ -31,7 +31,7 @@ class SignInViewController: ViewController {
         updateSignInButton()
         updateSignUpLabel()
         updateActivityIndicator(self)
-        
+        print(RealmManager().database.configuration.fileURL)
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(keyboardWillShow),

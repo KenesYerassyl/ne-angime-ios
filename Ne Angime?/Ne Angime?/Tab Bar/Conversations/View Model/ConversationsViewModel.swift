@@ -51,13 +51,8 @@ class ConversationsViewModel {
     }
     
     func getFullNameOfRecipient(at index: Int) -> String {
-        var fullName = "undefined undefined"
-        CoreDataManager.shared.getConversation(conversationID: conversations[index].conversationID) { conversationCoreData in
-            guard let convo = conversationCoreData,
-                  let firstName = convo.firstNameOfRecipient,
-                  let lastName = convo.lastNameOfRecipient else { return }
-            fullName = "\(firstName) \(lastName)"
-        }
+        let conversationRealm = RealmManager().getConversation(conversationID: conversations[index].conversationID)
+        let fullName = "\(conversationRealm?.firstNameOfRecipient ?? "undefined") \(conversationRealm?.lastNameOfRecipient ?? "undefined")"
         return fullName
     }
     
@@ -81,23 +76,20 @@ class ConversationsViewModel {
             }
         }
         group.notify(queue: .main) {
-            DispatchQueue.main.async { self.delegate?.reloadCollectionView() }
+            self.delegate?.reloadCollectionView()
         }
     }
     
     func fetchAllConversations() {
-        CoreDataManager.shared.getAllConversations { [weak self] results in
-            guard let results = results else { return }
-            self?.conversations.removeAll()
-            for conversationCoreData in results {
-                var conversationToAppend = conversationCoreData.convertToConversation()
-                conversationToAppend.messages.sort { (message1, message2) -> Bool in
-                    return message1.createdAt < message2.createdAt
-                }
-                self?.conversations.append(conversationToAppend)
+        for conversationRealm in RealmManager().getAllConversations() {
+            var conversation = conversationRealm.toConversation()
+            conversation.messages.sort { (message1, message2) -> Bool in
+                return message1.createdAt < message2.createdAt
             }
-            self?.adjustUserToConversation()
+            self.conversations.append(conversation)
         }
+        adjustUserToConversation()
+        
         ConversationManager.shared.getAllConversations { [weak self] conversations in
             guard let conversationsFromDB = conversations, let self = self else { return }
             let group = DispatchGroup()
@@ -107,28 +99,27 @@ class ConversationsViewModel {
                 for conversation in conversationsFromDB {
                     if !ConversationManager.shared.doesConversationExist(conversation, in: self.conversations) {
                         group.enter()
-                        CoreDataManager.shared.addConversation(conversation: conversation) { completed in
-                            if completed == .success { group.leave() }
-                        }
-                    }
-                }
-            }
-            for i in stride(from: 0, to: self.conversations.count, by: 1) {
-                for j in stride(from: 0, to: conversationsFromDB.count, by: 1) {
-                    if self.conversations[i].conversationID == conversationsFromDB[j].conversationID &&
-                        self.conversations[i] != conversationsFromDB[j] {
-                        shouldGetConversationFromDB = true
-                        group.enter()
-                        CoreDataManager.shared.addMessages(
-                            to: conversationsFromDB[j].conversationID,
-                            from: conversationsFromDB[j].messages
-                        ) { completed in
-                            if completed == .success { group.leave() }
+                        conversation.toConversationRealm { (conversationRealm) in
+                            autoreleasepool {
+                                let realm = RealmManager()
+                                realm.database.refresh()
+                                realm.add(object: conversationRealm)
+                                group.leave()
+                            }
                         }
                     }
                 }
             }
             group.notify(queue: .main) {
+                for i in stride(from: 0, to: self.conversations.count, by: 1) {
+                    for j in stride(from: 0, to: conversationsFromDB.count, by: 1) {
+                        if self.conversations[i].conversationID == conversationsFromDB[j].conversationID &&
+                            self.conversations[i] != conversationsFromDB[j] {
+                            shouldGetConversationFromDB = true
+                            RealmManager().addMessages(to: conversationsFromDB[j].conversationID, messages: conversationsFromDB[j].messages)
+                        }
+                    }
+                }
                 if shouldGetConversationFromDB {
                     self.conversations = conversationsFromDB
                     self.adjustUserToConversation()
@@ -140,14 +131,13 @@ class ConversationsViewModel {
     
     @objc func newConversationCreated(notification: Notification) {
         guard let userInfo = notification.userInfo,
-              let conversationID = userInfo["conversationID"] as? String else { return }
-        CoreDataManager.shared.getConversation(conversationID: conversationID) { (conversation) in
-            guard let conversation = conversation else { return }
-            self.conversations.append(conversation.convertToConversation())
-            DispatchQueue.main.async {
-                self.delegate?.reloadCollectionView()
-            }
+              let conversationID = userInfo["conversationID"] as? String,
+              var conversation = RealmManager().getConversation(conversationID: conversationID)?.toConversation() else { return }
+        conversation.messages.sort { (message1, message2) -> Bool in
+            return message1.createdAt < message2.createdAt
         }
+        conversations.append(conversation)
+        delegate?.reloadCollectionView()
     }
     
     @objc func newMessageToHandle(notification: Notification) {

@@ -8,6 +8,7 @@ pod 'SnapKit', '~> 5.0.0'
 pod 'MessageKit'
 pod 'NVActivityIndicatorView'
 pod 'SDWebImage', '~> 5.0'
+pod 'RealmSwift'
 
   # Pods for Ne Angime?
 
