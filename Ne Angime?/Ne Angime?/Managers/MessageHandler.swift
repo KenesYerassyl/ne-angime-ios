@@ -12,7 +12,12 @@ class MessageHandler {
     public static let shared = MessageHandler()
     private init(){}
     
-    public func handleMessage(messageWebSocket: MessageWebSocket) {
+    func handleStatusChangeMessage(messageWebSocket: MessageWebSocket) {
+        RealmManager().setMessageStatusSeen(from: messageWebSocket.conversationID, messageID: messageWebSocket.messageID)
+        NotificationCenter.default.post(name: .messageWasSeen, object: nil, userInfo: ["messageWebSocket" : messageWebSocket])
+    }
+    
+    func handleMessage(messageWebSocket: MessageWebSocket) {
         guard let createdAt = messageWebSocket.createdAt,
               let messageContent =  messageWebSocket.message
         else { fatalError("Message creation time date or message content is nil") }
@@ -30,10 +35,7 @@ class MessageHandler {
             NotificationCenter.default.post(
                 name: .newMessage,
                 object: nil,
-                userInfo: [
-                    "conversationID" : messageWebSocket.conversationID,
-                    "messageWebSocket" : messageWebSocket
-                ]
+                userInfo: ["messageWebSocket" : messageWebSocket]
             )
         } else {
             let conversationRealm = ConversationRealm(

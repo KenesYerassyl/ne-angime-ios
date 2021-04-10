@@ -94,14 +94,11 @@ class WebSocket: NSObject{
             let messageWebSocket = try JSONDecoder().decode(MessageWebSocket.self, from: data)
             switch messageWebSocket.type {
             case .receiveMessage:
-                DispatchQueue.main.async {
-                    MessageHandler.shared.handleMessage(messageWebSocket: messageWebSocket)
-                }
+                MessageHandler.shared.handleMessage(messageWebSocket: messageWebSocket)
             case .sendMessage:
                 print("Error: an app cannot receive such type of message. It only sends it")
             case .getMessageStatusSeen:
-                //TODO: this message was seen
-                print("A user receives this type message when his message was seen by a recipient")
+                MessageHandler.shared.handleStatusChangeMessage(messageWebSocket: messageWebSocket)
             case .setMessageStatusSeen:
                 print("Error: an app cannot receive such type of message. It only sends it")
             }

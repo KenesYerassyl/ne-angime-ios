@@ -30,6 +30,7 @@ class ChatViewModel {
         self.otherUser = Sender(senderId: otherUsername, displayName: "Ne Angime?")
         NotificationCenter.default.addObserver(self, selector: #selector(newMessageToHandle), name: .newMessage, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(fetchConversation), name: .conversationsAreLoadedFromDB, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(messageWasSeen), name: .messageWasSeen, object: nil)
     }
     
     deinit {
@@ -83,23 +84,39 @@ class ChatViewModel {
     
     @objc private func newMessageToHandle(notification: Notification) {
         guard let userInfo = notification.userInfo,
-              let conversationID = userInfo["conversationID"] as? String,
               let messageWebSocket = userInfo["messageWebSocket"] as? MessageWebSocket else { return }
         
         guard let createdAt = messageWebSocket.createdAt,
               let messageContent =  messageWebSocket.message
         else { fatalError("Message creation time date or message content is nil") }
         
-        if conversationID == self.conversationID && messageWebSocket.type == .receiveMessage {
-            messages.append(MessageMessageKit(
-                sender: otherUser,
-                messageId: messageWebSocket.messageID,
-                sentDate: Date(timeIntervalSince1970: createdAt),
-                kind: .text(messageContent),
-                isSeen: false
-            ))
-            DispatchQueue.main.async {
-                self.delegate?.updateCollectionView()
+        guard messageWebSocket.conversationID == self.conversationID && messageWebSocket.type == .receiveMessage else { return }
+        messages.append(MessageMessageKit(
+            sender: otherUser,
+            messageId: messageWebSocket.messageID,
+            sentDate: Date(timeIntervalSince1970: createdAt),
+            kind: .text(messageContent),
+            isSeen: false
+        ))
+        DispatchQueue.main.async {
+            self.delegate?.updateCollectionView()
+        }
+    }
+    
+    @objc private func messageWasSeen(notification: Notification) {
+        guard let userInfo = notification.userInfo,
+              let messageWebSocket = userInfo["messageWebSocket"] as? MessageWebSocket,
+              messageWebSocket.senderUsername == currentUser.senderId else { return }
+        
+        guard messageWebSocket.conversationID == self.conversationID && messageWebSocket.type == .getMessageStatusSeen else { return }
+        for index in stride(from: 0, to: messages.count, by: 1) {
+            if messages[index].messageId == messageWebSocket.messageID  {
+                assert(messages[index].sender == currentUser)
+                messages[index].isSeen = true
+                DispatchQueue.main.async {
+                    self.delegate?.updateCollectionView()
+                }
+                break
             }
         }
     }
@@ -116,9 +133,6 @@ class ChatViewModel {
                 kind: .text(message.message),
                 isSeen: message.isSeen
             ))
-        }
-        messages.sort { (messageType1, messageType2) -> Bool in
-            return messageType1.sentDate < messageType2.sentDate
         }
         if self.messages != messages {
             self.messages = messages

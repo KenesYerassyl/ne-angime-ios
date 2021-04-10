@@ -15,15 +15,14 @@ class RealmManager {
     init() {
         let config = Realm.Configuration(shouldCompactOnLaunch: { totalBytes, usedBytes in
             let fiftyMB = 50 * 1024 * 1024
-            let totalBytesInMB = Double(totalBytes) * (0.000001)
-            let usedBytesInMB = Double(usedBytes) * (0.000001)
-            print("Total bytes in MB: \(totalBytesInMB)")
-            print("Used bytes in MB: \(usedBytesInMB)")
+//            let totalBytesInMB = Double(totalBytes) * (0.000001)
+//            let usedBytesInMB = Double(usedBytes) * (0.000001)
+//            print("Total bytes in MB: \(totalBytesInMB)")
+//            print("Used bytes in MB: \(usedBytesInMB)")
             return (totalBytes > fiftyMB) && (Double(usedBytes) / Double(totalBytes)) < 0.5
         })
         self.database = try! Realm(configuration: config)
     }
-
     func add<T: Object>(object: T) {
         do {
             try database.write {
@@ -33,7 +32,6 @@ class RealmManager {
             print("Error in adding object to Realm: \(error), \(error.localizedDescription)")
         }
     }
-    
     func delete<T: Object>(object: T) {
         do {
             try database.write {
@@ -43,7 +41,6 @@ class RealmManager {
             print("Error in deleting object to Realm: \(error), \(error.localizedDescription)")
         }
     }
-    
     func deleteAll() {
         do {
             try database.write {
@@ -53,7 +50,6 @@ class RealmManager {
             print("Error in deleting all data from Realm: \(error), \(error.localizedDescription)")
         }
     }
-    
     func doesConversationExist(conversationID: String) -> Bool {
         let results = database.objects(ConversationRealm.self).filter("conversationID == '\(conversationID)'")
         assert(results.count <= 1)
@@ -96,10 +92,10 @@ class RealmManager {
         }
     }
     
-    func setMessageStatusSeen(from conversationID: String, message: Message) {
+    func setMessageStatusSeen(from conversationID: String, messageID: String) {
         let resultsForConversation = database.objects(ConversationRealm.self).filter("conversationID == '\(conversationID)'")
         assert(resultsForConversation.count <= 1)
-        let resultsForMessage = database.objects(MessageRealm.self).filter("messageID == '\(message.messageID)'")
+        let resultsForMessage = database.objects(MessageRealm.self).filter("messageID == '\(messageID)'")
         assert(resultsForMessage.count <= 1)
         do {
             try database.write {

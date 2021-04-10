@@ -14,12 +14,13 @@ class TabBarController: UITabBarController {
     private let findViewController = FindViewController()
     private let profileViewController = ProfileViewController()
     
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         delegate = self
         tabBar.tintColor = UIColor(hex: "#30289f")
         navigationItem.title = "Conversations"
-    
+        
         conversationsViewController.tabBarItem = UITabBarItem(
             title: "Conversations",
             image: UIImage(named: "conversations_tab_bar_icon"),

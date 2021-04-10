@@ -47,6 +47,22 @@ class ChatViewController: MessagesViewController {
         chatViewModel.fetchConversation()
     }
     
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        var positionOfFirstUnseenMessage = chatViewModel.getNumberOfMessages()-1
+        for index in stride(from: 0, to: chatViewModel.messages.count, by: 1) {
+            if !chatViewModel.messages[index].isSeen && chatViewModel.messages[index].sender == chatViewModel.otherUser {
+                positionOfFirstUnseenMessage = index
+                break;
+            }
+        }
+        messagesCollectionView.scrollToItem(
+            at: IndexPath(row: 0, section: positionOfFirstUnseenMessage),
+            at: .bottom,
+            animated: true
+        )
+    }
+    
     private func updateInputBar() {
         messageInputBar.backgroundView.backgroundColor = UIColor(hex: "#f2f2f2")
         messageInputBar.inputTextView.textContainerInset.bottom = view.bounds.height * 0.01
@@ -101,6 +117,31 @@ extension ChatViewController: MessagesDataSource {
     func messageTopLabelHeight(for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> CGFloat {
         return 17
     }
+    func messageBottomLabelAttributedText(for message: MessageType, at indexPath: IndexPath) -> NSAttributedString? {
+        guard
+            let font = UIFont(name: "Avenir", size: 12),
+            message.sender == chatViewModel.currentUser,
+            let messageMessageKit = message as? MessageMessageKit,
+            messageMessageKit.isSeen
+        else {
+            return nil
+        }
+        let readLabel = NSAttributedString(
+            string: "Read",
+            attributes: [
+                NSAttributedString.Key.font : font,
+                NSAttributedString.Key.foregroundColor : UIColor.systemGray
+            ]
+        )
+        return readLabel
+    }
+    func messageBottomLabelHeight(for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> CGFloat {
+        if message.sender == chatViewModel.currentUser, let messageMessageKit = message as? MessageMessageKit, messageMessageKit.isSeen {
+            return 11
+        } else {
+            return 0
+        }
+    }
 }
 
 // Extension for message kit custom delegates
@@ -129,6 +170,9 @@ extension ChatViewController: InputBarAccessoryViewDelegate, MessagesDisplayDele
 // Extension for view model delegate
 extension ChatViewController: ChatViewModelDelegate {
     func updateCollectionView() {
+        chatViewModel.messages.sort { (messageType1, messageType2) -> Bool in
+            return messageType1.sentDate < messageType2.sentDate
+        }
         messagesCollectionView.reloadData()
         messagesCollectionView.scrollToLastItem()
     }

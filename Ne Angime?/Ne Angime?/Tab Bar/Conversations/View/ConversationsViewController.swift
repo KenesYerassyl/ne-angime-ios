@@ -129,7 +129,7 @@ extension ConversationsViewController {
                             realm.database.refresh()
                             realm.setMessageStatusSeen(
                                 from: conversationIDToBeChanged,
-                                message: messageToBeUpdated
+                                messageID: messageToBeUpdated.messageID
                             )
                         }
                     }
@@ -187,6 +187,9 @@ extension ConversationsViewController: UICollectionViewDelegateFlowLayout {
 // Extension for view model delegate
 extension ConversationsViewController: ConversationsViewModelDelegate {
     func reloadCollectionView() {
+        conversationsViewModel.conversations.sort { (conversation1, conversation2) -> Bool in
+            return conversation1 > conversation2
+        }
         collectionView.reloadData()
     }
     

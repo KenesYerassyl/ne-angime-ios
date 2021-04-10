@@ -25,7 +25,9 @@ class ConversationsViewModel {
         NotificationCenter.default.removeObserver(self)
     }
     
+    // Array consisting of conversation objects, stores all conversations
     var conversations = [Conversation]()
+    // Dictionary with Key –> String and Value -> User Object
     var users = [String : User]()
     
     func getNumberOfItems() -> Int {
@@ -62,9 +64,6 @@ class ConversationsViewModel {
     }
     
     func adjustUserToConversation() {
-        conversations.sort { (conversation1, conversation2) -> Bool in
-            return conversation1 > conversation2
-        }
         users.removeAll()
         let group = DispatchGroup()
         for conversation in conversations {
@@ -111,16 +110,21 @@ class ConversationsViewModel {
                 }
             }
             group.notify(queue: .main) {
+                //starting in main thread
+                // for loop running throug 'conversations' array
                 for i in stride(from: 0, to: self.conversations.count, by: 1) {
                     for j in stride(from: 0, to: conversationsFromDB.count, by: 1) {
+                        // for loop running throug 'conversationsFromDB' array
                         if self.conversations[i].conversationID == conversationsFromDB[j].conversationID &&
-                            self.conversations[i] != conversationsFromDB[j] {
+                            self.conversations[i] != conversationsFromDB[j] { //if their IDs are equal, but contents are not
                             shouldGetConversationFromDB = true
+                            // Realm adds messages to it self
                             RealmManager().addMessages(to: conversationsFromDB[j].conversationID, messages: conversationsFromDB[j].messages)
                         }
                     }
                 }
                 if shouldGetConversationFromDB {
+                    //load conversations and adjust users to them
                     self.conversations = conversationsFromDB
                     self.adjustUserToConversation()
                     NotificationCenter.default.post(name: .conversationsAreLoadedFromDB, object: nil)
@@ -142,7 +146,6 @@ class ConversationsViewModel {
     
     @objc func newMessageToHandle(notification: Notification) {
         guard let userInfo = notification.userInfo,
-              let conversationID = userInfo["conversationID"] as? String,
               let messageWebSocket = userInfo["messageWebSocket"] as? MessageWebSocket else { return }
         
         guard let createdAt = messageWebSocket.createdAt,
@@ -150,7 +153,7 @@ class ConversationsViewModel {
         else { fatalError("Message creation time date or message content is nil") }
         
         for index in 0...self.conversations.count - 1 {
-            if self.conversations[index].conversationID == conversationID {
+            if self.conversations[index].conversationID == messageWebSocket.conversationID {
                 self.conversations[index].messages.append(
                     Message(
                         createdAt: createdAt,
