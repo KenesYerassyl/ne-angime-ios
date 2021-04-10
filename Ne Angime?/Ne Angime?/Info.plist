@@ -9,6 +9,8 @@
 	</dict>
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>Please allow access to a gallery</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Please allow access to your geolocation</string>
 	<key>NSCameraUsageDescription</key>
 	<string>Please allow access to a camera</string>
 	<key>CFBundleDevelopmentRegion</key>

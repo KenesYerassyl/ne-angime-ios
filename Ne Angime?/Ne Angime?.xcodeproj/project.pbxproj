@@ -26,6 +26,8 @@
 		873CE1AF25D7A85F0007E066 /* Ne_Angime_Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 873CE1AE25D7A85F0007E066 /* Ne_Angime_Tests.swift */; };
 		873CE1BA25D7A85F0007E066 /* Ne_Angime_UITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 873CE1B925D7A85F0007E066 /* Ne_Angime_UITests.swift */; };
 		87440995261CACDF0011EA31 /* RealmManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87440994261CACDF0011EA31 /* RealmManager.swift */; };
+		876625B726222A4800A7DE55 /* LocationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 876625B626222A4800A7DE55 /* LocationViewController.swift */; };
+		876625C126223AE500A7DE55 /* UIBarButtonItem+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 876625C026223AE500A7DE55 /* UIBarButtonItem+Extension.swift */; };
 		8776CFF3260A0290004C7B25 /* UsersViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8776CFF2260A0290004C7B25 /* UsersViewController.swift */; };
 		8776CFFA260A02CC004C7B25 /* UsersCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8776CFF9260A02CC004C7B25 /* UsersCollectionViewCell.swift */; };
 		8776D002260A02EA004C7B25 /* UsersViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8776D001260A02EA004C7B25 /* UsersViewModel.swift */; };
@@ -110,6 +112,8 @@
 		873CE1B925D7A85F0007E066 /* Ne_Angime_UITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Ne_Angime_UITests.swift; sourceTree = "<group>"; };
 		873CE1BB25D7A85F0007E066 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		87440994261CACDF0011EA31 /* RealmManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RealmManager.swift; sourceTree = "<group>"; };
+		876625B626222A4800A7DE55 /* LocationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationViewController.swift; sourceTree = "<group>"; };
+		876625C026223AE500A7DE55 /* UIBarButtonItem+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIBarButtonItem+Extension.swift"; sourceTree = "<group>"; };
 		8776CFF2260A0290004C7B25 /* UsersViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsersViewController.swift; sourceTree = "<group>"; };
 		8776CFF9260A02CC004C7B25 /* UsersCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsersCollectionViewCell.swift; sourceTree = "<group>"; };
 		8776D001260A02EA004C7B25 /* UsersViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsersViewModel.swift; sourceTree = "<group>"; };
@@ -289,6 +293,30 @@
 			path = "Ne Angime?UITests";
 			sourceTree = "<group>";
 		};
+		876625B526222A1F00A7DE55 /* Location */ = {
+			isa = PBXGroup;
+			children = (
+				876625BC26222AE000A7DE55 /* View Model */,
+				876625BB26222AD900A7DE55 /* View */,
+			);
+			path = Location;
+			sourceTree = "<group>";
+		};
+		876625BB26222AD900A7DE55 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				876625B626222A4800A7DE55 /* LocationViewController.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		876625BC26222AE000A7DE55 /* View Model */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = "View Model";
+			sourceTree = "<group>";
+		};
 		8776CFF1260A025E004C7B25 /* Users */ = {
 			isa = PBXGroup;
 			children = (
@@ -338,6 +366,7 @@
 				879AC88425FD38D0001D804F /* String+Extension.swift */,
 				879AC89425FD4F1A001D804F /* UIViewController+Extension.swift */,
 				87D9E6E2261CD51300E3DA01 /* Results+Extension.swift */,
+				876625C026223AE500A7DE55 /* UIBarButtonItem+Extension.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -493,6 +522,7 @@
 		87DC192E25D7B09200C67EB4 /* Conversations */ = {
 			isa = PBXGroup;
 			children = (
+				876625B526222A1F00A7DE55 /* Location */,
 				8776CFF1260A025E004C7B25 /* Users */,
 				87EA164725DD300500F2F9F5 /* Chat */,
 				87DC194225D7B4B800C67EB4 /* View Model */,
@@ -783,6 +813,7 @@
 			files = (
 				879A7F2625D7DD5500C70171 /* FriendsViewController.swift in Sources */,
 				87EA165025DD38AC00F2F9F5 /* ChatViewModel.swift in Sources */,
+				876625C126223AE500A7DE55 /* UIBarButtonItem+Extension.swift in Sources */,
 				87A7937D25EF98E0006F5CC2 /* ConversationManager.swift in Sources */,
 				87EE868C25D9476D00F89605 /* SignUpViewModel1.swift in Sources */,
 				879A7F5625D82CDE00C70171 /* SignInViewModel.swift in Sources */,
@@ -823,6 +854,7 @@
 				870E92C225F2B98A00ECB435 /* MessageMessageKit.swift in Sources */,
 				879CDF8226009A1200CE8195 /* Result.swift in Sources */,
 				87EE868725D9070F00F89605 /* SignUpViewController2.swift in Sources */,
+				876625B726222A4800A7DE55 /* LocationViewController.swift in Sources */,
 				87D9C53625F8A50A0023FE0B /* UITextField+Extension.swift in Sources */,
 				873CE19A25D7A85E0007E066 /* SceneDelegate.swift in Sources */,
 				8729774025E194DE00F0EC72 /* UserManager.swift in Sources */,

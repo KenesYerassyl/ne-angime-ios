@@ -14,12 +14,18 @@ class TabBarController: UITabBarController {
     private let findViewController = FindViewController()
     private let profileViewController = ProfileViewController()
     
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         delegate = self
         tabBar.tintColor = UIColor(hex: "#30289f")
         navigationItem.title = "Conversations"
+        navigationItem.rightBarButtonItem = UIBarButtonItem.menuButton(
+            self,
+            action: #selector(locationButtonClicked),
+            imageName: "location_icon",
+            size: CGSize(width: 40, height: 40),
+            tintColor: UIColor(hex: "#30289f")
+        )
         
         conversationsViewController.tabBarItem = UITabBarItem(
             title: "Conversations",
@@ -55,8 +61,13 @@ class TabBarController: UITabBarController {
         navigationItem.setHidesBackButton(true, animated: true)
     }
     
+    // Action function for FindViewController
     @objc private func clearButtonClicked() {
         findViewController.clearButtonClicked()
+    }
+    // Action function for ConversationViewController
+    @objc private func locationButtonClicked() {
+        conversationsViewController.locationButtonClicked()
     }
 }
 
@@ -64,10 +75,38 @@ class TabBarController: UITabBarController {
 extension TabBarController: UITabBarControllerDelegate {
     func tabBarController(_ tabBarController: UITabBarController, didSelect viewController: UIViewController) {
         let tag = viewController.tabBarItem.tag
-        navigationController?.setNavigationBarHidden(tag == 4, animated: false)
-        navigationController?.navigationBar.prefersLargeTitles = tag != 4 && tag != 3
-        navigationItem.rightBarButtonItem = tag == 3 ? UIBarButtonItem(title: "Clear", style: .done, target: self, action: #selector(clearButtonClicked)) : nil
-        navigationItem.titleView = tag == 3 ? viewController.navigationItem.titleView : nil
+        if tag == 1 {
+            navigationController?.setNavigationBarHidden(false, animated: false)
+            navigationController?.navigationBar.prefersLargeTitles = true
+            navigationItem.rightBarButtonItem = UIBarButtonItem.menuButton(
+                self,
+                action: #selector(locationButtonClicked),
+                imageName: "location_icon",
+                size: CGSize(width: 40, height: 40),
+                tintColor: UIColor(hex: "#30289f")
+            )
+            navigationItem.titleView = nil
+        } else if tag == 2 {
+            navigationController?.setNavigationBarHidden(false, animated: false)
+            navigationController?.navigationBar.prefersLargeTitles = true
+            navigationItem.rightBarButtonItem = nil
+            navigationItem.titleView = nil
+        } else if tag == 3 {
+            navigationController?.setNavigationBarHidden(false, animated: false)
+            navigationController?.navigationBar.prefersLargeTitles = false
+            navigationItem.rightBarButtonItem = UIBarButtonItem(
+                title: "Clear",
+                style: .done,
+                target: self,
+                action: #selector(clearButtonClicked)
+            )
+            navigationItem.titleView = viewController.navigationItem.titleView
+        } else {
+            navigationController?.setNavigationBarHidden(true, animated: false)
+            navigationController?.navigationBar.prefersLargeTitles = false
+            navigationItem.rightBarButtonItem = nil
+            navigationItem.titleView = nil
+        }
         navigationItem.title = viewController.title
     }
 }

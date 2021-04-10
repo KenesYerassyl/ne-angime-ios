@@ -219,8 +219,8 @@ extension SignInViewController: SignInViewModelDelegate {
 //Navigation Controller delegate extensions
 extension SignInViewController: UINavigationControllerDelegate {
     func navigationController(_ navigationController: UINavigationController, willShow viewController: UIViewController, animated: Bool) {
-        let item = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
-        item.tintColor = UIColor(hex: "#30289f")
-        viewController.navigationItem.backBarButtonItem = item
+        let backButton = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
+        backButton.tintColor = UIColor(hex: "#30289f")
+        viewController.navigationItem.backBarButtonItem = backButton
     }
 }

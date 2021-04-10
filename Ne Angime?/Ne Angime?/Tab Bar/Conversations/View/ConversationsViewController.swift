@@ -6,6 +6,7 @@
 //
 
 import SnapKit
+import MapKit
 
 class ConversationsViewController: ViewController {
     let conversationsViewModel = ConversationsViewModel()
@@ -51,7 +52,7 @@ class ConversationsViewController: ViewController {
         reloadCollectionView()
     }
     
-    func updateCollectionView() {
+    private func updateCollectionView() {
         view.addSubview(collectionView)
         collectionView.backgroundColor = .clear
         collectionView.snp.makeConstraints { make in
@@ -63,7 +64,7 @@ class ConversationsViewController: ViewController {
         collectionView.alwaysBounceVertical = true
     }
     
-    func updateNewConversationButton() {
+    private func updateNewConversationButton() {
         view.addSubview(newConversationButton)
         newConversationButton.snp.makeConstraints { make in
             guard let myTabBarController = self.tabBarController else { return }
@@ -137,8 +138,11 @@ extension ConversationsViewController {
                 }
             }
         }
-        
         self.navigationController?.pushViewController(chatViewController, animated: true)
+    }
+    
+    func locationButtonClicked() {
+        navigationController?.pushViewController(LocationViewController(), animated: true)
     }
 }
 // Extension for collection view delegate
