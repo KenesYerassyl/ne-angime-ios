@@ -39,7 +39,10 @@ class LocationViewController: UIViewController {
         switch CLLocationManager.authorizationStatus() {
         case .authorizedWhenInUse:
             mapView.showsUserLocation = true
-            print("damn")
+            let annotation = MKPointAnnotation()
+            annotation.title = "Yera stays here"
+            annotation.coordinate = CLLocationCoordinate2D(latitude: 42.336112, longitude: 69.656461)
+            mapView.addAnnotation(annotation)
         case .denied: // Show alert telling users how to turn on permissions
             break
         case .notDetermined:
