@@ -9,68 +9,71 @@ import Foundation
 
 protocol ProfileViewModelDelegate: class {
     func showErrorAlert(title: String, message: String)
+    func setImageWith(url: URL?)
+    func userMayInteract()
 }
 
 class ProfileViewModel {
-    
+
     weak var delegate: ProfileViewModelDelegate?
-    
-    func signOut() {
-        UserDefaults.standard.removeObject(forKey: "username")
-        UserDefaults.standard.removeObject(forKey: "firstname")
-        UserDefaults.standard.removeObject(forKey: "lastname")
-        UserDefaults.standard.removeObject(forKey: "email")
-        UserDefaults.standard.removeObject(forKey: "token")
-        UserDefaults.standard.removeObject(forKey: "avatar")
-        WebSocket.shared.disconnect()
-        RealmManager().deleteAll()
-    }
     
     func getUserFullName() -> (String, String) {
         guard let firstname = UserDefaults.standard.string(forKey: "firstname"),
               let lastname = UserDefaults.standard.string(forKey: "lastname") else { return ("undefined", "undefined") }
         return ("\(firstname)", "\(lastname)")
     }
-    
-    func uploadImage(imageData: String, _ completion: @escaping(Bool) -> Void) {
-        guard let cookie = UserDefaults.standard.string(forKey: "token"),
-              let data = try? JSONSerialization.data(withJSONObject: ["avatar" : imageData]) else {
-            completion(false)
+
+    func uploadImage(imageData: String) {
+        print("FUNCTION")
+        guard let data = try? JSONSerialization.data(withJSONObject: ["avatar" : imageData]) else {
+            DispatchQueue.main.async { self.delegate?.userMayInteract() }
+            print("Error in serializing JSON object while uploading image")
             return
         }
-        var request = APIRequest(method: .post, path: "auth/update/avatar")
-        request.headers = [
-            HTTPHeader(field: "Cookie", value: "token=\(cookie)"),
-            HTTPHeader(field: "Content-Type", value: "application/json")
-        ]
+        var request = APIRequest(method: .post, path: "user/profile/avatar")
         request.body = data
-        APIClient().request(request) { (data, response, error) in
+        APIClient().request(request, isAccessTokenRequired: true) { (data, response, error) in
             if let data = data, let response = response {
                 if (200...299).contains(response.statusCode) {
                     do {
                         guard let json = try JSONSerialization.jsonObject(with: data) as? [String : Any],
                               let url = json["url"] as? String else { return }
                         UserDefaults.standard.set(url, forKey: "avatar")
-                        completion(true)
+                        print("IMAGE UPLOADED SUCCESSFULY")
+                        DispatchQueue.main.async {
+                            self.delegate?.setImageWith(url: URL(string: url))
+                            self.delegate?.userMayInteract()
+                        }
                     } catch {
-                        print("Error in decoding data from uploading profile image: \(error)")
-                        completion(false)
+                        DispatchQueue.main.async { self.delegate?.userMayInteract() }
+                        print("Error in decoding data in uploading profile image: \(error)")
                     }
                 } else if response.statusCode == 413 {
                     DispatchQueue.main.async {
+                        self.delegate?.userMayInteract()
                         self.delegate?.showErrorAlert(title: "Something went wrong", message: "The size of an image should be less than 10 Mb. This image is too heavy, please choose another one.")
                     }
-                    completion(false)
+                } else if response.statusCode == 401 {
+                    print("TOKEN IS EXPIRED")
+                    APIClient().refresh { (result) in
+                        if result == .success {
+                            print("TOKEN HAS BEEN REFRESHED SUCCESSFULY")
+                            self.uploadImage(imageData: imageData)
+                        } else {
+                            DispatchQueue.main.async { self.delegate?.userMayInteract() }
+                            print("Error in refreshing token while uploading image")
+                        }
+                    }
                 } else {
+                    DispatchQueue.main.async { self.delegate?.userMayInteract() }
                     print("Unexpected error occured: unhandled response status code.")
-                    completion(false)
                 }
             } else if let error = error {
+                DispatchQueue.main.async { self.delegate?.userMayInteract() }
                 print("Error in uploading a profile image: \(error)")
-                completion(false)
             } else {
+                DispatchQueue.main.async { self.delegate?.userMayInteract() }
                 print("Unexpected error occured: data, response, and error are all nil.")
-                completion(false)
             }
         }
     }

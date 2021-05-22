@@ -12,21 +12,29 @@ class ConversationManager {
     private init(){}
     
     func getAllConversations(_ completion: @escaping([Conversation]?) -> Void) {
-        guard let cookie = UserDefaults.standard.string(forKey: "token") else {
-            completion(nil)
-            return
-        }
-        var request = APIRequest(method: .get, path: "chat")
-        request.headers = [HTTPHeader(field: "Cookie", value: "token=\(cookie)")]
+        let request = APIRequest(method: .get, path: "chat")
         
-        APIClient().request(request) { (data, response, error) in
-            if let data = data, let response = response, (200...299).contains(response.statusCode) {
-                do {
-                    let decoder = JSONDecoder()
-                    let conversations = try decoder.decode([Conversation].self, from: data)
-                    completion(conversations)
-                } catch {
-                    print("Error in decoding [Conversation] data: \(error)")
+        APIClient().request(request, isAccessTokenRequired: true) { (data, response, error) in
+            if let data = data, let response = response {
+                if (200...299).contains(response.statusCode) {
+                    do {
+                        let decoder = JSONDecoder()
+                        let conversations = try decoder.decode([Conversation].self, from: data)
+                        completion(conversations)
+                    } catch {
+                        print("Error in decoding [Conversation] data: \(error)")
+                        completion(nil)
+                    }
+                } else if response.statusCode == 401 {
+                    APIClient().refresh { (result) in
+                        if result == .success {
+                            self.getAllConversations { conversations in completion(conversations) }
+                        } else {
+                            completion(nil)
+                        }
+                    }
+                } else {
+                    print("Unexpected error occured: unhandled response status code.")
                     completion(nil)
                 }
             } else if let error = error {

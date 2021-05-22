@@ -13,4 +13,5 @@ extension Notification.Name {
     static let conversationsAreLoadedFromDB = Notification.Name("Conversations are loaded from the database")
     static let temporaryConversationCreated = Notification.Name("A temporary conversation was created")
     static let messageWasSeen = Notification.Name("Our message was seen")
+    static let signOut = Notification.Name("Sign Out")
 }

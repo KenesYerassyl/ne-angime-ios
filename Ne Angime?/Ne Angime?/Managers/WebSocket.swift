@@ -14,8 +14,8 @@ class WebSocket: NSObject{
     
     override init() {
         super.init()
-        guard let token = UserDefaults.standard.string(forKey: "token"),
-              let url = URL(string: "ws://kenesyerassyl-kenesyerassyl-node-chat-app.zeet.app:80/?token=\(token)") else { return }
+        guard let accessToken = UserDefaults.standard.string(forKey: "access_token"),
+              let url = URL(string: "ws://kenesyerassyl-kenesyerassyl-node-chat-app.zeet.app:80/?token=\(accessToken)") else { return }
         self.urlSession = URLSession(configuration: .default, delegate: self, delegateQueue: OperationQueue())
         webSocketTask = urlSession?.webSocketTask(with: url)
     }
@@ -24,8 +24,8 @@ class WebSocket: NSObject{
         urlSession = nil
         webSocketTask = nil
         
-        guard let token = UserDefaults.standard.string(forKey: "token"),
-              let url = URL(string: "ws://kenesyerassyl-kenesyerassyl-node-chat-app.zeet.app:80/?token=\(token)") else { return }
+        guard let accessToken = UserDefaults.standard.string(forKey: "access_token"),
+              let url = URL(string: "ws://kenesyerassyl-kenesyerassyl-node-chat-app.zeet.app:80/?token=\(accessToken)") else { return }
         self.urlSession = URLSession(configuration: .default, delegate: self, delegateQueue: OperationQueue())
         webSocketTask = urlSession?.webSocketTask(with: url)
     }
@@ -59,7 +59,8 @@ class WebSocket: NSObject{
                     fatalError()
                 }
             case .failure(let error):
-                print("Error when receiving \(error)")
+                let EE = error
+//                print("Error when receiving \(error)")
             }
             self.receive()
         })

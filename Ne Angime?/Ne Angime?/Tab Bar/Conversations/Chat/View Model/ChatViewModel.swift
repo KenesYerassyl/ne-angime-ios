@@ -65,21 +65,23 @@ class ChatViewModel {
         do {
             let data = try JSONEncoder().encode(messageWebSocket)
             WebSocket.shared.webSocketTask?.send(.data(data), completionHandler: { (error) in
-                guard let error = error else { return }
-                print("Error in sending data: \(error)")
+                if let error = error {
+                    print("Error in sending data: \(error)")
+                } else {
+                    guard let createdAt = messageWebSocket.createdAt else { fatalError("Message creation time date or message content is nil") }
+                    self.messages.append(MessageMessageKit(
+                        sender: self.currentUser,
+                        messageId: messageWebSocket.messageID,
+                        sentDate: Date(timeIntervalSince1970: createdAt),
+                        kind: .text(text),
+                        isSeen: false
+                    ))
+                    DispatchQueue.main.async { self.delegate?.updateCollectionView() }
+                }
             })
         } catch {
             print("Error in encoding message: \(error)")
         }
-        guard let createdAt = messageWebSocket.createdAt else { fatalError("Message creation time date or message content is nil") }
-        messages.append(MessageMessageKit(
-            sender: currentUser,
-            messageId: messageWebSocket.messageID,
-            sentDate: Date(timeIntervalSince1970: createdAt),
-            kind: .text(text),
-            isSeen: false
-        ))
-        delegate?.updateCollectionView()
     }
     
     @objc private func newMessageToHandle(notification: Notification) {

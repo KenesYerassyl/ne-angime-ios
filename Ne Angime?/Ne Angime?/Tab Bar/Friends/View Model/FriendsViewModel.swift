@@ -10,6 +10,7 @@ import Foundation
 protocol FriendsViewModelDelegate: class {
     func reloadCollectionView()
     func userMayInteract()
+    func statusChange(text: String, hide: Bool)
 }
 
 class FriendsViewModel {
@@ -25,14 +26,21 @@ class FriendsViewModel {
     }
     
     func fetchAllUsers() {
+        users.removeAll()
         UserManager.shared.getAllUsers { [weak self] (newUsers) in
             if let newUsers = newUsers {
                 self?.users = newUsers
                 DispatchQueue.main.async {
+                    self?.delegate?.statusChange(text: "Sorry, you do not have friends yet.", hide: !newUsers.isEmpty)
                     self?.delegate?.userMayInteract()
                     self?.delegate?.reloadCollectionView()
                 }
             } else {
+                DispatchQueue.main.async {
+                    self?.delegate?.statusChange(text: "Sorry, we could not load your friend list.", hide: false)
+                    self?.delegate?.userMayInteract()
+                    self?.delegate?.reloadCollectionView()
+                }
                 print("Unexpected error: new users fetched wrong")
             }
         }

@@ -21,6 +21,8 @@ class FriendsViewController: ViewController {
         temp.register(FriendsCollectionViewCell.self, forCellWithReuseIdentifier: FriendsCollectionViewCell.id)
         return temp
     }()
+    private var refreshControl = UIRefreshControl()
+    private let statusLabel = UILabel()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -30,11 +32,14 @@ class FriendsViewController: ViewController {
         friendsViewModel.delegate = self
         updateCollectionView()
         updateActivityIndicator(self)
+        updateRefreshControl()
+        updateStatusLabel(text: "Sorry, you do not have friends yet.")
+        
         startActivityIndicator()
         friendsViewModel.fetchAllUsers()
     }
     
-    func updateCollectionView() {
+    private func updateCollectionView() {
         view.addSubview(collectionView)
         collectionView.backgroundColor = .clear
         collectionView.snp.makeConstraints { make in
@@ -44,6 +49,34 @@ class FriendsViewController: ViewController {
             make.top.equalTo(view.safeAreaLayoutGuide)
         }
         collectionView.alwaysBounceVertical = true
+    }
+    
+    private func updateRefreshControl() {
+        refreshControl.addTarget(self, action: #selector(refresh), for: .valueChanged)
+        collectionView.addSubview(refreshControl)
+    }
+    
+    func updateStatusLabel(text: String) {
+        collectionView.addSubview(statusLabel)
+        statusLabel.snp.makeConstraints { make in
+            make.centerX.equalTo(collectionView)
+            make.centerY.equalTo(collectionView)
+            make.leading.equalTo(collectionView).offset(10)
+            make.trailing.equalTo(collectionView).offset(-10)
+        }
+        statusLabel.textAlignment = .center
+        statusLabel.font = UIFont(name: "Avenir", size: 20)
+        statusLabel.textColor = .systemGray3
+        statusLabel.text = text
+        statusLabel.isHidden = true
+    }
+}
+//Extension for logic functions
+extension FriendsViewController {
+    @objc private func refresh() {
+        startActivityIndicator()
+        friendsViewModel.fetchAllUsers()
+        refreshControl.endRefreshing()
     }
 }
 
@@ -81,6 +114,11 @@ extension FriendsViewController: UICollectionViewDelegateFlowLayout {
 
 // Extension for view model delegate
 extension FriendsViewController: FriendsViewModelDelegate {
+    func statusChange(text: String, hide: Bool) {
+        statusLabel.text = text
+        statusLabel.isHidden = hide
+    }
+    
     func userMayInteract() {
         stopActivityIndicator()
     }

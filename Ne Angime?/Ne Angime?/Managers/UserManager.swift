@@ -36,24 +36,32 @@ class UserManager {
     }
     
     func getUser(username: String, _ completion: @escaping(User?) -> Void) {
-        guard let cookie = UserDefaults.standard.string(forKey: "token") else {
-            completion(nil)
-            return
-        }
-        var request = APIRequest(method: .get, path: "users/user/\(username)")
-        request.headers = [HTTPHeader(field: "Cookie", value: "token=\(cookie)")]
+        let request = APIRequest(method: .get, path: "users/user/\(username)")
         
-        APIClient().request(request) { (data, response, error) in
-            if let data = data, let response = response, (200...299).contains(response.statusCode) {
-                do {
-                    let userDict = try JSONDecoder().decode([String : User].self, from: data)
-                    guard let user = userDict["user"] else {
+        APIClient().request(request, isAccessTokenRequired: true) { (data, response, error) in
+            if let data = data, let response = response {
+                if (200...299).contains(response.statusCode) {
+                    do {
+                        let userDict = try JSONDecoder().decode([String : User].self, from: data)
+                        guard let user = userDict["user"] else {
+                            completion(nil)
+                            return
+                        }
+                        completion(user)
+                    } catch {
+                        print("Error in decoding a user: \(error)")
                         completion(nil)
-                        return
                     }
-                    completion(user)
-                } catch {
-                    print("Error in decoding a user: \(error)")
+                } else if response.statusCode == 401 {
+                    APIClient().refresh { (result) in
+                        if result == .success {
+                            self.getUser(username: username) { user in completion(user) }
+                        } else {
+                            completion(nil)
+                        }
+                    }
+                } else {
+                    print("Unexpected error occured: unhandled response status code.")
                     completion(nil)
                 }
             } else if let error = error {
@@ -64,24 +72,32 @@ class UserManager {
     }
     
     func getAllUsers(_ completion: @escaping([User]?) -> Void) {
-        guard let cookie = UserDefaults.standard.string(forKey: "token") else {
-            completion(nil)
-            return
-        }
-        var request = APIRequest(method: .get, path: "users/all")
-        request.headers = [HTTPHeader(field: "Cookie", value: "token=\(cookie)")]
-        
-        APIClient().request(request) { (data, response, error) in
-            if let data = data, let response = response, (200...299).contains(response.statusCode) {
-                do {
-                    let userArray = try JSONDecoder().decode([String : [User]].self, from: data)
-                    if let newUsers = userArray["users"] {
-                        completion(newUsers)
-                    } else {
+        let request = APIRequest(method: .get, path: "users/all")
+        APIClient().request(request, isAccessTokenRequired: true) { (data, response, error) in
+            if let data = data, let response = response {
+                if (200...299).contains(response.statusCode) {
+                    do {
+                        let userArray = try JSONDecoder().decode([String : [User]].self, from: data)
+                        if let newUsers = userArray["users"] {
+                            completion(newUsers)
+                        } else {
+                            completion(nil)
+                        }
+                    } catch {
+                        print("Error in decoding [User] data: \(error)")
                         completion(nil)
                     }
-                } catch {
-                    print("Error in decoding [User] data: \(error)")
+                } else if response.statusCode == 401 {
+                    APIClient().refresh { result in
+                        if result == .success {
+                            self.getAllUsers { users in completion(users) }
+                        } else {
+                            print("Failed to refresh token in getting all users.")
+                            completion(nil)
+                        }
+                    }
+                } else {
+                    print("Unexpected error occured in requesting for all users: unhandled response status code \(response.statusCode).")
                     completion(nil)
                 }
             } else if let error = error {

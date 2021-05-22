@@ -41,27 +41,28 @@ class SignUpViewModel2 {
             signUpError(message: "Unexpected error occured")
             return
         }
-        var request = APIRequest(method: .post, path: "auth/register?stage=2")
-        request.headers = [HTTPHeader(field: "Content-Type", value: "application/json")]
+        var request = APIRequest(method: .post, path: "user/auth/register?stage=2")
         request.body = data
         
-        APIClient().request(request) { [weak self] (data, response, error) in
+        APIClient().request(request, isAccessTokenRequired: false) { [weak self] (data, response, error) in
             if let data = data, let response = response,
                let json = try? JSONSerialization.jsonObject(with: data) as? [String : Any] {
-                if let url = response.url,
-                   let allHeadersField = response.allHeaderFields as? [String : String],
-                   (200...299).contains(response.statusCode),
-                   let cookieValue = (HTTPCookie.cookies(withResponseHeaderFields: allHeadersField, for: url)).first?.value,
+                if (200...299).contains(response.statusCode),
                    let userData = json["data"] as? [String : Any],
                    let username = userData["username"],
                    let firstname = userData["firstname"],
                    let lastname = userData["lastname"],
-                   let email = userData["email"] {
+                   let email = userData["email"],
+                   let user_id = userData["user_id"] as? Int,
+                   let accessToken = userData["access_token"],
+                   let refreshToken = userData["refresh_token"] {
                     UserDefaults.standard.set(username, forKey: "username")
                     UserDefaults.standard.set(firstname, forKey: "firstname")
                     UserDefaults.standard.set(lastname, forKey: "lastname")
                     UserDefaults.standard.set(email, forKey: "email")
-                    UserDefaults.standard.set(cookieValue, forKey: "token")
+                    UserDefaults.standard.set(user_id, forKey: "user_id")
+                    UserDefaults.standard.set(accessToken, forKey: "access_token")
+                    UserDefaults.standard.set(refreshToken, forKey: "refresh_token")
                     DispatchQueue.main.async {
                         self?.delegate?.userMayInteract()
                         self?.delegate?.goToMainPage()

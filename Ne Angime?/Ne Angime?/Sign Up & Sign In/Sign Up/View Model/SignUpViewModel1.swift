@@ -20,11 +20,10 @@ class SignUpViewModel1 {
     func signUpStage1(username: String, firstname: String, lastname: String) {
         let signUpData1 = ["username" : username, "firstname" : firstname, "lastname" : lastname]
         guard let data = try? JSONSerialization.data(withJSONObject: signUpData1) else { return }
-        var request = APIRequest(method: .post, path: "auth/register?stage=1")
-        request.headers = [HTTPHeader(field: "Content-Type", value: "application/json")]
+        var request = APIRequest(method: .post, path: "user/auth/register?stage=1")
         request.body = data
         
-        APIClient().request(request) { [weak self] (data, response, error) in
+        APIClient().request(request, isAccessTokenRequired: false) { [weak self] (data, response, error) in
             if let data = data, let response = response {
                 if (200...299).contains(response.statusCode) {
                     DispatchQueue.main.async {

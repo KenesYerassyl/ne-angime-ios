@@ -41,7 +41,7 @@ class FindViewController: ViewController {
         findViewModel.delegate = self
         updateCollectionView()
         updateSearchBar()
-        updateNoResultsLabels()
+        updateStatusLabel(text: "Guess you want to find new friends?")
         updateActivityIndicator(self)
     }
     
@@ -62,17 +62,20 @@ class FindViewController: ViewController {
         searchBar.placeholder = "Type a name here"
         searchBar.searchTextField.addDoneButtonOnKeyboard()
     }
-    
-    func updateNoResultsLabels() {
-        view.addSubview(statusLabel)
+    func updateStatusLabel(text: String) {
+        collectionView.addSubview(statusLabel)
         statusLabel.snp.makeConstraints { make in
-            make.centerX.equalTo(view)
-            make.centerY.equalTo(view)
+            make.centerX.equalTo(collectionView)
+            make.centerY.equalTo(collectionView)
+            make.leading.equalTo(collectionView).offset(10)
+            make.trailing.equalTo(collectionView).offset(-10)
         }
+        statusLabel.textAlignment = .center
         statusLabel.font = UIFont(name: "Avenir", size: 20)
         statusLabel.textColor = .systemGray3
-        statusLabel.text = "Guess you want to find new friends?"
+        statusLabel.text = text
     }
+    
 }
 // Extension for collection view delegate
 extension FindViewController: UICollectionViewDelegate {

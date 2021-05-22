@@ -14,6 +14,19 @@ class TabBarController: UITabBarController {
     private let findViewController = FindViewController()
     private let profileViewController = ProfileViewController()
     
+    init() {
+        super.init(nibName: nil, bundle: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(signOut), name: .signOut, object: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         delegate = self
@@ -68,6 +81,37 @@ class TabBarController: UITabBarController {
     // Action function for ConversationViewController
     @objc private func locationButtonClicked() {
         conversationsViewController.locationButtonClicked()
+    }
+    // Action function for Sign Out
+    @objc func signOut() {
+        if let refreshToken = UserDefaults.standard.string(forKey: "refresh_token"),
+           let data = try? JSONSerialization.data(withJSONObject: ["refresh_token" : refreshToken]) {
+            var deletionRequest = APIRequest(method: .delete, path: "user/auth/logout")
+            deletionRequest.body = data
+            APIClient().request(deletionRequest, isAccessTokenRequired: false) { (_, response, error) in
+                if response != nil{
+                    UserDefaults.standard.removeObject(forKey: "username")
+                    UserDefaults.standard.removeObject(forKey: "firstname")
+                    UserDefaults.standard.removeObject(forKey: "lastname")
+                    UserDefaults.standard.removeObject(forKey: "email")
+                    UserDefaults.standard.removeObject(forKey: "access_token")
+                    UserDefaults.standard.removeObject(forKey: "refresh_token")
+                    UserDefaults.standard.removeObject(forKey: "user_id")
+                    UserDefaults.standard.removeObject(forKey: "avatar")
+                    WebSocket.shared.disconnect()
+                    RealmManager().deleteAll()
+                    DispatchQueue.main.async {
+                        self.navigationController?.popViewController(animated: true)
+                    }
+                } else if let error = error {
+                    print("Error in logging out: \(error)")
+                } else {
+                    print("Unexpected error occured: data, response, and error are all nil.")
+                }
+            }
+        } else {
+            fatalError("Logging out failed: No refresh token or failure in serializing json data")
+        }
     }
 }
 

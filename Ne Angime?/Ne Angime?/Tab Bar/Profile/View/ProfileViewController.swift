@@ -98,8 +98,7 @@ class ProfileViewController: ViewController {
 // Extension for logic functions
 extension ProfileViewController {
     @objc private func signOutButtonDidTap() {
-        profileViewModel.signOut()
-        navigationController?.popViewController(animated: true)
+        NotificationCenter.default.post(name: .signOut, object: nil)
     }
     
     @objc private func didTapProfileImageView() {
@@ -109,6 +108,14 @@ extension ProfileViewController {
 
 // Extension for View Model delegate
 extension ProfileViewController: ProfileViewModelDelegate {
+    func userMayInteract() {
+        stopActivityIndicator()
+    }
+    
+    func setImageWith(url: URL?) {
+        profileImageView.sd_setImage(with: url, placeholderImage: UIImage(named: "profile_placeholder"))
+    }
+    
     func showErrorAlert(title: String, message: String) {
         let alert = UIAlertController(
             title: title,
@@ -171,12 +178,7 @@ extension ProfileViewController: UIImagePickerControllerDelegate, UINavigationCo
         
         startActivityIndicator()
         
-        profileViewModel.uploadImage(imageData: imageData.base64EncodedString()) { [weak self] result in
-            DispatchQueue.main.async {
-                self?.stopActivityIndicator()
-                if result { self?.profileImageView.image = selectedImage }
-            }
-        }
+        profileViewModel.uploadImage(imageData: imageData.base64EncodedString())
     }
     func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
         picker.dismiss(animated: true)
