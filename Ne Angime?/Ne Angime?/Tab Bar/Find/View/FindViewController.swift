@@ -61,6 +61,7 @@ class FindViewController: ViewController {
         view.addSubview(searchBar)
         searchBar.placeholder = "Type a name here"
         searchBar.searchTextField.addDoneButtonOnKeyboard()
+        searchBar.tintColor = UIColor(hex: "#30289f")
     }
     func updateStatusLabel(text: String) {
         collectionView.addSubview(statusLabel)

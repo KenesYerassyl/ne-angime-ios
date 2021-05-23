@@ -144,6 +144,7 @@ extension TabBarController: UITabBarControllerDelegate {
                 target: self,
                 action: #selector(clearButtonClicked)
             )
+            navigationItem.rightBarButtonItem?.tintColor = UIColor(hex: "#30289f")
             navigationItem.titleView = viewController.navigationItem.titleView
         } else {
             navigationController?.setNavigationBarHidden(true, animated: false)

@@ -12,10 +12,6 @@ enum HTTPMethod: String {
     case put = "PUT"
     case post = "POST"
     case delete = "DELETE"
-    case head = "HEAD"
-    case options = "OPTIONS"
-    case trace = "TRACE"
-    case connect = "CONNECT"
 }
 
 struct HTTPHeader {
@@ -96,7 +92,6 @@ struct APIClient {
                        let newRefreshToken = userData["refresh_token"] {
                         UserDefaults.standard.set(newAccessToken, forKey: "access_token")
                         UserDefaults.standard.set(newRefreshToken, forKey: "refresh_token")
-                        print("TOKEN HAS BEEN REFRESHED SUCCESSFULY")
                         completion(.success)
                     } else if response.statusCode == 401 {
                         NotificationCenter.default.post(name: .signOut, object: nil)

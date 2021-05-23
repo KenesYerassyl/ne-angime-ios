@@ -43,11 +43,7 @@ class UserManager {
                 if (200...299).contains(response.statusCode) {
                     do {
                         let userDict = try JSONDecoder().decode([String : User].self, from: data)
-                        guard let user = userDict["user"] else {
-                            completion(nil)
-                            return
-                        }
-                        completion(user)
+                        completion(userDict["user"])
                     } catch {
                         print("Error in decoding a user: \(error)")
                         completion(nil)
@@ -78,11 +74,7 @@ class UserManager {
                 if (200...299).contains(response.statusCode) {
                     do {
                         let userArray = try JSONDecoder().decode([String : [User]].self, from: data)
-                        if let newUsers = userArray["users"] {
-                            completion(newUsers)
-                        } else {
-                            completion(nil)
-                        }
+                        completion(userArray["users"])
                     } catch {
                         print("Error in decoding [User] data: \(error)")
                         completion(nil)
@@ -102,6 +94,34 @@ class UserManager {
                 }
             } else if let error = error {
                 print("Error in getting all users: \(error)")
+                completion(nil)
+            }
+        }
+    }
+    
+    func getAllRelatedUsers(_ completion: @escaping([[User]]?) -> Void) {
+        let request = APIRequest(method: .get, path: "friends/all")
+        APIClient().request(request, isAccessTokenRequired: true) { (data, response, error) in
+            if let data = data, let response = response {
+                if (200...299).contains(response.statusCode) {
+                    do {
+                        let relatedUsersData = try JSONDecoder().decode([String : [String : [User]]].self, from: data)
+                        if let users = relatedUsersData["data"] {
+                            completion([users["friends"] ?? [], users["incoming_requests"] ?? [], users["outcoming_requests"] ?? []])
+                        } else {
+                            print("Error: received data is nil!")
+                            completion(nil)
+                        }
+                    } catch {
+                        print("Error in decoding [[User]] data: \(error)")
+                        completion(nil)
+                    }
+                } else {
+                    print("Unexpected error occured in requesting for all related users: unhandled response status code \(response.statusCode).")
+                    completion(nil)
+                }
+            } else if let error = error {
+                print("Error in getting all related users: \(error)")
                 completion(nil)
             }
         }

@@ -10,43 +10,41 @@ import Foundation
 protocol FriendsViewModelDelegate: class {
     func reloadCollectionView()
     func userMayInteract()
-    func statusChange(text: String, hide: Bool)
+    func statusChange(text: String, isTextChanged: Bool)
 }
 
 class FriendsViewModel {
     weak var delegate: FriendsViewModelDelegate?
     
-    var users = [User]()
+    var users = [[User]](repeating: [User](), count: 3)
     
-    func getNumberOfItems() -> Int {
-        return users.count
+    func getNumberOfItems(at segment: Int) -> Int {
+        return users[segment].count
     }
-    func getUser(at index: Int) -> User {
-        return users[index]
+    func getUser(at segment: Int, at index: Int) -> User {
+        return users[segment][index]
     }
     
-    func fetchAllUsers() {
-        users.removeAll()
-        UserManager.shared.getAllUsers { [weak self] (newUsers) in
-            if let newUsers = newUsers {
-                self?.users = newUsers
-                DispatchQueue.main.async {
-                    self?.delegate?.statusChange(text: "Sorry, you do not have friends yet.", hide: !newUsers.isEmpty)
-                    self?.delegate?.userMayInteract()
-                    self?.delegate?.reloadCollectionView()
-                }
+    func fetchAllRelatedUsers() {
+        users = [[User]](repeating: [User](), count: 3)
+        UserManager.shared.getAllRelatedUsers { [weak self] (relatedUsers) in
+            var isSuccess: Bool
+            if let relatedUsers = relatedUsers {
+                self?.users = relatedUsers
+                isSuccess = true
             } else {
-                DispatchQueue.main.async {
-                    self?.delegate?.statusChange(text: "Sorry, we could not load your friend list.", hide: false)
-                    self?.delegate?.userMayInteract()
-                    self?.delegate?.reloadCollectionView()
-                }
-                print("Unexpected error: new users fetched wrong")
+                isSuccess = false
+                print("Unexpected error: related users fetched wrong")
+            }
+            DispatchQueue.main.async {
+                self?.delegate?.statusChange(text: isSuccess ? "Sorry, this list is empty." : "Sorry, we could not load your this list.", isTextChanged: true)
+                self?.delegate?.userMayInteract()
+                self?.delegate?.reloadCollectionView()
             }
         }
     }
     
-    func getUserImageURL(at index: Int) -> URL? {
-        return URL(string: users[index].avatar ?? "")
+    func getUserImageURL(at segment: Int, at index: Int) -> URL? {
+        return URL(string: users[segment][index].avatar ?? "")
     }
 }

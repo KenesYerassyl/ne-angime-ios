@@ -24,7 +24,6 @@ class ProfileViewModel {
     }
 
     func uploadImage(imageData: String) {
-        print("FUNCTION")
         guard let data = try? JSONSerialization.data(withJSONObject: ["avatar" : imageData]) else {
             DispatchQueue.main.async { self.delegate?.userMayInteract() }
             print("Error in serializing JSON object while uploading image")
@@ -39,7 +38,6 @@ class ProfileViewModel {
                         guard let json = try JSONSerialization.jsonObject(with: data) as? [String : Any],
                               let url = json["url"] as? String else { return }
                         UserDefaults.standard.set(url, forKey: "avatar")
-                        print("IMAGE UPLOADED SUCCESSFULY")
                         DispatchQueue.main.async {
                             self.delegate?.setImageWith(url: URL(string: url))
                             self.delegate?.userMayInteract()
@@ -54,7 +52,6 @@ class ProfileViewModel {
                         self.delegate?.showErrorAlert(title: "Something went wrong", message: "The size of an image should be less than 10 Mb. This image is too heavy, please choose another one.")
                     }
                 } else if response.statusCode == 401 {
-                    print("TOKEN IS EXPIRED")
                     APIClient().refresh { (result) in
                         if result == .success {
                             self.uploadImage(imageData: imageData)

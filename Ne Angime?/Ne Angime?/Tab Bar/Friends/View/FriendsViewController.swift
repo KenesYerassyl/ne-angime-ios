@@ -23,6 +23,7 @@ class FriendsViewController: ViewController {
     }()
     private var refreshControl = UIRefreshControl()
     private let statusLabel = UILabel()
+    private let segmentedControl = UISegmentedControl(items: ["Friends", "Incoming", "Outcoming"])
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -30,13 +31,28 @@ class FriendsViewController: ViewController {
         collectionView.delegate = self
         collectionView.dataSource = self
         friendsViewModel.delegate = self
+        
+        updateSegmentedControl()
         updateCollectionView()
         updateActivityIndicator(self)
         updateRefreshControl()
-        updateStatusLabel(text: "Sorry, you do not have friends yet.")
+        updateStatusLabel(text: "Sorry, this list is empty.")
         
         startActivityIndicator()
-        friendsViewModel.fetchAllUsers()
+        friendsViewModel.fetchAllRelatedUsers()
+    }
+    
+    private func updateSegmentedControl() {
+        view.addSubview(segmentedControl)
+        segmentedControl.snp.makeConstraints { make in
+            make.height.equalTo(30)
+            make.centerX.equalTo(view)
+            make.width.equalTo(UIScreen.main.bounds.width * 0.9)
+            make.top.equalTo(view.safeAreaLayoutGuide)
+        }
+        segmentedControl.selectedSegmentIndex = 0
+        segmentedControl.selectedSegmentTintColor = UIColor(hex: "#8f87ff")
+        segmentedControl.addTarget(self, action: #selector(segmentDidChange), for: .valueChanged)
     }
     
     private func updateCollectionView() {
@@ -46,7 +62,7 @@ class FriendsViewController: ViewController {
             make.leading.equalTo(view)
             make.trailing.equalTo(view)
             make.bottom.equalTo(view)
-            make.top.equalTo(view.safeAreaLayoutGuide)
+            make.top.equalTo(segmentedControl.snp.bottom).offset(5)
         }
         collectionView.alwaysBounceVertical = true
     }
@@ -56,7 +72,7 @@ class FriendsViewController: ViewController {
         collectionView.addSubview(refreshControl)
     }
     
-    func updateStatusLabel(text: String) {
+    private func updateStatusLabel(text: String) {
         collectionView.addSubview(statusLabel)
         statusLabel.snp.makeConstraints { make in
             make.centerX.equalTo(collectionView)
@@ -75,8 +91,13 @@ class FriendsViewController: ViewController {
 extension FriendsViewController {
     @objc private func refresh() {
         startActivityIndicator()
-        friendsViewModel.fetchAllUsers()
+        friendsViewModel.fetchAllRelatedUsers()
         refreshControl.endRefreshing()
+    }
+    
+    @objc private func segmentDidChange() {
+        collectionView.reloadData()
+        statusChange(text: "", isTextChanged: false)
     }
 }
 
@@ -90,15 +111,15 @@ extension FriendsViewController: UICollectionViewDelegate {
 // Extension for collection view data source
 extension FriendsViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return friendsViewModel.getNumberOfItems()
+        return friendsViewModel.getNumberOfItems(at: segmentedControl.selectedSegmentIndex)
     }
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let collectionViewCell = collectionView.dequeueReusableCell(withReuseIdentifier: FriendsCollectionViewCell.id, for: indexPath) as? FriendsCollectionViewCell
         guard let cell = collectionViewCell else { return UICollectionViewCell() }
-        let user = friendsViewModel.getUser(at: indexPath.row)
+        let user = friendsViewModel.getUser(at: segmentedControl.selectedSegmentIndex, at: indexPath.row)
         cell.userNameLabel.text = "\(user.firstname) \(user.lastname)"
         cell.userImageView.sd_setImage(
-            with: friendsViewModel.getUserImageURL(at: indexPath.row),
+            with: friendsViewModel.getUserImageURL(at: segmentedControl.selectedSegmentIndex, at: indexPath.row),
             placeholderImage: UIImage(named: "profile_placeholder")
         )
         return cell
@@ -114,9 +135,9 @@ extension FriendsViewController: UICollectionViewDelegateFlowLayout {
 
 // Extension for view model delegate
 extension FriendsViewController: FriendsViewModelDelegate {
-    func statusChange(text: String, hide: Bool) {
-        statusLabel.text = text
-        statusLabel.isHidden = hide
+    func statusChange(text: String, isTextChanged: Bool) {
+        if isTextChanged { statusLabel.text = text }
+        statusLabel.isHidden = friendsViewModel.getNumberOfItems(at: segmentedControl.selectedSegmentIndex) != 0
     }
     
     func userMayInteract() {
