@@ -57,7 +57,6 @@ class ProfileViewModel {
                     print("TOKEN IS EXPIRED")
                     APIClient().refresh { (result) in
                         if result == .success {
-                            print("TOKEN HAS BEEN REFRESHED SUCCESSFULY")
                             self.uploadImage(imageData: imageData)
                         } else {
                             DispatchQueue.main.async { self.delegate?.userMayInteract() }

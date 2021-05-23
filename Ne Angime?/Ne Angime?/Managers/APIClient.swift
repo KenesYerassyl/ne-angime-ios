@@ -96,6 +96,7 @@ struct APIClient {
                        let newRefreshToken = userData["refresh_token"] {
                         UserDefaults.standard.set(newAccessToken, forKey: "access_token")
                         UserDefaults.standard.set(newRefreshToken, forKey: "refresh_token")
+                        print("TOKEN HAS BEEN REFRESHED SUCCESSFULY")
                         completion(.success)
                     } else if response.statusCode == 401 {
                         NotificationCenter.default.post(name: .signOut, object: nil)
