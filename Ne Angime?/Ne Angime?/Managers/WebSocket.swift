@@ -59,8 +59,7 @@ class WebSocket: NSObject{
                     fatalError()
                 }
             case .failure(let error):
-                let EE = error
-//                print("Error when receiving \(error)")
+                print("Error when receiving \(error)")
             }
             self.receive()
         })

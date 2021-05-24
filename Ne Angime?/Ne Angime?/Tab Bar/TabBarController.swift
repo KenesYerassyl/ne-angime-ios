@@ -88,7 +88,7 @@ class TabBarController: UITabBarController {
            let data = try? JSONSerialization.data(withJSONObject: ["refresh_token" : refreshToken]) {
             var deletionRequest = APIRequest(method: .delete, path: "user/auth/logout")
             deletionRequest.body = data
-            APIClient().request(deletionRequest, isAccessTokenRequired: false) { (_, response, error) in
+            APIClient().request(deletionRequest, isAccessTokenRequired: false) { [weak self] (_, response, error) in
                 if response != nil{
                     UserDefaults.standard.removeObject(forKey: "username")
                     UserDefaults.standard.removeObject(forKey: "firstname")
@@ -101,7 +101,7 @@ class TabBarController: UITabBarController {
                     WebSocket.shared.disconnect()
                     RealmManager().deleteAll()
                     DispatchQueue.main.async {
-                        self.navigationController?.popViewController(animated: true)
+                        self?.navigationController?.popViewController(animated: true)
                     }
                 } else if let error = error {
                     print("Error in logging out: \(error)")

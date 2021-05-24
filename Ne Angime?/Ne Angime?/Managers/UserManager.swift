@@ -38,7 +38,7 @@ class UserManager {
     func getUser(username: String, _ completion: @escaping(User?) -> Void) {
         let request = APIRequest(method: .get, path: "users/user/\(username)")
         
-        APIClient().request(request, isAccessTokenRequired: true) { (data, response, error) in
+        APIClient().request(request, isAccessTokenRequired: true) { [weak self] (data, response, error) in
             if let data = data, let response = response {
                 if (200...299).contains(response.statusCode) {
                     do {
@@ -51,7 +51,7 @@ class UserManager {
                 } else if response.statusCode == 401 {
                     APIClient().refresh { (result) in
                         if result == .success {
-                            self.getUser(username: username) { user in completion(user) }
+                            self?.getUser(username: username) { user in completion(user) }
                         } else {
                             completion(nil)
                         }
@@ -69,7 +69,7 @@ class UserManager {
     
     func getAllUsers(_ completion: @escaping([User]?) -> Void) {
         let request = APIRequest(method: .get, path: "users/all")
-        APIClient().request(request, isAccessTokenRequired: true) { (data, response, error) in
+        APIClient().request(request, isAccessTokenRequired: true) { [weak self] (data, response, error) in
             if let data = data, let response = response {
                 if (200...299).contains(response.statusCode) {
                     do {
@@ -82,7 +82,7 @@ class UserManager {
                 } else if response.statusCode == 401 {
                     APIClient().refresh { result in
                         if result == .success {
-                            self.getAllUsers { users in completion(users) }
+                            self?.getAllUsers { users in completion(users) }
                         } else {
                             print("Failed to refresh token in getting all users.")
                             completion(nil)

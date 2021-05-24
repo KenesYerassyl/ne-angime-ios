@@ -21,7 +21,7 @@ extension UIViewController {
         backButton.snp.makeConstraints { make in
             make.width.equalTo(width * 2)
             make.height.equalTo(height * 2)
-            make.top.equalTo(view.safeAreaLayoutGuide.snp.top).offset(12)
+            make.top.equalTo(view).offset(48)
             make.leading.equalTo(view).offset(24)
         }
         backButton.imageView?.snp.makeConstraints { make in

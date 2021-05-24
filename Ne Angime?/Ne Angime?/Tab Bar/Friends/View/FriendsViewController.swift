@@ -104,7 +104,12 @@ extension FriendsViewController {
 // Extension for collection view delegate
 extension FriendsViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        //TODO: navigate to the user's profile
+        let username = friendsViewModel.getUser(at: segmentedControl.selectedSegmentIndex, at: indexPath.row).username
+        let userProfileViewController = UserProfileViewController(username: username)
+        userProfileViewController.completion = { [weak self] in
+            self?.friendsViewModel.fetchAllRelatedUsers()
+        }
+        navigationController?.pushViewController(userProfileViewController, animated: true)
     }
 }
 

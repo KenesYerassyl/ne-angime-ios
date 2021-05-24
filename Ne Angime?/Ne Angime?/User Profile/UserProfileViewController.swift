@@ -13,16 +13,14 @@ class UserProfileViewController: ViewController {
     private let profileView = UIView()
     private let profileImageView = UIImageView()
     private let userNameLabel = UILabel()
-    private var userFullName: String
-    private var userAvatar: URL?
-    private var username: String
+    private let interactButton = UIButton()
+    var completion: (() -> Void)?
+    internal var username: String
     private let spacing = 24.0
     private let userProfileViewModel = UserProfileViewModel()
     
-    init(username: String, userFullName: String, userAvatar: URL?) {
-        self.userFullName = userFullName
+    init(username: String) {
         self.username = username
-        self.userAvatar = userAvatar
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -33,11 +31,16 @@ class UserProfileViewController: ViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = UIColor(hex: "#30289f")
+        addBackButton(withNormalColor: .normalLight, didTapBackButton: #selector(didTapBackButton))
         userProfileViewModel.delegate = self
         updateUserInfoView()
         updateProfileImageView()
         updateUserNameLabel()
+        updateInteractButton()
         updateActivityIndicator(self)
+        
+        startActivityIndicator()
+        userProfileViewModel.fetchUserProfile()
     }
     
     private func updateUserInfoView() {
@@ -73,7 +76,6 @@ class UserProfileViewController: ViewController {
         profileImageView.layer.masksToBounds = true
         profileImageView.layer.cornerRadius = view.bounds.height * 0.075
         profileImageView.isUserInteractionEnabled = true
-        profileImageView.sd_setImage(with: userAvatar, placeholderImage: UIImage(named: "profile_placeholder"))
     }
     
     private func updateUserNameLabel() {
@@ -83,13 +85,65 @@ class UserProfileViewController: ViewController {
             make.top.equalTo(profileView.snp.bottom).offset(spacing)
         }
         userNameLabel.font = UIFont(name: "Avenir Light", size: 30)
-        userNameLabel.text = self.userFullName
         userNameLabel.textColor = .white
+    }
+    
+    private func updateInteractButton() {
+        view.addSubview(interactButton)
+        interactButton.snp.makeConstraints { make in
+            make.top.equalTo(userInfoView).offset(spacing)
+            make.width.equalTo(UIScreen.main.bounds.width * 0.7)
+            make.centerX.equalTo(view)
+            make.height.equalTo(60)
+        }
+        interactButton.layer.cornerRadius = 20
+        interactButton.titleLabel?.font = UIFont(name: "Avenir", size: 20)
+        interactButton.layer.borderWidth = 1
+        interactButton.layer.borderColor = UIColor(hex: "#30289f").cgColor
+        interactButton.addTarget(self, action: #selector(interactButtonTapped), for: .touchUpInside)
+    }
+}
+// Extension for logic functions
+extension UserProfileViewController {
+    @objc private func interactButtonTapped() {
+        startActivityIndicator()
+        userProfileViewModel.changeRelation()
+    }
+    
+    @objc private func didTapBackButton() {
+        navigationController?.popViewController(animated: true)
     }
 }
 
 // Extension for View Model delegate
 extension UserProfileViewController: UserProfileViewModelDelegate {
+    func setStatus(_ newStatus: FriendStatus, refreshingList: Bool) {
+        switch newStatus {
+        case .friend:
+            interactButton.backgroundColor = UIColor(hex: "#f4f5fa")
+            interactButton.setTitle("Remove from friends", for: .normal)
+            interactButton.setTitleColor(.black, for: .normal)
+        case .incomingRequest:
+            interactButton.backgroundColor = UIColor(hex: "#30289f")
+            interactButton.setTitle("Approve request", for: .normal)
+            interactButton.setTitleColor(.white, for: .normal)
+        case .outcomingRequest:
+            interactButton.backgroundColor = UIColor(hex: "#f4f5fa")
+            interactButton.setTitle("Cancel request", for: .normal)
+            interactButton.setTitleColor(.black, for: .normal)
+        case.noRelation:
+            interactButton.backgroundColor = UIColor(hex: "#30289f")
+            interactButton.setTitle("Send request", for: .normal)
+            interactButton.setTitleColor(.white, for: .normal)
+        }
+        if refreshingList { completion?() }
+    }
+    
+    func setUserProfile(fullName: String, avatar: URL?) {
+        userNameLabel.text = fullName
+        profileImageView.sd_setImage(with: avatar, placeholderImage: UIImage(named: "profile_placeholder"))
+    }
+    
     func showErrorAlert(title: String, message: String) {
         let alert = UIAlertController(
             title: title,
@@ -98,5 +152,8 @@ extension UserProfileViewController: UserProfileViewModelDelegate {
         )
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
         present(alert, animated: true, completion: nil)
+    }
+    func userMayInteract() {
+        stopActivityIndicator()
     }
 }

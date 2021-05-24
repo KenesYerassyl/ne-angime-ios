@@ -14,7 +14,7 @@ class ConversationManager {
     func getAllConversations(_ completion: @escaping([Conversation]?) -> Void) {
         let request = APIRequest(method: .get, path: "chat")
         
-        APIClient().request(request, isAccessTokenRequired: true) { (data, response, error) in
+        APIClient().request(request, isAccessTokenRequired: true) { [weak self] (data, response, error) in
             if let data = data, let response = response {
                 if (200...299).contains(response.statusCode) {
                     do {
@@ -28,7 +28,7 @@ class ConversationManager {
                 } else if response.statusCode == 401 {
                     APIClient().refresh { (result) in
                         if result == .success {
-                            self.getAllConversations { conversations in completion(conversations) }
+                            self?.getAllConversations { conversations in completion(conversations) }
                         } else {
                             completion(nil)
                         }
