@@ -36,7 +36,8 @@ class SignInViewModel {
                    let email = userData["email"],
                    let user_id = userData["user_id"] as? Int,
                    let accessToken = userData["access_token"],
-                   let refreshToken = userData["refresh_token"] {
+                   let refreshToken = userData["refresh_token"],
+                   let isPrivate = userData["is_private"] {
                     UserDefaults.standard.set(username, forKey: "username")
                     UserDefaults.standard.set(firstname, forKey: "firstname")
                     UserDefaults.standard.set(lastname, forKey: "lastname")
@@ -44,8 +45,12 @@ class SignInViewModel {
                     UserDefaults.standard.set(user_id, forKey: "user_id")
                     UserDefaults.standard.set(accessToken, forKey: "access_token")
                     UserDefaults.standard.set(refreshToken, forKey: "refresh_token")
-                    if let avatar = userData["avatar"] as? String {
+                    UserDefaults.standard.set(isPrivate, forKey: "is_private")
+                    if let avatar = userData["avatar"] {
                         UserDefaults.standard.set(avatar, forKey: "avatar")
+                    }
+                    if let bio = userData["about"] {
+                        UserDefaults.standard.set(bio, forKey: "bio")
                     }
                     DispatchQueue.main.async {
                         self?.delegate?.userMayInteract()

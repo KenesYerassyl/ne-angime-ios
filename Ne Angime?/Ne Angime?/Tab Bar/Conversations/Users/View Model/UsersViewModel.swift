@@ -25,15 +25,15 @@ class UsersViewModel {
     }
     
     func fetchAllUsers() {
-        UserManager.shared.getAllUsers { [weak self] (newUsers) in
-            if let newUsers = newUsers {
-                self?.users = newUsers
+        UserManager.shared.getAllRelatedUsers { [weak self] (relatedUsers) in
+            if let relatedUsers = relatedUsers {
+                self?.users = relatedUsers[0]
                 DispatchQueue.main.async {
                     self?.delegate?.userMayInteract()
                     self?.delegate?.reloadCollectionView()
                 }
             } else {
-                print("Unexpected error: new users fetched wrong")
+                print("Unexpected error: relagted users fetched wrong")
             }
         }
     }

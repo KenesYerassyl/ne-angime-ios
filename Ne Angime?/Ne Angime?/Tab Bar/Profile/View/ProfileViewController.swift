@@ -184,7 +184,7 @@ class ProfileViewController: ViewController {
             make.centerX.equalTo(view)
             make.height.equalTo(40)
         }
-        bioLabel.text = "..."
+        bioLabel.text = UserDefaults.standard.string(forKey: "bio") ?? "..."
     }
     
     private func getCoupleLabel() -> (PaddingLabel, PaddingLabel) {

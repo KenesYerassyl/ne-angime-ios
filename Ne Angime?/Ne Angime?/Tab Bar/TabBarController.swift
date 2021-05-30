@@ -98,6 +98,8 @@ class TabBarController: UITabBarController {
                     UserDefaults.standard.removeObject(forKey: "refresh_token")
                     UserDefaults.standard.removeObject(forKey: "user_id")
                     UserDefaults.standard.removeObject(forKey: "avatar")
+                    UserDefaults.standard.removeObject(forKey: "is_private")
+                    UserDefaults.standard.removeObject(forKey: "bio")
                     WebSocket.shared.disconnect()
                     RealmManager().deleteAll()
                     DispatchQueue.main.async {

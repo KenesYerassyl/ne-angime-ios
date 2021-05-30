@@ -50,26 +50,26 @@ class UserProfileViewModel {
     }
     
     func changeRelation() {
-        guard let status = user.status else { fatalError() }
+        guard let status = user.status, let userID = user.userID else { fatalError() }
         var method: HTTPMethod
         var path: String
         var newStatus: FriendStatus
         switch status {
         case .friend:
             method = .delete
-            path = "friends/remove/\(user.userID)"
+            path = "friends/remove/\(userID)"
             newStatus = .incomingRequest
         case .incomingRequest:
             method = .post
-            path = "friends/approve/\(user.userID)"
+            path = "friends/approve/\(userID)"
             newStatus = .friend
         case .outcomingRequest:
             method = .delete
-            path = "friends/cancel_request/\(user.userID)"
+            path = "friends/cancel_request/\(userID)"
             newStatus = .noRelation
         case .noRelation:
             method = .post
-            path = "friends/request/\(user.userID)"
+            path = "friends/request/\(userID)"
             newStatus = .outcomingRequest
         }
         let request = APIRequest(method: method, path: path)

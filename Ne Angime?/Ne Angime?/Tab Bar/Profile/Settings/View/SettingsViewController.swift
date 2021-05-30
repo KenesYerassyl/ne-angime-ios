@@ -51,7 +51,9 @@ extension SettingsViewController: SettingsViewModelDelegate {
 }
 //Extension for collection view delegate
 extension SettingsViewController: UICollectionViewDelegate {
-
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        
+    }
 }
 //Extension for collection view data source
 extension SettingsViewController: UICollectionViewDataSource {

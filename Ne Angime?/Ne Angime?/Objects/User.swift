@@ -21,14 +21,18 @@ struct User: Codable, Equatable {
         lastname: "undefined",
         avatar: nil,
         userID: -1,
-        status: .noRelation
+        status: .noRelation,
+        bio: "",
+        isPrivate: false
     )
     var username: String
     var firstname: String
     var lastname: String
     var avatar: String?
-    var userID: Int
+    var userID: Int?
     var status: FriendStatus?
+    var bio: String?
+    var isPrivate: Bool?
     
     enum CodingKeys: String, CodingKey {
         case username
@@ -37,15 +41,8 @@ struct User: Codable, Equatable {
         case avatar
         case userID = "user_id"
         case status
-    }
-    
-    init(username: String, firstname: String, lastname: String, avatar: String?, userID: Int, status: FriendStatus?) {
-        self.username = username
-        self.firstname = firstname
-        self.lastname = lastname
-        self.avatar = avatar
-        self.userID = userID
-        self.status = status
+        case bio = "about"
+        case isPrivate = "is_private"
     }
     
     static func == (left: User, right: User) -> Bool {
