@@ -40,6 +40,7 @@ class UserProfileViewModel {
                     self?.delegate?.userMayInteract()
                 }
             } else {
+                print("Error: user cannot be got.")
                 DispatchQueue.main.async {
                     self?.delegate?.userMayInteract()
                     self?.delegate?.showErrorAlert(title: "Something went wrong.", message: "Please, try again later!")
@@ -85,11 +86,11 @@ class UserProfileViewModel {
                         if result == .success {
                             self?.changeRelation()
                         } else {
+                            print("Error in refreshing token while uploading image")
                             DispatchQueue.main.async {
                                 self?.delegate?.userMayInteract()
                                 self?.delegate?.showErrorAlert(title: "Something went wrong", message: "Please, try again later!")
                             }
-                            print("Error in refreshing token while uploading image")
                         }
                     }
                 } else {
@@ -99,25 +100,25 @@ class UserProfileViewModel {
                             self?.delegate?.showErrorAlert(title: "Something went wrong", message: message)
                         }
                     } else {
+                        print("Unexpected error occured: failed to decode message.")
                         DispatchQueue.main.async {
                             self?.delegate?.userMayInteract()
                             self?.delegate?.showErrorAlert(title: "Something went wrong", message: "Please, try again later!")
                         }
-                        print("Unexpected error occured: failed to decode message.")
                     }
                 }
             } else if let error = error {
-                DispatchQueue.main.async {
-                    self?.delegate?.userMayInteract()
-                    self?.delegate?.showErrorAlert(title: "Something went wrong", message: "Please, try again later!")
-                }
                 print("Error in uploading a profile image: \(error)")
-            } else {
                 DispatchQueue.main.async {
                     self?.delegate?.userMayInteract()
                     self?.delegate?.showErrorAlert(title: "Something went wrong", message: "Please, try again later!")
                 }
+            } else {
                 print("Unexpected error occured: data, response, and error are all nil.")
+                DispatchQueue.main.async {
+                    self?.delegate?.userMayInteract()
+                    self?.delegate?.showErrorAlert(title: "Something went wrong", message: "Please, try again later!")
+                }
             }
         }
     }

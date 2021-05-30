@@ -43,7 +43,7 @@ class UserManager {
                 if (200...299).contains(response.statusCode) {
                     do {
                         let userDict = try JSONDecoder().decode([String : User].self, from: data)
-                        completion(userDict["user"])
+                        completion(userDict["data"])
                     } catch {
                         print("Error in decoding a user: \(error)")
                         completion(nil)
@@ -53,6 +53,7 @@ class UserManager {
                         if result == .success {
                             self?.getUser(username: username) { user in completion(user) }
                         } else {
+                            print("Error: failure in refreshing tokens.")
                             completion(nil)
                         }
                     }

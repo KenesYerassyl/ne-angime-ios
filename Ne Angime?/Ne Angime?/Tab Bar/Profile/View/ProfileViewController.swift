@@ -14,10 +14,15 @@ class ProfileViewController: ViewController {
     private let userInfoView = UIView()
     private let profileView = UIView()
     private let profileImageView = UIImageView()
-    private let userNameLabel = UILabel()
+    private let userFullNameLabel = UILabel()
     private let signOutButton = UIButton()
+    private let settingsButton = UIButton()
     private let spacing = 24.0
     private let profileViewModel = ProfileViewModel()
+    private var usernameLabel: PaddingLabel!
+    private var emailLabel: PaddingLabel!
+    private var bioLabel: PaddingLabel!
+
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -25,9 +30,19 @@ class ProfileViewController: ViewController {
         profileViewModel.delegate = self
         updateUserInfoView()
         updateProfileImageView()
-        updateUserNameLabel()
+        updateFullUserNameLabel()
         updateSignOutButton()
+        updateSettingsButton()
+        updateUsernameLabel()
+        updateEmailLabel()
+        updateBioLabel()
         updateActivityIndicator(self)
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.navigationBar.prefersLargeTitles = false
+        navigationController?.setNavigationBarHidden(true, animated: false)
     }
     
     private func updateUserInfoView() {
@@ -69,16 +84,16 @@ class ProfileViewController: ViewController {
         profileImageView.sd_setImage(with: url, placeholderImage: UIImage(named: "profile_placeholder"))
     }
     
-    private func updateUserNameLabel() {
-        view.addSubview(userNameLabel)
-        userNameLabel.snp.makeConstraints { make in
+    private func updateFullUserNameLabel() {
+        view.addSubview(userFullNameLabel)
+        userFullNameLabel.snp.makeConstraints { make in
             make.centerX.equalTo(view)
             make.top.equalTo(profileView.snp.bottom).offset(spacing)
         }
-        userNameLabel.font = UIFont(name: "Avenir Light", size: 30)
+        userFullNameLabel.font = UIFont(name: "Avenir Light", size: 30)
         let userFullName = profileViewModel.getUserFullName()
-        userNameLabel.text = "\(userFullName.0) \(userFullName.1)"
-        userNameLabel.textColor = .white
+        userFullNameLabel.text = "\(userFullName.0) \(userFullName.1)"
+        userFullNameLabel.textColor = .white
     }
     
     private func updateSignOutButton() {
@@ -93,6 +108,99 @@ class ProfileViewController: ViewController {
         signOutButton.setImage(UIImage(named: "sign_out_icon_tapped"), for: .highlighted)
         signOutButton.addTarget(self, action: #selector(signOutButtonDidTap), for: .touchUpInside)
     }
+    
+    private func updateSettingsButton() {
+        view.addSubview(settingsButton)
+        settingsButton.snp.makeConstraints { make in
+            make.width.equalTo(30)
+            make.height.equalTo(30)
+            make.top.equalTo(view.safeAreaLayoutGuide.snp.top).offset(spacing / 2)
+            make.leading.equalTo(view).offset(spacing)
+        }
+        settingsButton.setImage(UIImage(named: "settings_icon_normal"), for: .normal)
+        settingsButton.setImage(UIImage(named: "settings_icon_tapped"), for: .highlighted)
+        settingsButton.addTarget(self, action: #selector(settingsButtonDidTap), for: .touchUpInside)
+    }
+    
+    private func updateUsernameLabel() {
+        let coupleLabel = getCoupleLabel()
+        view.addSubview(coupleLabel.0)
+        coupleLabel.0.snp.makeConstraints { make in
+            make.width.equalTo(UIScreen.main.bounds.width * 0.85)
+            make.top.equalTo(userInfoView).offset(spacing)
+            make.centerX.equalTo(view)
+            make.height.equalTo(20)
+        }
+        coupleLabel.0.text = "Username"
+        usernameLabel = coupleLabel.1
+        view.addSubview(usernameLabel)
+        usernameLabel.snp.makeConstraints { make in
+            make.width.equalTo(UIScreen.main.bounds.width * 0.85)
+            make.top.equalTo(coupleLabel.0.snp.bottom).offset(spacing/2)
+            make.centerX.equalTo(view)
+            make.height.equalTo(40)
+        }
+        guard let username = UserDefaults.standard.string(forKey: "username") else { fatalError() }
+        usernameLabel.text = username
+    }
+    
+    private func updateEmailLabel() {
+        let coupleLabel = getCoupleLabel()
+        view.addSubview(coupleLabel.0)
+        coupleLabel.0.snp.makeConstraints { make in
+            make.width.equalTo(UIScreen.main.bounds.width * 0.85)
+            make.top.equalTo(usernameLabel.snp.bottom).offset(spacing)
+            make.centerX.equalTo(view)
+            make.height.equalTo(20)
+        }
+        coupleLabel.0.text = "Email"
+        emailLabel = coupleLabel.1
+        view.addSubview(emailLabel)
+        emailLabel.snp.makeConstraints { make in
+            make.width.equalTo(UIScreen.main.bounds.width * 0.85)
+            make.top.equalTo(coupleLabel.0.snp.bottom).offset(spacing/2)
+            make.centerX.equalTo(view)
+            make.height.equalTo(40)
+        }
+        guard let email = UserDefaults.standard.string(forKey: "email") else { fatalError() }
+        emailLabel.text = email
+    }
+    
+    private func updateBioLabel() {
+        let coupleLabel = getCoupleLabel()
+        view.addSubview(coupleLabel.0)
+        coupleLabel.0.snp.makeConstraints { make in
+            make.width.equalTo(UIScreen.main.bounds.width * 0.85)
+            make.top.equalTo(emailLabel.snp.bottom).offset(spacing)
+            make.centerX.equalTo(view)
+            make.height.equalTo(20)
+        }
+        coupleLabel.0.text = "Bio"
+        bioLabel = coupleLabel.1
+        view.addSubview(bioLabel)
+        bioLabel.snp.makeConstraints { make in
+            make.width.equalTo(UIScreen.main.bounds.width * 0.85)
+            make.top.equalTo(coupleLabel.0.snp.bottom).offset(spacing/2)
+            make.centerX.equalTo(view)
+            make.height.equalTo(40)
+        }
+        bioLabel.text = "..."
+    }
+    
+    private func getCoupleLabel() -> (PaddingLabel, PaddingLabel) {
+        let titleLabel = PaddingLabel()
+        titleLabel.font = UIFont(name: "Avenir Black", size: 20)
+        let infoLabel = PaddingLabel()
+        infoLabel.font = UIFont(name: "Avenir Heavy", size: 20)
+        infoLabel.layer.cornerRadius = 15
+        infoLabel.layer.masksToBounds = true
+        infoLabel.padding(0, 0, 10, 10)
+        infoLabel.textAlignment = .left
+        infoLabel.numberOfLines = 0
+        infoLabel.sizeToFit()
+        infoLabel.backgroundColor = UIColor(hex: "#eeedfc")
+        return (titleLabel, infoLabel)
+    }
 }
 
 // Extension for logic functions
@@ -103,6 +211,14 @@ extension ProfileViewController {
     
     @objc private func didTapProfileImageView() {
         profileImageViewActionSheet()
+    }
+    
+    @objc private func settingsButtonDidTap() {
+        let settingsViewController = SettingsViewController()
+        settingsViewController.title = "Settings"
+        navigationController?.navigationBar.prefersLargeTitles = true
+        navigationController?.setNavigationBarHidden(false, animated: false)
+        navigationController?.pushViewController(settingsViewController, animated: true)
     }
 }
 
