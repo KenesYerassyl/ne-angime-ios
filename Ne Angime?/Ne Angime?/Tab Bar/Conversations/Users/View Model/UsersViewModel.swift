@@ -23,7 +23,6 @@ class UsersViewModel {
     func getUser(at index: Int) -> User {
         return users[index]
     }
-    
     func fetchAllUsers() {
         UserManager.shared.getAllRelatedUsers { [weak self] (relatedUsers) in
             if let relatedUsers = relatedUsers {

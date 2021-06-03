@@ -8,7 +8,8 @@
 import Foundation
 
 protocol SettingsViewModelDelegate: class {
-    
+    func reloadCollectionView()
+    func userMayInteract()
 }
 
 struct SettingsSection {
@@ -25,47 +26,7 @@ struct SettingsItem {
 
 class SettingsViewModel {
     var delegate: SettingsViewModelDelegate?
-    let settingsSections: [SettingsSection] = [
-        SettingsSection(name: "Account", items: [
-            SettingsItem(
-                title: "Bio",
-                data: nil,
-                hasToggle: false,
-                iconImageName: "bio_icon_normal"
-            ),
-            SettingsItem(
-                title: "Email",
-                data: UserDefaults.standard.string(forKey: "email") ?? "undefined",
-                hasToggle: false,
-                iconImageName: "email_icon_normal"
-            ),
-            SettingsItem(
-                title: "First Name",
-                data: UserDefaults.standard.string(forKey: "firstname") ?? "undefined",
-                hasToggle: false,
-                iconImageName: "firstname_icon_normal"
-            ),
-            SettingsItem(
-                title: "Last Name",
-                data: UserDefaults.standard.string(forKey: "lastname") ?? "undefined",
-                hasToggle: false,
-                iconImageName: "lastname_icon_normal"
-            ),
-            SettingsItem(
-                title: "Password",
-                data: nil,
-                hasToggle: false,
-                iconImageName: "password_icon_normal"
-            )
-        ]),
-        SettingsSection(name: "Privacy", items: [
-            SettingsItem(
-                title: "Private account",
-                data: "Hides your account from strangers",
-                hasToggle: true,
-                iconImageName: "private_mode_icon_normal")
-        ])
-    ]
+    var settingsSections = [SettingsSection]()
     
     func getNumberOfItems(at section: Int) -> Int {
         return settingsSections[section].items.count
@@ -81,5 +42,51 @@ class SettingsViewModel {
     
     func getSectionAt(indexPath: IndexPath) -> SettingsSection {
         return settingsSections[indexPath.section]
+    }
+    
+    func fetchSettingsInformation() {
+        settingsSections = [
+            SettingsSection(name: "Account", items: [
+                SettingsItem(
+                    title: "Bio",
+                    data: nil,
+                    hasToggle: false,
+                    iconImageName: "bio_icon_normal"
+                ),
+                SettingsItem(
+                    title: "Email",
+                    data: UserDefaults.standard.string(forKey: "email") ?? "undefined",
+                    hasToggle: false,
+                    iconImageName: "email_icon_normal"
+                ),
+                SettingsItem(
+                    title: "First Name",
+                    data: UserDefaults.standard.string(forKey: "firstname") ?? "undefined",
+                    hasToggle: false,
+                    iconImageName: "firstname_icon_normal"
+                ),
+                SettingsItem(
+                    title: "Last Name",
+                    data: UserDefaults.standard.string(forKey: "lastname") ?? "undefined",
+                    hasToggle: false,
+                    iconImageName: "lastname_icon_normal"
+                ),
+                SettingsItem(
+                    title: "Password",
+                    data: nil,
+                    hasToggle: false,
+                    iconImageName: "password_icon_normal"
+                )
+            ]),
+            SettingsSection(name: "Privacy", items: [
+                SettingsItem(
+                    title: "Private account",
+                    data: "Hides your account from strangers",
+                    hasToggle: true,
+                    iconImageName: "private_mode_icon_normal")
+            ])
+        ]
+        delegate?.userMayInteract()
+        delegate?.reloadCollectionView()
     }
 }

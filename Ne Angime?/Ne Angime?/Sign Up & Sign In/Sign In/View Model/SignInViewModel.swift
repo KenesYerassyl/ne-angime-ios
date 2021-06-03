@@ -64,7 +64,7 @@ class SignInViewModel {
                 }
             } else if let error = error {
                 print("Error in signing in: \(error)")
-                self?.signInError(message: error.localizedDescription)
+                self?.signInError(message: "Unexpected error occured")
             } else {
                 print("Unexpected error occured: data, response, and error are all nil.")
                 self?.signInError(message: "Unexpected error occured")

@@ -11,6 +11,7 @@ import SDWebImage
 
 class ProfileViewController: ViewController {
     
+    private let scrollView = UIScrollView()
     private let userInfoView = UIView()
     private let profileView = UIView()
     private let profileImageView = UIImageView()
@@ -22,12 +23,13 @@ class ProfileViewController: ViewController {
     private var usernameLabel: PaddingLabel!
     private var emailLabel: PaddingLabel!
     private var bioLabel: PaddingLabel!
-
+    private var refreshControl = UIRefreshControl()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = UIColor(hex: "#30289f")
         profileViewModel.delegate = self
+        updateScrollView()
         updateUserInfoView()
         updateProfileImageView()
         updateFullUserNameLabel()
@@ -37,6 +39,9 @@ class ProfileViewController: ViewController {
         updateEmailLabel()
         updateBioLabel()
         updateActivityIndicator(self)
+        updateRefreshControl()
+        
+        profileViewModel.fetchProfileInformation()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -45,23 +50,41 @@ class ProfileViewController: ViewController {
         navigationController?.setNavigationBarHidden(true, animated: false)
     }
     
+    private func updateScrollView() {
+        view.addSubview(scrollView)
+        scrollView.backgroundColor = .clear
+        scrollView.snp.makeConstraints { make in
+            make.bottom.equalTo(view)
+            make.top.equalTo(view)
+            make.leading.equalTo(view)
+            make.trailing.equalTo(view)
+            make.centerX.equalTo(view)
+            make.centerY.equalTo(view)
+            make.width.equalTo(view)
+            make.height.equalTo(view)
+        }
+        scrollView.alwaysBounceVertical = true
+        scrollView.bounces = true
+        scrollView.isScrollEnabled = true
+    }
+    
     private func updateUserInfoView() {
-        view.addSubview(userInfoView)
+        scrollView.addSubview(userInfoView)
         userInfoView.backgroundColor = .white
         userInfoView.snp.makeConstraints { make in
-            make.width.equalTo(view)
+            make.width.equalTo(scrollView)
             make.height.equalTo(view.bounds.height * 0.6)
-            make.bottom.equalTo(view)
+            make.top.equalTo(scrollView).offset(view.bounds.height * 0.4)
         }
         userInfoView.layer.cornerRadius = 30
     }
     
     private func updateProfileImageView() {
-        view.addSubview(profileView)
+        scrollView.addSubview(profileView)
         profileView.addSubview(profileImageView)
         profileView.backgroundColor = .gray
         profileView.snp.makeConstraints { make in
-            make.centerX.equalTo(view)
+            make.centerX.equalTo(scrollView)
             make.width.equalTo(view.bounds.height * 0.2)
             make.height.equalTo(view.bounds.height * 0.2)
             make.centerY.equalTo(userInfoView.snp.top).offset(-4.2*spacing - 0.1 * Double(view.bounds.height))
@@ -70,7 +93,7 @@ class ProfileViewController: ViewController {
         
         profileImageView.backgroundColor = .white
         profileImageView.snp.makeConstraints { make in
-            make.centerX.equalTo(view)
+            make.centerX.equalTo(scrollView)
             make.width.equalTo(view.bounds.height * 0.19)
             make.height.equalTo(view.bounds.height * 0.19)
             make.centerY.equalTo(userInfoView.snp.top).offset(-4.2*spacing - 0.1 * Double(view.bounds.height))
@@ -80,19 +103,15 @@ class ProfileViewController: ViewController {
         profileImageView.isUserInteractionEnabled = true
         let gesture = UITapGestureRecognizer(target: self, action: #selector(didTapProfileImageView))
         profileImageView.addGestureRecognizer(gesture)
-        let url = URL(string: UserDefaults.standard.string(forKey: "avatar") ?? "")
-        profileImageView.sd_setImage(with: url, placeholderImage: UIImage(named: "profile_placeholder"))
     }
     
     private func updateFullUserNameLabel() {
-        view.addSubview(userFullNameLabel)
+        scrollView.addSubview(userFullNameLabel)
         userFullNameLabel.snp.makeConstraints { make in
-            make.centerX.equalTo(view)
+            make.centerX.equalTo(scrollView)
             make.top.equalTo(profileView.snp.bottom).offset(spacing)
         }
         userFullNameLabel.font = UIFont(name: "Avenir Light", size: 30)
-        let userFullName = profileViewModel.getUserFullName()
-        userFullNameLabel.text = "\(userFullName.0) \(userFullName.1)"
         userFullNameLabel.textColor = .white
     }
     
@@ -124,67 +143,62 @@ class ProfileViewController: ViewController {
     
     private func updateUsernameLabel() {
         let coupleLabel = getCoupleLabel()
-        view.addSubview(coupleLabel.0)
+        scrollView.addSubview(coupleLabel.0)
         coupleLabel.0.snp.makeConstraints { make in
             make.width.equalTo(UIScreen.main.bounds.width * 0.85)
             make.top.equalTo(userInfoView).offset(spacing)
-            make.centerX.equalTo(view)
+            make.centerX.equalTo(scrollView)
             make.height.equalTo(20)
         }
         coupleLabel.0.text = "Username"
         usernameLabel = coupleLabel.1
-        view.addSubview(usernameLabel)
+        scrollView.addSubview(usernameLabel)
         usernameLabel.snp.makeConstraints { make in
             make.width.equalTo(UIScreen.main.bounds.width * 0.85)
             make.top.equalTo(coupleLabel.0.snp.bottom).offset(spacing/2)
-            make.centerX.equalTo(view)
+            make.centerX.equalTo(scrollView)
             make.height.equalTo(40)
         }
-        guard let username = UserDefaults.standard.string(forKey: "username") else { fatalError() }
-        usernameLabel.text = username
     }
     
     private func updateEmailLabel() {
         let coupleLabel = getCoupleLabel()
-        view.addSubview(coupleLabel.0)
+        scrollView.addSubview(coupleLabel.0)
         coupleLabel.0.snp.makeConstraints { make in
             make.width.equalTo(UIScreen.main.bounds.width * 0.85)
             make.top.equalTo(usernameLabel.snp.bottom).offset(spacing)
-            make.centerX.equalTo(view)
+            make.centerX.equalTo(scrollView)
             make.height.equalTo(20)
         }
         coupleLabel.0.text = "Email"
         emailLabel = coupleLabel.1
-        view.addSubview(emailLabel)
+        scrollView.addSubview(emailLabel)
         emailLabel.snp.makeConstraints { make in
             make.width.equalTo(UIScreen.main.bounds.width * 0.85)
             make.top.equalTo(coupleLabel.0.snp.bottom).offset(spacing/2)
-            make.centerX.equalTo(view)
+            make.centerX.equalTo(scrollView)
             make.height.equalTo(40)
         }
-        guard let email = UserDefaults.standard.string(forKey: "email") else { fatalError() }
-        emailLabel.text = email
     }
     
     private func updateBioLabel() {
         let coupleLabel = getCoupleLabel()
-        view.addSubview(coupleLabel.0)
+        scrollView.addSubview(coupleLabel.0)
         coupleLabel.0.snp.makeConstraints { make in
             make.width.equalTo(UIScreen.main.bounds.width * 0.85)
             make.top.equalTo(emailLabel.snp.bottom).offset(spacing)
-            make.centerX.equalTo(view)
+            make.centerX.equalTo(scrollView)
             make.height.equalTo(20)
         }
         coupleLabel.0.text = "Bio"
         bioLabel = coupleLabel.1
-        view.addSubview(bioLabel)
+        scrollView.addSubview(bioLabel)
         bioLabel.snp.makeConstraints { make in
             make.width.equalTo(UIScreen.main.bounds.width * 0.85)
             make.top.equalTo(coupleLabel.0.snp.bottom).offset(spacing/2)
-            make.centerX.equalTo(view)
+            make.centerX.equalTo(scrollView)
             make.height.equalTo(40)
         }
-        bioLabel.text = UserDefaults.standard.string(forKey: "bio") ?? "..."
     }
     
     private func getCoupleLabel() -> (PaddingLabel, PaddingLabel) {
@@ -201,10 +215,20 @@ class ProfileViewController: ViewController {
         infoLabel.backgroundColor = UIColor(hex: "#eeedfc")
         return (titleLabel, infoLabel)
     }
+    private func updateRefreshControl() {
+        refreshControl.addTarget(self, action: #selector(refresh), for: .valueChanged)
+        scrollView.addSubview(refreshControl)
+    }
 }
 
 // Extension for logic functions
 extension ProfileViewController {
+    @objc private func refresh() {
+        startActivityIndicator()
+        profileViewModel.fetchProfileInformation()
+        refreshControl.endRefreshing()
+    }
+    
     @objc private func signOutButtonDidTap() {
         NotificationCenter.default.post(name: .signOut, object: nil)
     }
@@ -215,6 +239,9 @@ extension ProfileViewController {
     
     @objc private func settingsButtonDidTap() {
         let settingsViewController = SettingsViewController()
+        settingsViewController.completion = { [weak self] in
+            self?.refresh()
+        }
         settingsViewController.title = "Settings"
         navigationController?.navigationBar.prefersLargeTitles = true
         navigationController?.setNavigationBarHidden(false, animated: false)
@@ -224,6 +251,14 @@ extension ProfileViewController {
 
 // Extension for View Model delegate
 extension ProfileViewController: ProfileViewModelDelegate {
+    func updateProfilePage(url: URL?, fullname: String, username: String, email: String, bio: String) {
+        profileImageView.sd_setImage(with: url, placeholderImage: UIImage(named: "profile_placeholder"))
+        userFullNameLabel.text = fullname
+        usernameLabel.text = username
+        emailLabel.text = email
+        bioLabel.text = bio
+        stopActivityIndicator()
+    }
     func userMayInteract() {
         stopActivityIndicator()
     }

@@ -35,6 +35,8 @@
 		8776CFFA260A02CC004C7B25 /* UsersCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8776CFF9260A02CC004C7B25 /* UsersCollectionViewCell.swift */; };
 		8776D002260A02EA004C7B25 /* UsersViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8776D001260A02EA004C7B25 /* UsersViewModel.swift */; };
 		877F994025DA89C7009761A3 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 877F993F25DA89C7009761A3 /* User.swift */; };
+		878C9F002669177F00F9DF1B /* ChangeAccountDataViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 878C9EFF2669177F00F9DF1B /* ChangeAccountDataViewController.swift */; };
+		878C9F0A266928E300F9DF1B /* ChangeAccountDataViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 878C9F09266928E300F9DF1B /* ChangeAccountDataViewModel.swift */; };
 		879A7F1825D7BFBD00C70171 /* ConversationsCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 879A7F1725D7BFBD00C70171 /* ConversationsCollectionViewCell.swift */; };
 		879A7F1E25D7CB0E00C70171 /* UIColor+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 879A7F1D25D7CB0E00C70171 /* UIColor+Extension.swift */; };
 		879A7F2625D7DD5500C70171 /* FriendsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 879A7F2525D7DD5500C70171 /* FriendsViewController.swift */; };
@@ -130,6 +132,8 @@
 		8776CFF9260A02CC004C7B25 /* UsersCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsersCollectionViewCell.swift; sourceTree = "<group>"; };
 		8776D001260A02EA004C7B25 /* UsersViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsersViewModel.swift; sourceTree = "<group>"; };
 		877F993F25DA89C7009761A3 /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
+		878C9EFF2669177F00F9DF1B /* ChangeAccountDataViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChangeAccountDataViewController.swift; sourceTree = "<group>"; };
+		878C9F09266928E300F9DF1B /* ChangeAccountDataViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChangeAccountDataViewModel.swift; sourceTree = "<group>"; };
 		879A7F1725D7BFBD00C70171 /* ConversationsCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationsCollectionViewCell.swift; sourceTree = "<group>"; };
 		879A7F1D25D7CB0E00C70171 /* UIColor+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor+Extension.swift"; sourceTree = "<group>"; };
 		879A7F2525D7DD5500C70171 /* FriendsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FriendsViewController.swift; sourceTree = "<group>"; };
@@ -394,6 +398,31 @@
 			path = Managers;
 			sourceTree = "<group>";
 		};
+		878C9EFE2669174400F9DF1B /* ChangeAccountData */ = {
+			isa = PBXGroup;
+			children = (
+				878C9F08266928CF00F9DF1B /* View Model */,
+				878C9F07266928CA00F9DF1B /* View */,
+			);
+			path = ChangeAccountData;
+			sourceTree = "<group>";
+		};
+		878C9F07266928CA00F9DF1B /* View */ = {
+			isa = PBXGroup;
+			children = (
+				878C9EFF2669177F00F9DF1B /* ChangeAccountDataViewController.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		878C9F08266928CF00F9DF1B /* View Model */ = {
+			isa = PBXGroup;
+			children = (
+				878C9F09266928E300F9DF1B /* ChangeAccountDataViewModel.swift */,
+			);
+			path = "View Model";
+			sourceTree = "<group>";
+		};
 		879A7F1C25D7CAFC00C70171 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
@@ -615,6 +644,7 @@
 		87FF061E265D4EA600B0F708 /* Settings */ = {
 			isa = PBXGroup;
 			children = (
+				878C9EFE2669174400F9DF1B /* ChangeAccountData */,
 				87FF0620265D4EB300B0F708 /* View Model */,
 				87FF061F265D4EAD00B0F708 /* View */,
 			);
@@ -878,6 +908,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				878C9F002669177F00F9DF1B /* ChangeAccountDataViewController.swift in Sources */,
 				87E7C5922663D4CA0076E4F3 /* SettingsFooterView.swift in Sources */,
 				879A7F2625D7DD5500C70171 /* FriendsViewController.swift in Sources */,
 				87EA165025DD38AC00F2F9F5 /* ChatViewModel.swift in Sources */,
@@ -886,6 +917,7 @@
 				87EE868C25D9476D00F89605 /* SignUpViewModel1.swift in Sources */,
 				879A7F5625D82CDE00C70171 /* SignInViewModel.swift in Sources */,
 				8729777A25E24B1B00F0EC72 /* Notification+Extension.swift in Sources */,
+				878C9F0A266928E300F9DF1B /* ChangeAccountDataViewModel.swift in Sources */,
 				870E92BA25F2B95000ECB435 /* Sender.swift in Sources */,
 				87CAFC8925F3DD3900FE25F8 /* Message.swift in Sources */,
 				87D9E6E3261CD51300E3DA01 /* Results+Extension.swift in Sources */,

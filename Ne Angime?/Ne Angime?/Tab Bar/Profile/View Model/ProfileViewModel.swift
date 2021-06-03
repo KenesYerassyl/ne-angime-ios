@@ -11,18 +11,30 @@ protocol ProfileViewModelDelegate: class {
     func showErrorAlert(title: String, message: String)
     func setImageWith(url: URL?)
     func userMayInteract()
+    func updateProfilePage(url: URL?, fullname: String, username: String, email: String, bio: String)
 }
 
 class ProfileViewModel {
 
     weak var delegate: ProfileViewModelDelegate?
     
-    func getUserFullName() -> (String, String) {
+    private func getUserFullName() -> (String, String) {
         guard let firstname = UserDefaults.standard.string(forKey: "firstname"),
               let lastname = UserDefaults.standard.string(forKey: "lastname") else { return ("undefined", "undefined") }
         return ("\(firstname)", "\(lastname)")
     }
-
+    
+    func fetchProfileInformation() {
+        let nameCouple = getUserFullName()
+        delegate?.updateProfilePage(
+            url: URL(string: UserDefaults.standard.string(forKey: "avatar") ?? ""),
+            fullname: "\(nameCouple.0) \(nameCouple.1)",
+            username: { guard let temp = UserDefaults.standard.string(forKey: "username") else { fatalError() }; return temp }(),
+            email: { guard let temp = UserDefaults.standard.string(forKey: "email") else { fatalError() }; return temp }(),
+            bio: UserDefaults.standard.string(forKey: "bio") ?? ""
+        )
+    }
+    
     func uploadImage(imageData: String) {
         guard let data = try? JSONSerialization.data(withJSONObject: ["avatar" : imageData]) else {
             DispatchQueue.main.async {

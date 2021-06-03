@@ -23,6 +23,8 @@ class SettingsViewController: ViewController {
         return temp
     }()
     private let settingsViewModel = SettingsViewModel()
+    var completion: (() -> Void)?
+    private var refreshControl = UIRefreshControl()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -31,6 +33,8 @@ class SettingsViewController: ViewController {
         collectionView.delegate = self
         collectionView.dataSource = self
         updateCollectionView()
+        updateRefreshControl()
+        settingsViewModel.fetchSettingsInformation()
     }
     
     func updateCollectionView() {
@@ -43,16 +47,48 @@ class SettingsViewController: ViewController {
             make.top.equalTo(view.safeAreaLayoutGuide).offset(24)
         }
         collectionView.alwaysBounceVertical = true
+        collectionView.bounces = true
+    }
+    private func updateRefreshControl() {
+        refreshControl.addTarget(self, action: #selector(refresh), for: .valueChanged)
+        collectionView.addSubview(refreshControl)
     }
 }
+//Extension for logic functions
+extension SettingsViewController {
+    @objc private func refresh() {
+        startActivityIndicator()
+        settingsViewModel.fetchSettingsInformation()
+        refreshControl.endRefreshing()
+    }
+}
+
 //Extension for View Model
 extension SettingsViewController: SettingsViewModelDelegate {
-    
+    func userMayInteract() {
+        stopActivityIndicator()
+    }
+    func reloadCollectionView() {
+        collectionView.reloadData()
+    }
 }
 //Extension for collection view delegate
 extension SettingsViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        
+        switch settingsViewModel.getSectionAt(indexPath: indexPath).name {
+        case "Account":
+            let changeAccountDataViewController = ChangeAccountDataViewController(settingsViewModel.getItemAt(indexPath: indexPath).title)
+            changeAccountDataViewController.completion = { [weak self] in
+                self?.refresh()
+                self?.completion?()
+            }
+            navigationController?.pushViewController(
+                changeAccountDataViewController,
+                animated: true
+            )
+        default:
+            print("Not handled yet")
+        }
     }
 }
 //Extension for collection view data source
@@ -78,7 +114,7 @@ extension SettingsViewController: UICollectionViewDataSource {
             with: CGSize(width: image.size.width * (imageViewHeight / image.size.height), height: imageViewHeight),
             scaleMode: .aspectFit
         )
-        if item.hasToggle { cell.updateToggleSwitch() }
+        if item.hasToggle { cell.updateToggleSwitch() } else { cell.removeToggleSwitch() }
         return cell
     }
     

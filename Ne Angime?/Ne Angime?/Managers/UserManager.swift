@@ -75,7 +75,7 @@ class UserManager {
                 if (200...299).contains(response.statusCode) {
                     do {
                         let userArray = try JSONDecoder().decode([String : [User]].self, from: data)
-                        completion(userArray["users"])
+                        completion(userArray["data"])
                     } catch {
                         print("Error in decoding [User] data: \(error)")
                         completion(nil)

@@ -80,4 +80,9 @@ class SettingsCollectionViewCell: UICollectionViewCell {
         toggleSwitch.onTintColor = UIColor(hex: "#30289F")
         toggleSwitch.isUserInteractionEnabled = true
     }
+    
+    func removeToggleSwitch() {
+        toggleSwitch.removeFromSuperview()
+        toggleSwitch.snp.removeConstraints()
+    }
 }
