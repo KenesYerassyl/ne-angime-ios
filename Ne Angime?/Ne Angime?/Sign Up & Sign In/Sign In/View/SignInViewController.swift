@@ -70,7 +70,7 @@ class SignInViewController: ViewController {
     private func updateWelcomeLabel() {
         view.addSubview(welcomeLabel)
         welcomeLabel.font = UIFont(name: "Avenir Black", size: 24)
-        welcomeLabel.text = "Welcome negroe!"
+        welcomeLabel.text = "Welcome to Ne Angime?"
         welcomeLabel.snp.makeConstraints { make in
             make.centerX.equalTo(view)
             make.height.equalTo(view.bounds.height * 0.05)
