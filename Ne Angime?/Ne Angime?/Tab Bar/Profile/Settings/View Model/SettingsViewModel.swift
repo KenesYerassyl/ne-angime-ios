@@ -49,7 +49,7 @@ class SettingsViewModel {
             SettingsSection(name: "Account", items: [
                 SettingsItem(
                     title: "Bio",
-                    data: nil,
+                    data: UserDefaults.standard.string(forKey: "bio") ?? "...",
                     hasToggle: false,
                     iconImageName: "bio_icon_normal"
                 ),

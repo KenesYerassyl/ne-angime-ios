@@ -11,7 +11,7 @@ protocol UserProfileViewModelDelegate: class {
     func showErrorAlert(title: String, message: String)
     var username: String { get set }
     func userMayInteract()
-    func setUserProfile(fullName: String, avatar: URL?)
+    func setUserProfile(fullName: String, avatar: URL?, username: String, email: String, bio: String)
     func setStatus(_ newStatus: FriendStatus, refreshingList: Bool)
 }
 
@@ -35,7 +35,13 @@ class UserProfileViewModel {
                 self?.user = user
                 DispatchQueue.main.async {
                     guard let status = user.status else { fatalError() }
-                    self?.delegate?.setUserProfile(fullName: "\(user.firstname) \(user.lastname)", avatar: URL(string: user.avatar ?? ""))
+                    self?.delegate?.setUserProfile(
+                        fullName: "\(user.firstname) \(user.lastname)",
+                        avatar: URL(string: user.avatar ?? ""),
+                        username: user.username,
+                        email: "undefined",
+                        bio: user.bio ?? "..."
+                    )
                     self?.delegate?.setStatus(status, refreshingList: false)
                     self?.delegate?.userMayInteract()
                 }

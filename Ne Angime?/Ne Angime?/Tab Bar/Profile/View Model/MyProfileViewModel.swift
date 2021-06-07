@@ -7,16 +7,16 @@
 
 import Foundation
 
-protocol ProfileViewModelDelegate: class {
+protocol MyProfileViewModelDelegate: class {
     func showErrorAlert(title: String, message: String)
     func setImageWith(url: URL?)
     func userMayInteract()
     func updateProfilePage(url: URL?, fullname: String, username: String, email: String, bio: String)
 }
 
-class ProfileViewModel {
+class MyProfileViewModel {
 
-    weak var delegate: ProfileViewModelDelegate?
+    weak var delegate: MyProfileViewModelDelegate?
     
     private func getUserFullName() -> (String, String) {
         guard let firstname = UserDefaults.standard.string(forKey: "firstname"),

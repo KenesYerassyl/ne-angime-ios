@@ -9,7 +9,7 @@ import UIKit
 import NVActivityIndicatorView
 import SDWebImage
 
-class ProfileViewController: ViewController {
+class MyProfileViewController: ViewController {
     
     private let scrollView = UIScrollView()
     private let userInfoView = UIView()
@@ -22,7 +22,7 @@ class ProfileViewController: ViewController {
     private let profileViewModel = ProfileViewModel()
     private var usernameLabel: PaddingLabel!
     private var emailLabel: PaddingLabel!
-    private var bioLabel: PaddingLabel!
+    private var bioTextView = UITextView()
     private var refreshControl = UIRefreshControl()
     
     override func viewDidLoad() {
@@ -37,7 +37,7 @@ class ProfileViewController: ViewController {
         updateSettingsButton()
         updateUsernameLabel()
         updateEmailLabel()
-        updateBioLabel()
+        updateBioTextView()
         updateActivityIndicator(self)
         updateRefreshControl()
         
@@ -54,15 +54,13 @@ class ProfileViewController: ViewController {
         view.addSubview(scrollView)
         scrollView.backgroundColor = .clear
         scrollView.snp.makeConstraints { make in
-            make.bottom.equalTo(view)
             make.top.equalTo(view)
             make.leading.equalTo(view)
             make.trailing.equalTo(view)
-            make.centerX.equalTo(view)
-            make.centerY.equalTo(view)
             make.width.equalTo(view)
             make.height.equalTo(view)
         }
+        scrollView.contentSize.height = view.bounds.height * 2
         scrollView.alwaysBounceVertical = true
         scrollView.bounces = true
         scrollView.isScrollEnabled = true
@@ -73,7 +71,7 @@ class ProfileViewController: ViewController {
         userInfoView.backgroundColor = .white
         userInfoView.snp.makeConstraints { make in
             make.width.equalTo(scrollView)
-            make.height.equalTo(view.bounds.height * 0.6)
+            make.height.equalTo(scrollView.contentSize.height)
             make.top.equalTo(scrollView).offset(view.bounds.height * 0.4)
         }
         userInfoView.layer.cornerRadius = 30
@@ -129,12 +127,12 @@ class ProfileViewController: ViewController {
     }
     
     private func updateSettingsButton() {
-        view.addSubview(settingsButton)
+        scrollView.addSubview(settingsButton)
         settingsButton.snp.makeConstraints { make in
             make.width.equalTo(30)
             make.height.equalTo(30)
             make.top.equalTo(view.safeAreaLayoutGuide.snp.top).offset(spacing / 2)
-            make.leading.equalTo(view).offset(spacing)
+            make.leading.equalTo(scrollView).offset(spacing)
         }
         settingsButton.setImage(UIImage(named: "settings_icon_normal"), for: .normal)
         settingsButton.setImage(UIImage(named: "settings_icon_tapped"), for: .highlighted)
@@ -181,7 +179,7 @@ class ProfileViewController: ViewController {
         }
     }
     
-    private func updateBioLabel() {
+    private func updateBioTextView() {
         let coupleLabel = getCoupleLabel()
         scrollView.addSubview(coupleLabel.0)
         coupleLabel.0.snp.makeConstraints { make in
@@ -191,14 +189,18 @@ class ProfileViewController: ViewController {
             make.height.equalTo(20)
         }
         coupleLabel.0.text = "Bio"
-        bioLabel = coupleLabel.1
-        scrollView.addSubview(bioLabel)
-        bioLabel.snp.makeConstraints { make in
+        scrollView.addSubview(bioTextView)
+        bioTextView.snp.makeConstraints { make in
             make.width.equalTo(UIScreen.main.bounds.width * 0.85)
             make.top.equalTo(coupleLabel.0.snp.bottom).offset(spacing/2)
             make.centerX.equalTo(scrollView)
-            make.height.equalTo(40)
         }
+        bioTextView.textContainerInset = UIEdgeInsets(top: 0, left: 10, bottom: 0, right: 10)
+        bioTextView.font = UIFont(name: "Avenir Heavy", size: 20)
+        bioTextView.layer.cornerRadius = 15
+        bioTextView.backgroundColor = UIColor(hex: "#eeedfc")
+        bioTextView.isEditable = false
+        bioTextView.isScrollEnabled = false
     }
     
     private func getCoupleLabel() -> (PaddingLabel, PaddingLabel) {
@@ -222,7 +224,7 @@ class ProfileViewController: ViewController {
 }
 
 // Extension for logic functions
-extension ProfileViewController {
+extension MyProfileViewController {
     @objc private func refresh() {
         startActivityIndicator()
         profileViewModel.fetchProfileInformation()
@@ -250,13 +252,13 @@ extension ProfileViewController {
 }
 
 // Extension for View Model delegate
-extension ProfileViewController: ProfileViewModelDelegate {
+extension MyProfileViewController: ProfileViewModelDelegate {
     func updateProfilePage(url: URL?, fullname: String, username: String, email: String, bio: String) {
         profileImageView.sd_setImage(with: url, placeholderImage: UIImage(named: "profile_placeholder"))
         userFullNameLabel.text = fullname
         usernameLabel.text = username
         emailLabel.text = email
-        bioLabel.text = bio
+        bioTextView.text = bio
         stopActivityIndicator()
     }
     func userMayInteract() {
@@ -279,7 +281,7 @@ extension ProfileViewController: ProfileViewModelDelegate {
 }
 
 // Extensions for image picker and navigation controller delegates
-extension ProfileViewController: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+extension MyProfileViewController: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
     private func profileImageViewActionSheet() {
         let actionSheet = UIAlertController(
             title: "Profile Picture",

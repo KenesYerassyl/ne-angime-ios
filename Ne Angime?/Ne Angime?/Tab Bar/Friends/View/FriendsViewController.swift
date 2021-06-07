@@ -42,6 +42,12 @@ class FriendsViewController: ViewController {
         friendsViewModel.fetchAllRelatedUsers()
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.navigationBar.prefersLargeTitles = true
+        navigationController?.setNavigationBarHidden(false, animated: false)
+    }
+    
     private func updateSegmentedControl() {
         view.addSubview(segmentedControl)
         segmentedControl.snp.makeConstraints { make in

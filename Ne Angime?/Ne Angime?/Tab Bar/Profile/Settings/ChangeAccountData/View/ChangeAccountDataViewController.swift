@@ -19,7 +19,13 @@ class ChangeAccountDataViewController: ViewController {
     private var emailTextField = UITextField()
     private var editableData: String
     private let doneButton = UIButton()
+    private var keyboardHeight: CGFloat?
     private let changeAccountDataViewModel = ChangeAccountDataViewModel()
+    private lazy var safeAreaOriginY: CGFloat = {
+        let temp = view.safeAreaLayoutGuide.layoutFrame.origin.y
+        return temp
+    }()
+    private let characterLimit = 250
     var completion: (() -> Void)?
     
     init(_ dataToChange: String) {
@@ -51,6 +57,19 @@ class ChangeAccountDataViewController: ViewController {
             fatalError()
         }
         updateDoneButton()
+        
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(keyboardWillShow),
+            name: UIResponder.keyboardWillShowNotification,
+            object: nil
+        )
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(keyboardWillHide),
+            name: UIResponder.keyboardWillHideNotification,
+            object: nil
+        )
     }
     
     private func getTextField(with placeholder: String) -> UITextField {
@@ -68,6 +87,20 @@ class ChangeAccountDataViewController: ViewController {
     
     private func updateBioTextView() {
         view.addSubview(bioTextView)
+        bioTextView.snp.makeConstraints { make in
+            make.centerX.equalTo(view)
+            make.width.equalTo(view.bounds.width * 0.85)
+            make.top.equalTo(view.safeAreaLayoutGuide).offset(spacing)
+        }
+        bioTextView.layer.cornerRadius = 20
+        bioTextView.layer.borderWidth = 3
+        bioTextView.layer.borderColor = UIColor.systemGray5.cgColor
+        bioTextView.textContainerInset = UIEdgeInsets(top: 10, left: view.bounds.width * 0.08, bottom: 10, right: view.bounds.width * 0.08)
+        bioTextView.font = UIFont(name: "Avenir", size: 20)
+        bioTextView.isScrollEnabled = false
+        bioTextView.delegate = self
+        bioTextView.addDoneButtonOnKeyboard()
+        bioTextView.text = UserDefaults.standard.string(forKey: "bio") ?? ""
     }
     private func updatePasswordTextField() {
         passwordTextField1 = getTextField(with: "Enter your current password")
@@ -178,10 +211,10 @@ extension ChangeAccountDataViewController {
             let bodyData = ["new_about" : bioTextView.text ?? ""]
             changeAccountDataViewModel.changeRequest(bodyData: bodyData, path: "user/profile/about")
         case "First Name":
-            let bodyData = ["firstname" : firstnameTextField.text ?? ""]
+            let bodyData = ["firstname" : firstnameTextField.text?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""]
             changeAccountDataViewModel.changeRequest(bodyData: bodyData, path: "user/profile/firstname")
         case "Last Name":
-            let bodyData = ["lastname" : lastnameTextField.text ?? ""]
+            let bodyData = ["lastname" : lastnameTextField.text?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""]
             changeAccountDataViewModel.changeRequest(bodyData: bodyData, path: "user/profile/lastname")
         case "Password":
             let bodyData = [
@@ -192,9 +225,21 @@ extension ChangeAccountDataViewController {
             changeAccountDataViewModel.changeRequest(bodyData: bodyData, path: "user/auth/update/password")
         case "Email":
             print("Not handled yet!")
-//            changeAccountDataViewModel.changeRequestProfile(with: "email", newData: emailTextField.text ?? "", endpoint: "")
+        //            changeAccountDataViewModel.changeRequestProfile(with: "email", newData: emailTextField.text ?? "", endpoint: "")
         default:
             fatalError()
+        }
+    }
+    
+    @objc private func keyboardWillShow(notification: Notification) {
+        if let keyboardSize = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue {
+            keyboardHeight = keyboardSize.height
+        }
+    }
+    
+    @objc private func keyboardWillHide(notification: Notification) {
+        if view.frame.origin.y != 0 {
+            view.frame.origin.y = 0
         }
     }
 }
@@ -230,5 +275,19 @@ extension ChangeAccountDataViewController: ChangeAccountDataViewModelDelegate {
         )
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
         present(alert, animated: true, completion: nil)
+    }
+}
+
+extension ChangeAccountDataViewController: UITextViewDelegate {
+    func textViewDidChange(_ textView: UITextView) {
+        let content = (safeAreaOriginY + CGFloat(spacing) + textView.bounds.height) + view.frame.origin.y
+        if content > view.bounds.height - (keyboardHeight ?? 0) {
+            view.frame.origin.y = view.frame.origin.y - (content - (view.bounds.height - (keyboardHeight ?? 0))) - 20
+        }
+    }
+    
+    func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
+        if !text.isEmpty && text.first!.isNewline { return false }
+        return textView.text.count + text.count <= characterLimit
     }
 }

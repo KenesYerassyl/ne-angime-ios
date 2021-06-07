@@ -12,7 +12,7 @@ class TabBarController: UITabBarController {
     private let conversationsViewController = ConversationsViewController()
     private let friendsViewController = FriendsViewController()
     private let findViewController = FindViewController()
-    private let profileViewController = ProfileViewController()
+    private let profileViewController = MyProfileViewController()
     
     init() {
         super.init(nibName: nil, bundle: nil)

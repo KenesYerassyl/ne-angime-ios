@@ -44,6 +44,11 @@ class FindViewController: ViewController {
         updateStatusLabel(text: "Guess you want to find new friends?")
         updateActivityIndicator(self)
     }
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.navigationBar.prefersLargeTitles = true
+        navigationController?.setNavigationBarHidden(false, animated: false)
+    }
     
     func updateCollectionView() {
         view.addSubview(collectionView)
@@ -81,7 +86,7 @@ class FindViewController: ViewController {
 // Extension for collection view delegate
 extension FindViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        //TODO: navigate to the user's profile
+        navigationController?.pushViewController(UserProfileViewController(username: findViewModel.getUser(at: indexPath.row).username), animated: true)
     }
 }
 // Extension for collection view data source
