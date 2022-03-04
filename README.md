@@ -51,6 +51,8 @@ Link to the repo https://git.io/JZIN3
 
 ### 10. Settings page, where user can change personal info (Privacy mode is currently unavailable).
 
+![Simulator Screen Shot - iPhone 11 Pro - 2022-03-04 at 18 02 19](https://user-images.githubusercontent.com/68700872/156732771-75d962bf-4544-455c-a561-2b90dd12609f.png)
+
 
 
 
