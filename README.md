@@ -11,7 +11,7 @@ Back-end provided by @Eager-coder
 Link to the repo https://git.io/JZIN3
 
 
-![Simulator Screen Shot - iPhone 11 - 2021-06-07 at 16 39 55](https://user-images.githubusercontent.com/68700872/121003145-014d9d00-c7af-11eb-8562-77ff0e43adc1.png)
+![Simulator Screen Shot - iPhone 11 Pro - 2022-03-04 at 17 59 19](https://user-images.githubusercontent.com/68700872/156732322-b4f2f586-39cf-40a0-b413-3ebf6276fca3.png)
 
 ### 1. This is log in page.
 
